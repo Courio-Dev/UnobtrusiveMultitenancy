@@ -12,9 +12,6 @@
     <!--<DisableImplicitFrameworkReferences>false</DisableImplicitFrameworkReferences>-->
     <MvcRazorCompileOnPublish>true</MvcRazorCompileOnPublish>
     <MvcRazorCompileViewsOnPublish>true</MvcRazorCompileViewsOnPublish>
-    <!-- Used to store connection strings and other sensitive settings, so you don't have to check them into your source
-         control provider. Only use this in Development, it is not intended for Production use.
-         See http://docs.asp.net/en/latest/security/app-secrets.html -->
     <UserSecretsId>MvcBoilerplate-fe5dc3df-2725-4ccc-9e53-0fc56fe83882</UserSecretsId>
     <TypeScriptToolsVersion>2.5</TypeScriptToolsVersion>
   </PropertyGroup>
@@ -29,10 +26,6 @@
   <ItemGroup>
     <None Remove="Scripts\site.ts" />
   </ItemGroup>
-  <!--<PropertyGroup>
-  <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-  <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-</PropertyGroup>-->
   <ItemGroup Label="Files">
     <!-- Remove the .gitignore file from the published output. -->
     <Content Update="Configs\MultitenancyOptions.json">
