@@ -1,0 +1,43 @@
+﻿{
+  "MultitenancyOptions": {
+    "Tenants": [
+      {
+        "Name": "Tenant 1",
+        "Hostnames": [
+          "localhost:47887",
+          "localhost:44301",
+          "localhost:60000"
+        ],
+        "Theme": "Cerulean",
+        "ConnectionString": "Server=(localdb)\\mssqllocaldb;Database=saaskit-sample-tenant1;Trusted_Connection=True;MultipleActiveResultSets=true"
+      },
+      {
+        "Name": "Tenant 2",
+        "Hostnames": [
+          "localhost:44302",
+          "localhost:60001"
+        ],
+        "Theme": "Darkly",
+        "ConnectionString": "Server=(localdb)\\mssqllocaldb;Database=saaskit-sample-tenant2;Trusted_Connection=True;MultipleActiveResultSets=true"
+      },
+      {
+        "Name": "Tenant 3",
+        "Hostnames": [
+          "localhost:44304",
+          "localhost:44305"
+        ],
+        "Theme": "Darkly",
+        "ConnectionString": "Server=(localdb)\\mssqllocaldb;Database=saaskit-sample-tenant2;Trusted_Connection=True;MultipleActiveResultSets=true"
+      },
+      {
+        "Name": "Tenant 4",
+        "Hostnames": [
+          "localhost:51261",
+          "localhost:51262"
+        ],
+        "Theme": "Darkly",
+        "ConnectionString": "Server=(localdb)\\mssqllocaldb;Database=saaskit-sample-tenant2;Trusted_Connection=True;MultipleActiveResultSets=true"
+      }
+    ]
+  }
+}

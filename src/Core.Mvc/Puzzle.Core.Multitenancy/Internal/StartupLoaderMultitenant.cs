@@ -1,0 +1,88 @@
+﻿using Microsoft.AspNetCore.Hosting.Internal;
+using System;
+using System.Globalization;
+using System.Linq;
+using System.Reflection;
+
+namespace Puzzle.Core.Multitenancy.Internal
+{
+    /// <inheritdoc />
+    internal class StartupLoaderMultitenant
+    {
+        /// <inheritdoc />
+        internal static StartupMethodsMultitenant<TTenant> LoadMethods<TTenant>(IServiceProvider hostingServiceProvider, Type startupType, string environmentName)
+        {
+            var methods = StartupLoader.LoadMethods(hostingServiceProvider, startupType, environmentName);
+            var servicesMethosPerTenant = FindConfigurePerTenantServicesDelegate<TTenant>(startupType, null, environmentName);
+
+            return new StartupMethodsMultitenant<TTenant>(methods, servicesMethosPerTenant.Build(methods.StartupInstance));
+        }
+
+        private static ConfigureMultitenantServicesBuilder<TTenant> FindConfigurePerTenantServicesDelegate<TTenant>(Type startupType, string tenantName, string environmentName)
+        {
+            var pertenantKey = "PerTenant";
+            string methodName = $@"Configure{pertenantKey}{{0}}Services";
+            var servicesMethod = FindMethod(startupType, methodName, environmentName, typeof(IServiceProvider), required: false)
+                ?? FindMethod(startupType, methodName, environmentName, typeof(void), required: false);
+            return new ConfigureMultitenantServicesBuilder<TTenant>(servicesMethod);
+        }
+
+        /// <summary>
+        /// Take from :https://github.com/aspnet/Hosting/blob/rel/1.1.0/src/Microsoft.AspNetCore.Hosting/Internal/StartupLoader.cs
+        /// </summary>
+        /// <param name="startupType"></param>
+        /// <param name="methodName"></param>
+        /// <param name="environmentName"></param>
+        /// <param name="returnType"></param>
+        /// <param name="required"></param>
+        /// <returns></returns>
+        private static MethodInfo FindMethod(Type startupType, string methodName, string environmentName, Type returnType = null, bool required = true)
+        {
+            // Copy the find method.
+            // See https://github.com/aspnet/Hosting/blob/rel/1.1.0/src/Microsoft.AspNetCore.Hosting/Internal/StartupLoader.cs.
+
+            var methodNameWithEnv = string.Format(CultureInfo.InvariantCulture, methodName, environmentName);
+            var methodNameWithNoEnv = string.Format(CultureInfo.InvariantCulture, methodName, "");
+
+            var methods = startupType.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static);
+            var selectedMethods = methods.Where(method => method.Name.Equals(methodNameWithEnv, StringComparison.OrdinalIgnoreCase)).ToList();
+            if (selectedMethods.Count > 1)
+            {
+                throw new InvalidOperationException(string.Format("Having multiple overloads of method '{0}' is not supported.", methodNameWithEnv));
+            }
+            if (selectedMethods.Count == 0)
+            {
+                selectedMethods = methods.Where(method => method.Name.Equals(methodNameWithNoEnv, StringComparison.OrdinalIgnoreCase)).ToList();
+                if (selectedMethods.Count > 1)
+                {
+                    throw new InvalidOperationException(string.Format("Having multiple overloads of method '{0}' is not supported.", methodNameWithNoEnv));
+                }
+            }
+
+            var methodInfo = selectedMethods.FirstOrDefault();
+            if (methodInfo == null)
+            {
+                if (required)
+                {
+                    throw new InvalidOperationException(string.Format("A public method named '{0}' or '{1}' could not be found in the '{2}' type.",
+                        methodNameWithEnv,
+                        methodNameWithNoEnv,
+                        startupType.FullName));
+                }
+                return null;
+            }
+            if (returnType != null && methodInfo.ReturnType != returnType)
+            {
+                if (required)
+                {
+                    throw new InvalidOperationException(string.Format("The '{0}' method in the type '{1}' must have a return type of '{2}'.",
+                        methodInfo.Name,
+                        startupType.FullName,
+                        returnType.Name));
+                }
+                return null;
+            }
+            return methodInfo;
+        }
+    }
+}

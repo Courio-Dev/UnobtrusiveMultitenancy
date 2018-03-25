@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2024
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{938F61AB-A715-4870-A3F8-BAA4573465DD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Host", "Host", "{09455435-891C-4583-BD89-247FCF26C3E1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PuzzleCMS.WebHost", "src\Host\PuzzleCMS.WebHost\PuzzleCMS.WebHost.csproj", "{1F6A83DC-65CA-435B-93DF-69E5295668B1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core.Mvc", "Core.Mvc", "{4C1D4A63-1206-4948-BC79-FEE4BB87C27F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solutions Items", "Solutions Items", "{81CBA0A8-63C5-47E1-A9D8-741F81C6ED78}"
+	ProjectSection(SolutionItems) = preProject
+		testsandcoverage.bat = testsandcoverage.bat
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Puzzle.Core.Multitenancy", "src\Core.Mvc\Puzzle.Core.Multitenancy\Puzzle.Core.Multitenancy.csproj", "{93C0E47A-8F09-476E-B279-8522CD3A0109}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{C46235CA-CF95-4644-BC9C-3F5339321DA3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PuzzleCMS.UnitsTests", "test\PuzzleCMS.UnitsTests\PuzzleCMS.UnitsTests.csproj", "{B6D75A37-A852-45DB-B6B4-5BCB8A0FBB57}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1F6A83DC-65CA-435B-93DF-69E5295668B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F6A83DC-65CA-435B-93DF-69E5295668B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F6A83DC-65CA-435B-93DF-69E5295668B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F6A83DC-65CA-435B-93DF-69E5295668B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93C0E47A-8F09-476E-B279-8522CD3A0109}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93C0E47A-8F09-476E-B279-8522CD3A0109}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93C0E47A-8F09-476E-B279-8522CD3A0109}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93C0E47A-8F09-476E-B279-8522CD3A0109}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6D75A37-A852-45DB-B6B4-5BCB8A0FBB57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6D75A37-A852-45DB-B6B4-5BCB8A0FBB57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6D75A37-A852-45DB-B6B4-5BCB8A0FBB57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6D75A37-A852-45DB-B6B4-5BCB8A0FBB57}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{09455435-891C-4583-BD89-247FCF26C3E1} = {938F61AB-A715-4870-A3F8-BAA4573465DD}
+		{1F6A83DC-65CA-435B-93DF-69E5295668B1} = {09455435-891C-4583-BD89-247FCF26C3E1}
+		{4C1D4A63-1206-4948-BC79-FEE4BB87C27F} = {938F61AB-A715-4870-A3F8-BAA4573465DD}
+		{93C0E47A-8F09-476E-B279-8522CD3A0109} = {4C1D4A63-1206-4948-BC79-FEE4BB87C27F}
+		{B6D75A37-A852-45DB-B6B4-5BCB8A0FBB57} = {C46235CA-CF95-4644-BC9C-3F5339321DA3}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {68CFAEA8-5607-4971-BA55-057074F8412E}
+	EndGlobalSection
+EndGlobal
