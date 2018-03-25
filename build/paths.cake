@@ -81,9 +81,6 @@ public class BuildPaths
         FilePathCollection unitTestProjects = context.GetFiles("./test/**/*.csproj");
         FilePathCollection integrationTestProjects = context.GetFiles("./test/*IntegrationTests/**/*.csproj");
 
-        context.Information("Testing OpenCover xount " + unitTestProjects.Count);
-        context.Information("Testing OpenCover xount " + integrationTestProjects.Count);
-
         var configuration =  parameters.Configuration;
         var buildDirectories = GetBuildDirectories(context);
         var testProjects =(new[]{unitTestProjects,integrationTestProjects}).SelectMany(p => p).ToList();

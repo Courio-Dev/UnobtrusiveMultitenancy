@@ -26,6 +26,9 @@
     <Description>PROJECT-DESCRIPTION</Description>
     <Copyright>Copyright © PROJECT-AUTHOR. All rights Reserved</Copyright>
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Scripts\site.ts" />
+  </ItemGroup>
   <!--<PropertyGroup>
   <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
@@ -63,6 +66,9 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core.Mvc\Puzzle.Core.Multitenancy\Puzzle.Core.Multitenancy.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="Scripts\site.ts" />
   </ItemGroup>
   <!-- Execute the following commands before publishing the project. -->
   <Target Label="Scripts" Name="PrepublishScript" BeforeTargets="PrepareForPublish" Condition=" '$(IsCrossTargetingBuild)' != 'true' ">
