@@ -1,9 +1,10 @@
 # Build script
+version: '{build}'
 image: Previous Visual Studio 2017
 os: Previous Visual Studio 2017
-init:
-  - git config --global core.autocrlf true
-
+branches:
+  only:
+  - master
 clone_depth: 1
 environment:
   global:
@@ -11,9 +12,7 @@ environment:
     DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
     # Disable sending usage data to Microsoft
     DOTNET_CLI_TELEMETRY_OPTOUT: true
-  
-version: '{build}'
- 
+    
 pull_requests:
   # Do not increment build number for pull requests
   do_not_increment_build_number: true
@@ -22,8 +21,46 @@ nuget:
   # Do not publish NuGet packages for pull requests
   disable_publish_on_pr: true
 
+init:
+  # Good practise, because Windows line endings are different from Unix/Linux ones
+  - cmd: git config --global core.autocrlf true
+
+install:
+  # Install repo specific stuff here
+  # .NET Core SDK binaries
+  # Download .NET Core 2.1 Preview 1 SDK and add to PATH
+  #- ps: $urlCurrent = "https://download.microsoft.com/download/0/6/5/0656B047-5F2F-4281-A851-F30776F8616D/dotnet-dev-win-x64.2.0.0-preview1-005977.zip"
+  #- ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetsdk"
+  #- ps: mkdir $env:DOTNET_INSTALL_DIR -Force | Out-Null
+  #- ps: $tempFileCurrent = [System.IO.Path]::GetTempFileName()
+  #- ps: (New-Object System.Net.WebClient).DownloadFile($urlCurrent, $tempFileCurrent)
+  #- ps: Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory($tempFileCurrent, $env:DOTNET_INSTALL_DIR)
+  #- ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
+
+  # .NET Core SDK binaries
+  - ps: $urlCurrent = "https://download.microsoft.com/download/5/D/F/5DF4B836-7DFD-4CCF-AC96-101E2A4C7421/dotnet-sdk-2.1.2-win-x64.zip"
+  - ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetsdk"
+  - ps: mkdir $env:DOTNET_INSTALL_DIR -Force | Out-Null
+  - ps: $tempFileCurrent = [System.IO.Path]::Combine([System.IO.Path]::GetTempPath(), [System.IO.Path]::GetRandomFileName())
+  - ps: (New-Object System.Net.WebClient).DownloadFile($urlCurrent, $tempFileCurrent)
+  - ps: Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory($tempFileCurrent, $env:DOTNET_INSTALL_DIR)
+  - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
+
+before_build:
+  # Display .NET Core version
+  - cmd: dotnet --version
 build_script:
-- ps: .\build.ps1
- 
+  - ps: .\build.ps1
+
+after_build:
+  # For once the build has completed
+
+on_finish :
+  # any cleanup in here
+
 test: 'off'
 deploy: 'off'
+
+cache:
+- tools -> build.cake
+- packages -> build.cake
