@@ -35,6 +35,8 @@ env:
 
 before_install:
   - git fetch --depth=1
+  # You must run this command to give Travis permissions to execute the build.sh shell script:
+  - git update-index --chmod=+x build.sh
 
 script:
   - ./build.sh --verbosity=diagnostic
