@@ -50,7 +50,7 @@ before_build:
   # Display .NET Core version
   - cmd: dotnet --version
 build_script:
-  - ps: .\build.ps1
+  - ps: .\build.ps1 --verbosity diagnostic
 
 after_build:
   # For once the build has completed
