@@ -10,7 +10,8 @@ Just add a line in the Program.cs and add a configuration file.
 
 And voila your application is multitenant.
 
-Inspired by [saaskit](https://github.com/saaskit/saaskit) and [here](https://stackoverflow.com/questions/38940241/autofac-multitenant-in-an-aspnet-core-application-does-not-seem-to-resolve-tenan).
+Inspired by [saaskit](https://github.com/saaskit/saaskit) and [here](https://stackoverflow.com/questions/38940241/autofac-multitenant-in-an-aspnet-core-application-does-not-seem-to-resolve-tenant).
+
 
 ## Continuous integration
 
@@ -19,9 +20,13 @@ Inspired by [saaskit](https://github.com/saaskit/saaskit) and [here](https://sta
 | AppVeyor                    | Windows      | [![Build status](https://ci.appveyor.com/api/projects/status/u4fjn6pf3d17fokg?svg=true)](https://ci.appveyor.com/project/Courio-Dev/unobtrusivemultitenancy)                 | 
 | Travis                      | Linux / OS X | ![Travis build status]("")                                           |
 
-
 ## Code Coverage
 
+## Features
+
+## Installation
+
+Package nuget coming soon.
 
 ## Getting started
 
