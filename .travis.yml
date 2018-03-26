@@ -25,7 +25,7 @@ mono:
 # Ensure Mono is installed
 #mono: latest
 
-dotnet: 2.1.4
+dotnet: sdk-2.1.300-preview1-008174
 
 env:
     # Set the DOTNET_SKIP_FIRST_TIME_EXPERIENCE environment variable to stop wasting time caching packages
