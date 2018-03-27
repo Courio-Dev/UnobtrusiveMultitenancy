@@ -150,7 +150,7 @@
                 <a asp-route="@HomeControllerRoute.GetIndex"
                    class="navbar-brand" role="banner">
                     <span class="fa fa-star"></span>
-                    @AppSettings.Value.SiteTitle ?? (Tenant?.Name ?? ""))
+                    @(Tenant?.Name ?? (AppSettings.Value.SiteTitle ??""))
                 </a>
                 <a asp-controller="Home" asp-action="Index" class="navbar-brand">@(Tenant?.Name ?? "")</a>
             </div>
@@ -178,7 +178,7 @@
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
                         </button>
-                        <a asp-controller="Home" asp-action="Index" class="navbar-brand">Identity Sample</a>
+                        <a asp-controller="Home" asp-action="Index" class="navbar-brand">@(Tenant?.Name ?? (AppSettings.Value.SiteTitle ??"")) - Sample</a>
                     </div>
                     <div class="navbar-collapse collapse">
                         <ul class="nav navbar-nav">
