@@ -19,11 +19,10 @@ addons:
 # OS X 10.12
 osx_image: xcode9.2
 
+# Ensure Mono is installed
 mono:
   - latest
 
-# Ensure Mono is installed
-#mono: latest
 dotnet: 2.1.300-preview1-008174
 
 env:
@@ -36,15 +35,7 @@ before_install:
   - git fetch --depth=1
   # You must run this command to give Travis permissions to execute the build.sh shell script:
   - chmod +x build.sh
-  #- curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
-  #- sudo mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg
-  #- sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-trusty-prod
-  #  trusty main" > /etc/apt/sources.list.d/dotnetdev.list'
-  #- sudo apt-get update
-  #- sudo apt-get install dotnet-sdk-2.1.300-preview1-008174
-  # sudo apt-get install sshpass
   
-
 script:
   - ./build.sh --verbosity=diagnostic
 

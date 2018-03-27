@@ -26,17 +26,6 @@ init:
   - cmd: git config --global core.autocrlf true
 
 install:
-  # Install repo specific stuff here
-  # .NET Core SDK binaries
-  # Download .NET Core 2.1 Preview 1 SDK and add to PATH
-  #- ps: $urlCurrent = "https://download.microsoft.com/download/0/6/5/0656B047-5F2F-4281-A851-F30776F8616D/dotnet-dev-win-x64.2.0.0-preview1-005977.zip"
-  #- ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetsdk"
-  #- ps: mkdir $env:DOTNET_INSTALL_DIR -Force | Out-Null
-  #- ps: $tempFileCurrent = [System.IO.Path]::GetTempFileName()
-  #- ps: (New-Object System.Net.WebClient).DownloadFile($urlCurrent, $tempFileCurrent)
-  #- ps: Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory($tempFileCurrent, $env:DOTNET_INSTALL_DIR)
-  #- ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
-
   # .NET Core SDK binaries
   - ps: $urlCurrent = "https://download.microsoft.com/download/D/7/8/D788D3CD-44C4-487D-829B-413E914FB1C3/dotnet-sdk-2.1.300-preview1-008174-win-x64.zip"
   - ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetsdk"
@@ -49,8 +38,10 @@ install:
 before_build:
   # Display .NET Core version
   - cmd: dotnet --version
+  - choco install codecov
 build_script:
   - ps: .\build.ps1 --verbosity=diagnostic
+  - codecov -f .\artifacts\Coverage\coverage.xml -t $(CODECOV_TOKEN)
 
 after_build:
   # For once the build has completed
