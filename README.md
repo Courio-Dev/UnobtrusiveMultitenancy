@@ -18,7 +18,7 @@ Inspired by [saaskit](https://github.com/saaskit/saaskit) and [here](https://sta
 | Build server                | Platform     | Build status                                                                                                                                                        |
 |-----------------------------|--------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | AppVeyor                    | Windows      | [![Build status](https://ci.appveyor.com/api/projects/status/u4fjn6pf3d17fokg?svg=true)](https://ci.appveyor.com/project/Courio-Dev/unobtrusivemultitenancy)                 | 
-| Travis                      | Linux / OS X | ![Travis build status]("")                                           |
+| Travis                      | Linux / OS X | [![Build Status](https://travis-ci.org/Courio-Dev/UnobtrusiveMultitenancy.svg?branch=master)](https://travis-ci.org/Courio-Dev/UnobtrusiveMultitenancy)                                           |
 
 ## Code Coverage
 
