@@ -21,7 +21,6 @@ osx_image: xcode9.2
 
 mono:
   - latest
-# - 4.4.2
 
 # Ensure Mono is installed
 #mono: latest
