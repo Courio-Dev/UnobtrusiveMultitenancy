@@ -22,6 +22,10 @@ Inspired by [saaskit](https://github.com/saaskit/saaskit) and [here](https://sta
 
 ## Code Coverage
 
+<sup>Codecov</sup>[![codecov](https://codecov.io/gh/Courio-Dev/UnobtrusiveMultitenancy/branch/master/graph/badge.svg)](https://codecov.io/gh/Courio-Dev/UnobtrusiveMultitenancy)
+
+
+
 ## Features
 
 ## Installation
