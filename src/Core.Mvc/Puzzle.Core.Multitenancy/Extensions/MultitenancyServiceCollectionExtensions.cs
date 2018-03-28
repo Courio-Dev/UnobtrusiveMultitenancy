@@ -20,7 +20,6 @@ namespace Puzzle.Core.Multitenancy.Extensions
         /// <typeparam name="TResolver"></typeparam>
         /// <param name="services"></param>
         /// <returns></returns>
-
         public static IServiceCollection AddMultitenancy<TTenant, TResolver>(this IServiceCollection services)
             where TResolver : class, ITenantResolver<TTenant>
             where TTenant : class

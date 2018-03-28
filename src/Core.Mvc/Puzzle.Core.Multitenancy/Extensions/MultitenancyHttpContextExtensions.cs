@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Puzzle.Core.Multitenancy.Constants;
 using System;
 
 namespace Puzzle.Core.Multitenancy.Extensions
@@ -8,7 +9,7 @@ namespace Puzzle.Core.Multitenancy.Extensions
     /// </summary>
     internal static class MultitenancyHttpContextExtensions
     {
-        private const string TenantContextKey = "saaskit.TenantContext";
+        private const string TenantContextKey = MultitenancyConstants.MultiTenantContextKey;
 
         internal static void SetTenantContext<TTenant>(this HttpContext context, TenantContext<TTenant> tenantContext)
         {

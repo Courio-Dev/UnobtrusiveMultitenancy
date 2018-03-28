@@ -17,7 +17,7 @@ namespace Puzzle.Core.Multitenancy.Internal
         /// <summary>
         /// Credit for this method goes to http://stackoverflow.com/questions/2920744/url-slugify-alrogithm-in-cs
         /// </summary>
-        private static string GenerateSlug(string value, int? maxLength = null)
+        private static string GenerateSlug(string value)
         {
             // prepare string, remove accents, lower case and convert hyphens to whitespace
             var result = RemoveDiacritics(value).Replace("-", " ").ToLowerInvariant();

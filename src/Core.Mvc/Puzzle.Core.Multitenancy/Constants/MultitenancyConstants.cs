@@ -1,7 +1,10 @@
 ﻿namespace Puzzle.Core.Multitenancy.Constants
 {
-    public static class MultitenancyConstants
+    internal static class MultitenancyConstants
     {
         public const string UseUnobstrusiveMulitenancyStartupKey = nameof(UseUnobstrusiveMulitenancyStartupKey);
+
+        public const string MultiTenantContextKey = nameof(MultiTenantContextKey);
+        
     }
 }

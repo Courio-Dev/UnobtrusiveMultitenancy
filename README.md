@@ -28,7 +28,7 @@ Inspired by [saaskit](https://github.com/saaskit/saaskit) and [Explanation of  m
 
 ## Features
 
-- Per Tenant Middleware Pipeline
+- Per Tenant Middleware
 - Per Tenant DI
 - Per Tenant Services
 - Per Tenant HostingEnvironment (Coming soon)
@@ -41,7 +41,7 @@ Package nuget coming soon.
 
 ## Getting started
 
-#### Initialisation
+#### Initialization
 
 Replace this line  ``` .UseStartup<Startup>() ```  in your ```Program.cs``` like in example below.
 
@@ -170,7 +170,7 @@ and you have this result :
 ![](screenshots/tenant1-withmvc.png)
 ![](screenshots/tenant2-withoutmvc.png)
 
-## Reference
+## References
 
-- [saaskit](https://github.com/saaskit/saaskit) 
+- [Saaskit](https://github.com/saaskit/saaskit) 
 - [Explanation of  multitenancy with autofac in ASP.NET Core](https://stackoverflow.com/questions/38940241/autofac-multitenant-in-an-aspnet-core-application-does-not-seem-to-resolve-tenan/38960122#38960122)
