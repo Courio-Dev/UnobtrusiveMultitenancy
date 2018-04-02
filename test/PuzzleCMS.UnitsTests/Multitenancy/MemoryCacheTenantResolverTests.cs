@@ -56,7 +56,7 @@
         {
             Task res() => Task.Run(() =>
             {
-               var resolver = new TestTenantMemoryCacheResolver(cache,loggerFactory, options, cacheExpirationInSeconds:1);
+                TestTenantMemoryCacheResolver resolver = new TestTenantMemoryCacheResolver(cache,loggerFactory, options, cacheExpirationInSeconds:1);
             });
 
             Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(res).ConfigureAwait(false);

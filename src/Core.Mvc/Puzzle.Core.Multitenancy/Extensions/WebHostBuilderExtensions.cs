@@ -136,8 +136,10 @@
                         services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
                         services.AddSingleton((s) => multitenancyConfig);
-                        services.Configure<MultitenancyOptions>(multitenancyConfig.Config.GetSection(nameof(MultitenancyOptions)));
+                        services.AddSingleton<IConfigureOptions<MultitenancyOptions>, MultitenancyOptionsSetup>();
+                        //services.Configure<MultitenancyOptions>(multitenancyConfig.Config.GetSection(nameof(MultitenancyOptions)));
                         services.AddScoped(cfg => cfg.GetService<IOptionsMonitor<MultitenancyOptions>>().CurrentValue);
+                        services.AddSingleton<IOptionsMonitor<MultitenancyOptions>, MonitorMultitenancyOptions>();
                         services.AddMultitenancy<TTenant, TResolver>();
 
                         // manage IStartup

@@ -43,9 +43,11 @@ Package nuget coming soon.
 
 #### Initialization
 
-Replace this line  ``` .UseStartup<Startup>() ```  in your ```Program.cs``` like in example below.
+
 
 Before you need to add ```MultitenancyOptions.json```  config file either at the Root folder or in the Configs folder or provide your own configuration object which contains ```MultitenancyOptions```
+
+Replace this line  ``` .UseStartup<Startup>() ```  in your ```Program.cs``` like in example below.
 
 ``` json
 {
@@ -73,6 +75,7 @@ Before you need to add ```MultitenancyOptions.json```  config file either at the
   }
 }
 ``` 
+__**N.B:**__  If MultitenancyOptionsnot found ,it will fallback to default ``` .UseStartup<Startup>() ```
 
 You have two options :
 
@@ -169,6 +172,11 @@ public void Configure(IApplicationBuilder application, IApplicationLifetime appL
 and you have this result :
 ![](screenshots/tenant1-withmvc.png)
 ![](screenshots/tenant2-withoutmvc.png)
+
+In example project if you try to UseMvc work for ```Tenant 2``` you will get this error :
+
+![](screenshots/tenant2-withmvc_error.png)
+
 
 ## References
 
