@@ -124,6 +124,7 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
             Assert.Contains("services", ex.Message);
         }
 
+        /*
         [Fact]
         public async Task ThrowExceptionWhenHttpContextIsNull_InTenantPipelineMiddleware()
         {
@@ -164,92 +165,7 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
                            ex.Message);
             }
 
-            /*
-            // Arrange
-            var server = TestServer.Create((app) =>
-            {
-                app.UseMiddleware<MyAuthMiddleware>();
-
-                app.Run(async (httpContext) =>
-                {
-                    if (httpContext.User != null)
-                    {
-                        await httpContext.Response.WriteAsync("Claims: "
-                            + string.Join(
-                                ",",
-                                httpContext.User.Claims.Select(claim => string.Format("{0}:{1}", claim.Type, claim.Value))));
-                    }
-                });
-            });
-
-            // Arrange
-            var middleware = new TenantResolutionMiddleware<TestTenant>(
-                next:
-                );
-            // Act
-
-            Task res() => Task.Run(() => {
-                Puzzle.Core.Multitenancy.Extensions.WebHostBuilderExtensions.
-                UseUnobtrusiveMulitenancyStartup<TestStartup, TestTenant, TestTenantMemoryCacheResolver>(null);
-            });
-
-            // Assert
-            Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(res).ConfigureAwait(false);
-            Assert.Contains("hostBuilder", ex.Message);
-            */
-        }
-        /*
-        [Fact]
-        public async Task ThrowExceptionWhenDelegateIsNull_TenantResolutionMiddleware()
-        {
-            // Arrange
-            var middleware = new TenantResolutionMiddleware<TestTenant>(
-                next:
-                );
-            // Act
-
-            Task res() => Task.Run(() => {
-                Puzzle.Core.Multitenancy.Extensions.WebHostBuilderExtensions.
-                UseUnobtrusiveMulitenancyStartup<TestStartup, TestTenant, TestTenantMemoryCacheResolver>(null);
-            });
-
-            // Assert
-            Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(res).ConfigureAwait(false);
-            Assert.Contains("hostBuilder", ex.Message);
         }
         */
-
-        /*
-        [Fact]
-        public async void ThrowExceptionWhenUserPertenant_HasOneNullParameter()
-        {
-            // Arrange
-            var builder = new WebHostBuilder()
-                .Configure(app =>
-                {
-                    UsePerTenantApplicationBuilderExtensions.UsePerTenant<TestTenant>(app, null);
-                });
-
-
-            // Act
-            // Assert
-            using (TestServer server = new TestServer(builder))
-            using (HttpClient client = server.CreateClient())
-            {
-                // Assert
-                Task res() => Task.Run(async () =>
-                {
-                    System.Net.Http.HttpResponseMessage response = await client.GetAsync("/").ConfigureAwait(false);
-                    response.EnsureSuccessStatusCode();
-                    string result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                });
-
-                Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(res).ConfigureAwait(false);
-                Assert.Contains("app", ex.Message);
-            }
-
-        }
-        */
-
     }
 }
