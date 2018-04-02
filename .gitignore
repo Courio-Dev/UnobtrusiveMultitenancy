@@ -326,3 +326,7 @@ ASALocalRun/
 
 # Ignore GeneratedReports
 [Gg]eneratedReports/
+
+# Visual Studio Bower Packages
+**/wwwroot/app/
+**/wwwroot/lib/
