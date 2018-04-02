@@ -1,28 +1,31 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Puzzle.Core.Multitenancy.Internal.Options;
-using System;
-
-namespace Puzzle.Core.Multitenancy.Internal.Configurations
+﻿namespace Puzzle.Core.Multitenancy.Internal.Configurations
 {
+    using System;
+
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Extensions.Configuration;
+    using Puzzle.Core.Multitenancy.Internal.Options;
+
     internal class MultiTenancyConfig
     {
-        private readonly char DS = System.IO.Path.DirectorySeparatorChar;
         private readonly string environment;
-        public readonly IConfiguration Config;
 
         public MultiTenancyConfig(string environment, IConfiguration multitenancyConfiguration = null)
         {
             this.environment = environment;
-            this.Config = BuildConfiguration(DS, environment, multitenancyConfiguration);
+            Config = BuildConfiguration(Ds, environment, multitenancyConfiguration);
         }
 
         public MultiTenancyConfig(IHostingEnvironment env) => throw new NotImplementedException();
 
+        public IConfiguration Config { get; private set; }
+
         public MultitenancyOptions CurrentMultiTenacyOptionsValue => Config.GetSection(nameof(MultitenancyOptions)).Get<MultitenancyOptions>();
 
-        //public string Version => Config["version"] ?? "x.x.x.x";
-        //public string DataFolder => (Config["DataFolder"] ?? "App_Data/Data").Replace("/", "\\");
+        protected char Ds => System.IO.Path.DirectorySeparatorChar;
+
+        // public string Version => Config["version"] ?? "x.x.x.x";
+        // public string DataFolder => (Config["DataFolder"] ?? "App_Data/Data").Replace("/", "\\");
         private static IConfiguration BuildConfiguration(char ds, string environment, IConfiguration multitenancyConfiguration = null)
         {
             const string configDirectory = "Configs";
@@ -30,8 +33,8 @@ namespace Puzzle.Core.Multitenancy.Internal.Configurations
 
             IConfiguration BuildDefaultConfiguration(string envName)
             {
-                var configurationBuilder = HostingStartupConfigurationExtensions.GetBaseConfigurationBuilder();
-                var config = configurationBuilder
+                IConfigurationBuilder configurationBuilder = HostingStartupConfigurationExtensions.GetBaseConfigurationBuilder();
+                IConfigurationRoot config = configurationBuilder
                     .AddJsonFile($"{nameof(MultitenancyOptions)}.json", optional: true, reloadOnChange: true)
                     .AddJsonFile($"{nameof(MultitenancyOptions)}.{envName}.json", optional: true, reloadOnChange: true)
                     .AddJsonFile($"{configDirectory}{ds}{nameof(MultitenancyOptions)}.json", optional: true, reloadOnChange: true)

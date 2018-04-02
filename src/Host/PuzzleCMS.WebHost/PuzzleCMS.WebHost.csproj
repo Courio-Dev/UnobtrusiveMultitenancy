@@ -27,7 +27,6 @@
     <None Remove="Scripts\site.ts" />
   </ItemGroup>
   <ItemGroup Label="Files">
-    <!-- Remove the .gitignore file from the published output. -->
     <Content Update="Configs\MultitenancyOptions.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -68,4 +67,9 @@
       <UserProperties global_1json__JSONSchema="" />
     </VisualStudio>
   </ProjectExtensions>
+
+  <ItemGroup>
+    <Folder Include="Services\Feed\" />
+  </ItemGroup>
+  
 </Project>

@@ -1,33 +1,33 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Puzzle.Core.Multitenancy.Internal.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Puzzle.Core.Multitenancy.Internal.Resolvers
+﻿namespace Puzzle.Core.Multitenancy.Internal.Resolvers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.Extensions.Caching.Memory;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
+    using Puzzle.Core.Multitenancy.Internal.Options;
+
     internal class CachingAppTenantResolver : MemoryCacheTenantResolver<AppTenant>
     {
-        private readonly IEnumerable<AppTenant> tenants;
+        //private readonly IEnumerable<AppTenant> Tenants;
         private readonly IOptionsMonitor<MultitenancyOptions> optionsMonitor;
 
-        public CachingAppTenantResolver(IMemoryCache cache, ILoggerFactory loggerFactory/*, MultitenancyOptions options*/, IOptionsMonitor<MultitenancyOptions> optionsMonitor)
+        public CachingAppTenantResolver(IMemoryCache cache, ILoggerFactory loggerFactory, IOptionsMonitor<MultitenancyOptions> optionsMonitor)
             : base(cache, loggerFactory)
         {
-            //if(options == null) throw new ArgumentException(nameof(options));
-            //tenants = options.Tenants;
             this.optionsMonitor = optionsMonitor ?? throw new ArgumentNullException($"Argument {nameof(optionsMonitor)} must not be null");
-            this.tenants = this.optionsMonitor.CurrentValue.Tenants;
+            //this.Tenants = this.optionsMonitor.CurrentValue.Tenants;
             this.optionsMonitor.OnChange(vals =>
             {
-                //TODO : find a way to clear a cache.
+                // TODO : find a way to clear a cache.
                 loggerFactory.CreateLogger<CachingAppTenantResolver>().LogDebug($"Config changed: {string.Join(", ", vals)}");
             });
         }
+
+        protected IEnumerable<AppTenant> Tenants => optionsMonitor.CurrentValue.Tenants;
 
         protected override string GetContextIdentifier(HttpContext context)
         {
@@ -43,7 +43,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Resolvers
         {
             TenantContext<AppTenant> tenantContext = null;
 
-            var tenant = tenants.FirstOrDefault(t =>
+            AppTenant tenant = Tenants.FirstOrDefault(t =>
                 t.Hostnames.Any(h => h.Equals(context.Request.Host.Value.ToLower())));
 
             if (tenant != null)

@@ -1,5 +1,8 @@
 ﻿namespace PuzzleCMS.WebHost
 {
+    using System;
+    using System.Net;
+
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
@@ -8,48 +11,35 @@
     using Microsoft.Extensions.Logging;
     using Puzzle.Core.Multitenancy;
     using Puzzle.Core.Multitenancy.Internal;
-    using System;
-    using System.Net;
 
-    /// <inheritdoc />
     public class Startup
     {
-        #region Fields
-
-        protected readonly TenantContext<AppTenant> tenantContext;
-        protected readonly IConfiguration Configuration;
+        private readonly IConfiguration configuration;
         private readonly IHostingEnvironment hostingEnvironment;
         private readonly ILoggerFactory loggerFactory;
-
-        #endregion Fields
 
         public Startup(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
         {
             this.hostingEnvironment = hostingEnvironment ?? throw new ArgumentException(nameof(hostingEnvironment));
-            this.Configuration = configuration ?? throw new ArgumentException(nameof(configuration));
+            this.configuration = configuration ?? throw new ArgumentException(nameof(configuration));
             this.loggerFactory = loggerFactory ?? throw new ArgumentException(nameof(loggerFactory));
         }
 
-        #region Public Methods
-
-        /// <inheritdoc />
         public void ConfigureServices(IServiceCollection services)
         {
         }
 
-        /// <inheritdoc />
         public void ConfigurePerTenantServices(IServiceCollection services, AppTenant tenant)
         {
-            if (tenant.Id == "Tenant-1".ToLowerInvariant())
+            if (tenant.Id.ToUpperInvariant() == "Tenant-1".ToUpperInvariant())
             {
                 services.AddMvc();
             }
-            else if (tenant.Id == "Tenant-2".ToLowerInvariant())
+            else if (tenant.Id.ToUpperInvariant() == "Tenant-2".ToUpperInvariant())
             {
             }
         }
 
-        /// <inheritdoc />
         public void Configure(IApplicationBuilder application, IApplicationLifetime appLifetime)
         {
             if (hostingEnvironment.IsDevelopment())
@@ -61,21 +51,19 @@
 
             application.UsePerTenant<AppTenant>((tenantContext, builder) =>
             {
-                if (tenantContext.Tenant.Id == "Tenant-1".ToLowerInvariant())
+                if (tenantContext.Tenant.Id.ToUpperInvariant() == "Tenant-1".ToUpperInvariant())
                 {
                     builder.UseMvcWithDefaultRoute();
                 }
-                else if (tenantContext.Tenant.Id == "Tenant-2".ToLowerInvariant())
+                else if (tenantContext.Tenant.Id.ToUpperInvariant() == "Tenant-2".ToUpperInvariant())
                 {
                     builder.Run(async ctx =>
                     {
                         ctx.Response.StatusCode = (int)HttpStatusCode.OK;
-                        await ctx.Response.WriteAsync(string.Format("{0} Without MVC", tenantContext.Tenant.Name));
+                        await ctx.Response.WriteAsync(text: string.Format("{0} Without MVC", tenantContext.Tenant.Name)).ConfigureAwait(false);
                     });
                 }
             });
         }
-
-        #endregion Public Methods
     }
 }

@@ -1,11 +1,11 @@
 ﻿namespace PuzzleCMS.WebHost
 {
+    using System.IO;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using Puzzle.Core.Multitenancy.Extensions;
-    using System.IO;
 
     public sealed class Program
     {
@@ -21,7 +21,7 @@
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args)
         {
-            var config = new ConfigurationBuilder()
+            IConfigurationRoot config = new ConfigurationBuilder()
                     .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), BasePathName))
                     .AddJsonFile(HostingJsonFileName, optional: true)
                     .AddEnvironmentVariables()
@@ -32,9 +32,9 @@
               .CreateDefaultBuilder()
               .CaptureStartupErrors(false)
               .SuppressStatusMessages(false)
-              .UseSetting(WebHostDefaults.DetailedErrorsKey, true.ToString().ToLower())
-               .UseConfiguration(config)
-               .ConfigureAppConfiguration((context, configBuilder) =>
+              .UseSetting(WebHostDefaults.DetailedErrorsKey, value: true.ToString().ToLower())
+              .UseConfiguration(config)
+              .ConfigureAppConfiguration((context, configBuilder) =>
                {
                    ConfigureConfigurationBuilder(context, configBuilder, args);
                })
@@ -44,21 +44,22 @@
               })
               .UseIISIntegration()
               .UseAzureAppServices()
-              //.PreferHostingUrls(false)
+
+              // .PreferHostingUrls(false)
               .UseUnobtrusiveMulitenancyStartupWithDefaultConvention<Startup>()
               ;
         }
 
         private static void ConfigureConfigurationBuilder(WebHostBuilderContext ctx, IConfigurationBuilder config, string[] args)
         {
-            var env = ctx.HostingEnvironment;
+            IHostingEnvironment env = ctx.HostingEnvironment;
 
             config
                 .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "Configs"))
                 .AddEnvironmentVariables()
                 .AddCommandLine(args)
-                .AddJsonFile(HostingJsonFileName, optional: false, reloadOnChange: true) // require the json file!	// Add configuration from the config.json file.
-                .AddJsonFile("config.json", optional: false, reloadOnChange: true)      // require the json file!
+                .AddJsonFile(HostingJsonFileName, optional: false, reloadOnChange: true)
+                .AddJsonFile("config.json", optional: false, reloadOnChange: true)
                 .AddXmlFile("settings.xml", optional: true, reloadOnChange: true)
                 .AddJsonFile($"config.{env.EnvironmentName}.json", optional: true)
 
@@ -68,11 +69,9 @@
                 // and other sensitive settings, so you don't have to check them into your source control provider.
                 // Only use this in Development, it is not intended for Production use. See
                 // http://docs.asp.net/en/latest/security/app-secrets.html
-
                 .AddUserSecrets<Startup>()
                 .AddApplicationInsightsSettings(developerMode: env.IsProduction())
                 .Build();
-            ;
         }
 
         private static void ConfigureLogger(WebHostBuilderContext ctx, ILoggingBuilder logging)
@@ -87,7 +86,7 @@
             int? sslPort = null;
             if (ctx.HostingEnvironment.IsDevelopment())
             {
-                var launchConfiguration = new ConfigurationBuilder()
+                IConfigurationRoot launchConfiguration = new ConfigurationBuilder()
                     .SetBasePath(ctx.HostingEnvironment.ContentRootPath)
                     .AddJsonFile(@"Properties\launchSettings.json")
                     .Build();

@@ -1,13 +1,15 @@
 ﻿namespace Puzzle.Core.Multitenancy.Internal.StartupFilters
 {
+    using System;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Puzzle.Core.Multitenancy.Extensions;
     using Puzzle.Core.Multitenancy.Internal.Middlewares;
-    using System;
 
     /// <summary>
-    ///
+    /// MultitenantRequestStartupFilter
+    /// <typeparamref name="TStartup" />
+    /// <typeparamref name="TTenant"/>
     /// </summary>
     internal sealed class MultitenantRequestStartupFilter<TStartup, TTenant> : IStartupFilter
          where TStartup : class
@@ -30,10 +32,11 @@
             return builder =>
             {
                 builder.UseMultitenancy<TTenant>();
-                //builder.UseMiddleware<TenantUnresolvedRedirectMiddleware<AppTenant>>("", false);
+
+                // builder.UseMiddleware<TenantUnresolvedRedirectMiddleware<AppTenant>>("", false);
                 builder.UseMiddleware<MultitenancyRequestServicesContainerMiddleware<TTenant>>();
 
-                //builder.UsePerTenant<TStartup, TTenant>((ctx, innerBuilder) => { });
+                // builder.UsePerTenant<TStartup, TTenant>((ctx, innerBuilder) => { });
                 next(builder);
             };
         }

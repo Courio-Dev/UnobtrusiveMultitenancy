@@ -1,17 +1,17 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection;
-using Puzzle.Core.Multitenancy.Internal;
-using Puzzle.Core.Multitenancy.Internal.Configurations;
-using PuzzleCMS.UnitsTests.Base;
-using System;
-using System.Threading.Tasks;
-using Xunit;
-
-namespace PuzzleCMS.UnitsTests.Multitenancy
+﻿namespace PuzzleCMS.UnitsTests.Multitenancy
 {
+    using System;
+    using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.TestHost;
+    using Microsoft.Extensions.DependencyInjection;
+    using Puzzle.Core.Multitenancy.Internal;
+    using Puzzle.Core.Multitenancy.Internal.Configurations;
+    using PuzzleCMS.UnitsTests.Base;
+    using Xunit;
+
     public class ConfigureMultitenantServicesBuilderTests : MultitenancyBaseTest
     {
         public ConfigureMultitenantServicesBuilderTests(MultitenancyBaseFixture testBaseFixture)
@@ -23,21 +23,22 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
         public async Task WhenConfigurePerTenantServicesHasMoreThanTwoArguments_ThrowException()
         {
             // Arrange
-            var builder = CreateWebHostBuilder<TestStartup, TestTenant, TestTenantMemoryCacheResolver>();
+            WebHostBuilder builder = CreateWebHostBuilder<TestStartup, TestTenant, TestTenantMemoryCacheResolver>();
 
             // Act
-            using (var server = new TestServer(builder))
-            using (var client = server.CreateClient())
+            using (TestServer server = new TestServer(builder))
+            using (System.Net.Http.HttpClient client = server.CreateClient())
             {
                 Task res() => Task.Run(async () =>
                 {
-                    var response = await client.GetAsync("/tenant-1-1");
+                    System.Net.Http.HttpResponseMessage response = await client.GetAsync("/tenant-1-1").ConfigureAwait(false);
                     response.EnsureSuccessStatusCode();
-                    var result = await response.Content.ReadAsStringAsync();
+                    string result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 });
 
-                Exception ex = await Assert.ThrowsAsync<InvalidOperationException>(res);
-                Assert.Equal("The ConfigurePerTenantServices method must take only two parameter one of type IServiceCollection and one of type TTenant.",
+                Exception ex = await Assert.ThrowsAsync<InvalidOperationException>(res).ConfigureAwait(false);
+                Assert.Equal(
+                    "The ConfigurePerTenantServices method must take only two parameter one of type IServiceCollection and one of type TTenant.",
                            ex.Message);
             }
         }
@@ -46,21 +47,22 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
         public async Task WhenConfigurePerTenantServicesHasNonValidArguments_ThrowException()
         {
             // Arrange
-            var builder = CreateWebHostBuilder<TestStartup2, TestTenant, TestTenantMemoryCacheResolver>();
+            WebHostBuilder builder = CreateWebHostBuilder<TestStartup2, TestTenant, TestTenantMemoryCacheResolver>();
 
             // Act
-            using (var server = new TestServer(builder))
-            using (var client = server.CreateClient())
+            using (TestServer server = new TestServer(builder))
+            using (System.Net.Http.HttpClient client = server.CreateClient())
             {
                 Task res() => Task.Run(async () =>
                 {
-                    var response = await client.GetAsync("/tenant-1-1");
+                    System.Net.Http.HttpResponseMessage response = await client.GetAsync("/tenant-1-1").ConfigureAwait(false);
                     response.EnsureSuccessStatusCode();
-                    var result = await response.Content.ReadAsStringAsync();
+                    string result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 });
 
-                Exception ex = await Assert.ThrowsAsync<InvalidOperationException>(res);
-                Assert.Equal("The ConfigurePerTenantServices method must take only two parameter one of type IServiceCollection and one of type TTenant.",
+                Exception ex = await Assert.ThrowsAsync<InvalidOperationException>(res).ConfigureAwait(false);
+                Assert.Equal(
+                    "The ConfigurePerTenantServices method must take only two parameter one of type IServiceCollection and one of type TTenant.",
                            ex.Message);
             }
         }
@@ -69,16 +71,15 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
         public async Task WhenConfigurePerTenantServicesHasAllValidArguments_ThenOk()
         {
             // Arrange
-            var builder = CreateWebHostBuilder<TestStartupValidArguments, TestTenant, TestTenantMemoryCacheResolver>();
+            WebHostBuilder builder = CreateWebHostBuilder<TestStartupValidArguments, TestTenant, TestTenantMemoryCacheResolver>();
 
             // Act
-
-            using (var server = new TestServer(builder))
-            using (var client = server.CreateClient())
+            using (TestServer server = new TestServer(builder))
+            using (System.Net.Http.HttpClient client = server.CreateClient())
             {
-                var response = await client.GetAsync("/tenant-1-1");
+                System.Net.Http.HttpResponseMessage response = await client.GetAsync("/tenant-1-1").ConfigureAwait(false);
                 response.EnsureSuccessStatusCode();
-                var result = await response.Content.ReadAsStringAsync();
+                string result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
                 // Assert
                 Assert.Equal("Default", result);
@@ -89,41 +90,41 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
         [Fact]
         public void ConventionalStartupClass_WhenHasMulitpleOverrideConfigurePerTenantServicesWithEnv_ThrowsIfStartupBuildsTheContainerAsync()
         {
-            //Arrange
-            var serviceCollection = new ServiceCollection();
+            // Arrange
+            ServiceCollection serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton<IServiceProviderFactory<IServiceCollection>, DefaultServiceProviderFactory>();
-            var services = serviceCollection.BuildServiceProvider();
+            ServiceProvider services = serviceCollection.BuildServiceProvider();
 
-            //Act
-            var exception = Assert.Throws<InvalidOperationException>(() =>
+            // Act
+            InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() =>
             {
-                //startup.ConfigureServicesDelegate(serviceCollection)
-                var startup = StartupLoaderMultitenant.
+                // startup.ConfigureServicesDelegate(serviceCollection)
+                StartupMethodsMultitenant<TestTenant> startup = StartupLoaderMultitenant.
                 LoadMethods<TestTenant>(services, typeof(TestStartupMulitpleOverrideConfigurePerTenantServicesWithEnv), "IntegrationTest");
             });
 
-            //Assert
-            var expectedMessage = $"Having multiple overloads of method 'ConfigurePerTenantIntegrationTestServices' is not supported.";
+            // Assert
+            string expectedMessage = $"Having multiple overloads of method 'ConfigurePerTenantIntegrationTestServices' is not supported.";
             Assert.Equal(expectedMessage, exception.Message);
         }
 
         [Fact]
         public void ConventionalStartupClass_WhenHasMulitpleOverrideConfigurePerTenantServicesWitouthEnv_ThrowsIfStartupBuildsTheContainerAsync()
         {
-            //Arrange
-            var serviceCollection = new ServiceCollection();
+            // Arrange
+            ServiceCollection serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton<IServiceProviderFactory<IServiceCollection>, DefaultServiceProviderFactory>();
-            var services = serviceCollection.BuildServiceProvider();
+            ServiceProvider services = serviceCollection.BuildServiceProvider();
 
-            //Act
-            var exception = Assert.Throws<InvalidOperationException>(() =>
+            // Act
+            InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() =>
             {
-                var startup = StartupLoaderMultitenant.
-                LoadMethods<TestTenant>(services, typeof(TestStartupMulitpleOverrideConfigurePerTenantServicesWithoutEnv), "");
+                StartupMethodsMultitenant<TestTenant> startup = StartupLoaderMultitenant.
+                LoadMethods<TestTenant>(services, typeof(TestStartupMulitpleOverrideConfigurePerTenantServicesWithoutEnv), string.Empty);
             });
 
-            //Assert
-            var expectedMessage = $"Having multiple overloads of method 'ConfigurePerTenantServices' is not supported.";
+            // Assert
+            string expectedMessage = $"Having multiple overloads of method 'ConfigurePerTenantServices' is not supported.";
             Assert.Equal(expectedMessage, exception.Message);
         }
 
@@ -131,15 +132,15 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
         public async Task ConventionalStartupClass_ConfigureServicesHasInvalidOperationException_ThenThrowsInvalidOperationException()
         {
             // Arrange
-            var builder = CreateWebHostBuilder<TestStartupConfigureServicesInvalidOperationException, TestTenant, TestTenantMemoryCacheResolver>();
+            WebHostBuilder builder = CreateWebHostBuilder<TestStartupConfigureServicesInvalidOperationException, TestTenant, TestTenantMemoryCacheResolver>();
 
             // Act
             Task res() => Task.Run(() =>
             {
-                var server = new TestServer(builder);
+                TestServer server = new TestServer(builder);
             });
 
-            Exception ex = await Assert.ThrowsAsync<InvalidOperationException>(res);
+            Exception ex = await Assert.ThrowsAsync<InvalidOperationException>(res).ConfigureAwait(false);
             Assert.Equal("TestStartupInvalidOperationException", ex.Message);
         }
 
@@ -147,15 +148,15 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
         public async Task ConventionalStartupClass_ConfigureServicesHasException_ThenThrowsException()
         {
             // Arrange
-            var builder = CreateWebHostBuilder<TestStartupConfigureServicesException, TestTenant, TestTenantMemoryCacheResolver>();
+            WebHostBuilder builder = CreateWebHostBuilder<TestStartupConfigureServicesException, TestTenant, TestTenantMemoryCacheResolver>();
 
             // Act
             Task res() => Task.Run(() =>
             {
-                var server = new TestServer(builder);
+                TestServer server = new TestServer(builder);
             });
 
-            Exception ex = await Assert.ThrowsAsync<Exception>(res);
+            Exception ex = await Assert.ThrowsAsync<Exception>(res).ConfigureAwait(false);
             Assert.Equal("TestStartupInvalidOperationException", ex.Message);
         }
 
@@ -163,15 +164,15 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
         public async Task ConventionalStartupClass_ConfigureHasInvalidOperationException_ThenThrowsInvalidOperationException()
         {
             // Arrange
-            var builder = CreateWebHostBuilder<TestStartupConfigureInvalidOperationException, TestTenant, TestTenantMemoryCacheResolver>();
+            WebHostBuilder builder = CreateWebHostBuilder<TestStartupConfigureInvalidOperationException, TestTenant, TestTenantMemoryCacheResolver>();
 
             // Act
             Task res() => Task.Run(() =>
             {
-                var server = new TestServer(builder);
+                TestServer server = new TestServer(builder);
             });
 
-            Exception ex = await Assert.ThrowsAsync<InvalidOperationException>(res);
+            Exception ex = await Assert.ThrowsAsync<InvalidOperationException>(res).ConfigureAwait(false);
             Assert.Equal("TestStartupInvalidOperationException", ex.Message);
         }
 
@@ -179,15 +180,15 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
         public async Task ConventionalStartupClass_ConfigureHasException_ThenThrowsException()
         {
             // Arrange
-            var builder = CreateWebHostBuilder<TestStartupConfigureException, TestTenant, TestTenantMemoryCacheResolver>();
+            WebHostBuilder builder = CreateWebHostBuilder<TestStartupConfigureException, TestTenant, TestTenantMemoryCacheResolver>();
 
             // Act
             Task res() => Task.Run(() =>
             {
-                var server = new TestServer(builder);
+                TestServer server = new TestServer(builder);
             });
 
-            Exception ex = await Assert.ThrowsAsync<Exception>(res);
+            Exception ex = await Assert.ThrowsAsync<Exception>(res).ConfigureAwait(false);
             Assert.Equal("TestStartupInvalidOperationException", ex.Message);
         }
 
@@ -197,7 +198,6 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
             {
             }
 
-            /// <inheritdoc />
             public void ConfigurePerTenantServices(IServiceCollection services, TestTenant tenant, MultiTenancyConfig config)
             {
             }
@@ -206,7 +206,7 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
             {
                 application.Run(async (context) =>
                 {
-                    await context.Response.WriteAsync(("Default"));
+                    await context.Response.WriteAsync("Default").ConfigureAwait(false);
                 });
             }
         }
@@ -217,7 +217,6 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
             {
             }
 
-            /// <inheritdoc />
             public void ConfigurePerTenantServices(IServiceCollection services, MultiTenancyConfig config)
             {
             }
@@ -226,7 +225,7 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
             {
                 application.Run(async (context) =>
                 {
-                    await context.Response.WriteAsync(("Default"));
+                    await context.Response.WriteAsync("Default").ConfigureAwait(false);
                 });
             }
         }
@@ -237,7 +236,6 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
             {
             }
 
-            /// <inheritdoc />
             public void ConfigurePerTenantServices(IServiceCollection services, TestTenant tenant)
             {
             }
@@ -246,7 +244,7 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
             {
                 application.Run(async (context) =>
                 {
-                    await context.Response.WriteAsync(("Default"));
+                    await context.Response.WriteAsync("Default").ConfigureAwait(false);
                 });
             }
         }
@@ -257,7 +255,6 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
             {
             }
 
-            /// <inheritdoc />
             public void ConfigurePerTenantIntegrationTestServices(IServiceCollection services, TestTenant tenant)
             {
             }
@@ -270,7 +267,7 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
             {
                 application.Run(async (context) =>
                 {
-                    await context.Response.WriteAsync(("Default"));
+                    await context.Response.WriteAsync("Default").ConfigureAwait(false);
                 });
             }
         }
@@ -281,7 +278,6 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
             {
             }
 
-            /// <inheritdoc />
             public void ConfigurePerTenantServices(IServiceCollection services, TestTenant tenant)
             {
             }
@@ -294,7 +290,7 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
             {
                 application.Run(async (context) =>
                 {
-                    await context.Response.WriteAsync(("Default"));
+                    await context.Response.WriteAsync("Default").ConfigureAwait(false);
                 });
             }
         }
@@ -310,7 +306,7 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
             {
                 application.Run(async (context) =>
                 {
-                    await context.Response.WriteAsync(("Default"));
+                    await context.Response.WriteAsync("Default").ConfigureAwait(false);
                 });
             }
         }
@@ -338,7 +334,7 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
             {
                 application.Run(async (context) =>
                 {
-                    await context.Response.WriteAsync(("Default"));
+                    await context.Response.WriteAsync("Default").ConfigureAwait(false);
                 });
             }
         }

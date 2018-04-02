@@ -1,22 +1,22 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Puzzle.Core.Multitenancy.Internal.Options;
-using System;
-using System.Diagnostics;
-using System.Reflection;
-using System.Runtime.ExceptionServices;
-
-namespace Puzzle.Core.Multitenancy.Internal
+﻿namespace Puzzle.Core.Multitenancy.Internal
 {
+    using System;
+    using System.Diagnostics;
+    using System.Reflection;
+    using System.Runtime.ExceptionServices;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Options;
+    using Puzzle.Core.Multitenancy.Internal.Options;
+
     internal class ConventionMultitenantBasedStartup<TTenant> : IStartup
     {
         private readonly StartupMethodsMultitenant<TTenant> methods;
 
         public ConventionMultitenantBasedStartup(StartupMethodsMultitenant<TTenant> methods)
         {
-            Debug.Assert(methods != null);
+            Debug.Assert(methods != null, nameof(methods));
 
             this.methods = methods;
         }
@@ -42,9 +42,9 @@ namespace Puzzle.Core.Multitenancy.Internal
         {
             try
             {
-                using (ServiceProvider provider = (methods.ConfigureServicesDelegate(services) as ServiceProvider))
+                using (ServiceProvider provider = methods.ConfigureServicesDelegate(services) as ServiceProvider)
                 {
-                    var optionsMonitor = provider.GetRequiredService<IOptionsMonitor<MultitenancyOptions>>();
+                    IOptionsMonitor<MultitenancyOptions> optionsMonitor = provider.GetRequiredService<IOptionsMonitor<MultitenancyOptions>>();
                     services.AddSingleton<IServiceFactoryForMultitenancy<TTenant>>(_ =>
                     {
                         return new ServiceFactoryForMultitenancy<TTenant>(services.Clone(), methods.ConfigurePerTenantServicesDelegate, optionsMonitor);

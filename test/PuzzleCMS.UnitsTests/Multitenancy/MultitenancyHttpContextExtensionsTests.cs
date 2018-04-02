@@ -1,18 +1,18 @@
-﻿using Microsoft.AspNetCore.Http;
-using Puzzle.Core.Multitenancy;
-using Puzzle.Core.Multitenancy.Extensions;
-using System;
-using Xunit;
-
-namespace PuzzleCMS.UnitsTests.Multitenancy
+﻿namespace PuzzleCMS.UnitsTests.Multitenancy
 {
+    using System;
+    using Microsoft.AspNetCore.Http;
+    using Puzzle.Core.Multitenancy;
+    using Puzzle.Core.Multitenancy.Extensions;
+    using Xunit;
+
     public class MultitenancyHttpContextExtensionsTests
     {
         [Fact]
         public void CannotSetTenantContext_WhenHttpContextIsNull()
         {
             HttpContext httpContext = null;
-            var tenantContext = new TenantContext<AppTenantTest>(new AppTenantTest());
+            TenantContext<AppTenantTest> tenantContext = new TenantContext<AppTenantTest>(new AppTenantTest());
 
             Exception ex = Assert.Throws<ArgumentNullException>(() => httpContext.SetTenantContext(tenantContext));
             Assert.Contains($"Argument context must not be null", ex.Message);
@@ -78,7 +78,7 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
         {
             HttpContext httpContext = new DefaultHttpContext();
 
-            var tenantContext = new TenantContext<AppTenantTest>(new AppTenantTest());
+            TenantContext<AppTenantTest> tenantContext = new TenantContext<AppTenantTest>(new AppTenantTest());
             httpContext.SetTenantContext(tenantContext);
 
             Assert.Same(tenantContext, httpContext.GetTenantContext<AppTenantTest>());
@@ -89,7 +89,7 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
         {
             HttpContext httpContext = new DefaultHttpContext();
 
-            var tenant = new AppTenantTest { Name = "Name" };
+            AppTenantTest tenant = new AppTenantTest { Name = "Name" };
             httpContext.SetTenantContext(new TenantContext<AppTenantTest>(tenant));
 
             Assert.Same(tenant, httpContext.GetTenant<AppTenantTest>());

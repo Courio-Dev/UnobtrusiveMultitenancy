@@ -1,16 +1,16 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Puzzle.Core.Multitenancy.Extensions;
-using Puzzle.Core.Multitenancy.Internal.Options;
-using System;
-using System.Collections.Concurrent;
-using System.Threading.Tasks;
-
-namespace Puzzle.Core.Multitenancy.Internal.Middlewares
+﻿namespace Puzzle.Core.Multitenancy.Internal.Middlewares
 {
+    using System;
+    using System.Collections.Concurrent;
+    using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
+    using Puzzle.Core.Multitenancy.Extensions;
+    using Puzzle.Core.Multitenancy.Internal.Options;
+
     internal class TenantPipelineMiddleware<TTenant>
     {
         private readonly ILogger<TenantPipelineMiddleware<TTenant>> logger;
@@ -35,8 +35,8 @@ namespace Puzzle.Core.Multitenancy.Internal.Middlewares
             IApplicationBuilder> configuration, IOptionsMonitor<MultitenancyOptions> optionsMonitor,
             IServiceFactoryForMultitenancy<TTenant> serviceFactoryForMultitenancy)
         {
-            this.next = next ?? throw new ArgumentNullException($"Argument {nameof(next)} must not be null"); ;
-            this.rootApp = rootApp ?? throw new ArgumentNullException($"Argument {nameof(rootApp)} must not be null"); ;
+            this.next = next ?? throw new ArgumentNullException($"Argument {nameof(next)} must not be null");
+            this.rootApp = rootApp ?? throw new ArgumentNullException($"Argument {nameof(rootApp)} must not be null");
             this.logger = rootApp.ApplicationServices.GetRequiredService<ILoggerFactory>().CreateLogger<TenantPipelineMiddleware<TTenant>>();
             this.serviceFactoryForMultitenancy = serviceFactoryForMultitenancy ?? throw new ArgumentNullException(nameof(serviceFactoryForMultitenancy));
 
@@ -45,39 +45,44 @@ namespace Puzzle.Core.Multitenancy.Internal.Middlewares
             this.optionsMonitor.OnChange(vals =>
             {
                 pipelinesBranchBuilder.Clear();
-                //log change.
+
+                // log change.
                 logger.LogDebug($"Config changed: {string.Join(", ", vals)}");
             });
         }
 
         public async Task Invoke(HttpContext httpContext)
         {
-            if (httpContext == null) throw new ArgumentNullException($"Argument {nameof(httpContext)} must not be null");
-            var tenantContext = httpContext.GetTenantContext<TTenant>();
+            if (httpContext == null)
+            {
+                throw new ArgumentNullException($"Argument {nameof(httpContext)} must not be null");
+            }
+
+            TenantContext<TTenant> tenantContext = httpContext.GetTenantContext<TTenant>();
             if (tenantContext != null)
             {
-                var tenantPipeline = pipelines.GetOrAdd(
+                Lazy<RequestDelegate> tenantPipeline = pipelines.GetOrAdd(
                     tenantContext.Tenant,
-                    new Lazy<RequestDelegate>(() => BuildTenantPipeline(httpContext, tenantContext))
-                );
-                await tenantPipeline.Value(httpContext);
+                    new Lazy<RequestDelegate>(() => BuildTenantPipeline(httpContext, tenantContext)));
+                await tenantPipeline.Value(httpContext).ConfigureAwait(false);
             }
+
             // await next(context);
         }
 
         private RequestDelegate BuildTenantPipeline(HttpContext httpContext, TenantContext<TTenant> tenantContext)
         {
-            var branchBuilder = rootApp.New();
-            var builderContext = new TenantPipelineBuilderContext<TTenant>(tenantContext);
+            IApplicationBuilder branchBuilder = rootApp.New();
+            TenantPipelineBuilderContext<TTenant> builderContext = new TenantPipelineBuilderContext<TTenant>(tenantContext);
 
             IServiceProvider provider = serviceFactoryForMultitenancy.Build(tenantContext);
             branchBuilder.Use(async (context, next) =>
             {
-                var factory = provider.GetRequiredService<IServiceScopeFactory>();
-                using (var scope = factory.CreateScope())
+                IServiceScopeFactory factory = provider.GetRequiredService<IServiceScopeFactory>();
+                using (IServiceScope scope = factory.CreateScope())
                 {
                     context.RequestServices = scope.ServiceProvider;
-                    await next();
+                    await next().ConfigureAwait(false);
                 }
             });
 
@@ -87,7 +92,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Middlewares
             // register root pipeline at the end of the tenant branch
             branchBuilder.Run(next);
 
-            var branchDelegate = branchBuilder.Build();
+            RequestDelegate branchDelegate = branchBuilder.Build();
             return branchDelegate;
         }
     }

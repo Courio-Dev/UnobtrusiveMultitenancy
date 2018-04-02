@@ -35,18 +35,6 @@
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
   </ItemGroup>
 
-  <!--
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(TestSdkVersion)" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(AspNetCoreVersion)" />
-    <PackageReference Include="Moq" Version="4.7.99" />
-    <PackageReference Include="xunit" Version="$(XunitVersion)" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="$(XunitRunnerVisualStudioVersion)" />
-    <PackageReference Include="xunit.analyzers" Version="$(XunitAnalyzers)" />
-    <DotNetCliToolReference Include="dotnet-xunit" Version="$(XunitVersion)" />
-  </ItemGroup>
-  -->
-
   <ItemGroup>
     <ProjectReference Include="..\..\src\Core.Mvc\Puzzle.Core.Multitenancy\Puzzle.Core.Multitenancy.csproj" />
   </ItemGroup>

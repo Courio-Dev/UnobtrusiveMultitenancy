@@ -1,18 +1,18 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Linq;
-using System.Reflection;
-
-namespace Puzzle.Core.Multitenancy.Internal
+﻿namespace Puzzle.Core.Multitenancy.Internal
 {
+    using System;
+    using System.Linq;
+    using System.Reflection;
+    using Microsoft.Extensions.DependencyInjection;
+
     internal class ConfigureMultitenantServicesBuilder<TTenant>
     {
-        public MethodInfo MethodInfo { get; }
-
         public ConfigureMultitenantServicesBuilder(MethodInfo configure)
         {
             MethodInfo = configure;
         }
+
+        public MethodInfo MethodInfo { get; }
 
         public Action<IServiceCollection, TTenant> Build(object instance) => (services, tenant) => Invoke(instance, services, tenant);
 
@@ -30,15 +30,14 @@ namespace Puzzle.Core.Multitenancy.Internal
             }
 
             // Only support IServiceCollection parameters
-            var parameters = MethodInfo.GetParameters();
+            ParameterInfo[] parameters = MethodInfo.GetParameters();
             if (parameters.Length > 2
-                 || parameters.Any(p => (p.ParameterType != typeof(IServiceCollection)) && (p.ParameterType != typeof(TTenant)))
-               )
+                 || parameters.Any(p => (p.ParameterType != typeof(IServiceCollection)) && (p.ParameterType != typeof(TTenant))))
             {
                 throw new InvalidOperationException("The ConfigurePerTenantServices method must take only two parameter one of type IServiceCollection and one of type TTenant.");
             }
 
-            var arguments = new object[MethodInfo.GetParameters().Length];
+            object[] arguments = new object[MethodInfo.GetParameters().Length];
 
             if (parameters.Length > 0)
             {

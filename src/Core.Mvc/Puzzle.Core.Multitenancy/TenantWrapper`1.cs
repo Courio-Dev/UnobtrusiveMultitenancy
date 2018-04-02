@@ -7,6 +7,7 @@
     public class TenantWrapper<TTenant> : ITenant<TTenant>
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="TenantWrapper{TTenant}"/> class.
         /// Intializes the wrapper with the tenant instance to return.
         /// </summary>
         /// <param name="tenant">The tenant instance to return.</param>
@@ -16,8 +17,11 @@
         }
 
         /// <summary>
-        /// The tenant instance.
+        /// Gets the tenant instance.
         /// </summary>
-		public TTenant Value { get; }
+        /// <value>
+        /// The tenant instance.
+        /// </value>
+        public TTenant Value { get; }
     }
 }

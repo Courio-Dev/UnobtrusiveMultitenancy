@@ -1,26 +1,31 @@
-﻿using System;
-using System.Globalization;
-using System.Text;
-using System.Text.RegularExpressions;
-
-namespace Puzzle.Core.Multitenancy.Internal
+﻿namespace Puzzle.Core.Multitenancy.Internal
 {
+    using System;
+    using System.Globalization;
+    using System.Text;
+    using System.Text.RegularExpressions;
+
     public class AppTenant
     {
         public string Name { get; set; }
 
-        public string Id => GenerateSlug(Name);
+        public string Id => GenerateSlug(Name).ToLowerInvariant();
+
         public string[] Hostnames { get; set; }
+
         public string Theme { get; set; }
+
         public string ConnectionString { get; set; }
 
         /// <summary>
         /// Credit for this method goes to http://stackoverflow.com/questions/2920744/url-slugify-alrogithm-in-cs
         /// </summary>
+        /// <param name="value">value</param>
+        /// <returns>string</returns>
         private static string GenerateSlug(string value)
         {
             // prepare string, remove accents, lower case and convert hyphens to whitespace
-            var result = RemoveDiacritics(value).Replace("-", " ").ToLowerInvariant();
+            string result = RemoveDiacritics(value).Replace("-", " ").ToLowerInvariant();
 
             result = Regex.Replace(result, @"[^a-z0-9\s-]", string.Empty); // remove invalid characters
             result = Regex.Replace(result, @"\s+", " ").Trim(); // convert multiple spaces into one space
@@ -30,14 +35,17 @@ namespace Puzzle.Core.Multitenancy.Internal
 
         private static string RemoveDiacritics(string text)
         {
-            if (text == null) throw new ArgumentNullException(nameof(text));
-
-            var normalizedString = text.Normalize(NormalizationForm.FormD);
-            var stringBuilder = new StringBuilder();
-
-            foreach (var c in normalizedString)
+            if (text == null)
             {
-                var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+                throw new ArgumentNullException(nameof(text));
+            }
+
+            string normalizedString = text.Normalize(NormalizationForm.FormD);
+            StringBuilder stringBuilder = new StringBuilder();
+
+            foreach (char c in normalizedString)
+            {
+                UnicodeCategory unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
                 if (unicodeCategory != UnicodeCategory.NonSpacingMark)
                 {
                     stringBuilder.Append(c);

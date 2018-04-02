@@ -1,22 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Puzzle.Core.Multitenancy
+﻿namespace Puzzle.Core.Multitenancy
 {
+    using System;
+    using System.Collections.Generic;
+
     public class TenantContext<TTenant> : IDisposable
     {
         private bool disposed;
 
         public TenantContext(TTenant tenant)
         {
-            if (tenant == null) throw new ArgumentNullException($"Argument {nameof(tenant)} must not be null");
-            this.Tenant = tenant;
-            this.Properties = new Dictionary<string, object>();
+            if (tenant == null)
+            {
+                throw new ArgumentNullException($"Argument {nameof(tenant)} must not be null");
+            }
+
+            Tenant = tenant;
+            Properties = new Dictionary<string, object>();
         }
 
         public string Id { get; } = Guid.NewGuid().ToString();
 
         public TTenant Tenant { get; private set; }
+
         public IDictionary<string, object> Properties { get; }
 
         public void Dispose()
@@ -34,7 +39,7 @@ namespace Puzzle.Core.Multitenancy
 
             if (disposing)
             {
-                foreach (var prop in Properties)
+                foreach (KeyValuePair<string, object> prop in Properties)
                 {
                     TryDisposeProperty(prop.Value as IDisposable);
                 }
@@ -56,7 +61,9 @@ namespace Puzzle.Core.Multitenancy
             {
                 obj.Dispose();
             }
-            catch (ObjectDisposedException) { }
+            catch (ObjectDisposedException)
+            {
+            }
         }
     }
 }

@@ -1,60 +1,49 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace PuzzleCMS.UnitsTests.Base
+﻿namespace PuzzleCMS.UnitsTests.Base
 {
+    using System;
+    using System.Net.Http;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.TestHost;
+    using Microsoft.Extensions.DependencyInjection;
+
     public class MultitenancyAbstractIntegrationBaseTestServerFixtureBase : MultitenancyBaseFixture
     {
-        private string[] urls = new string[] {
-            "http://localhost:47887",
-            "http://localhost:44301",
-            "http://localhost:60000",
-            "http://localhost:44302",
-            "http://localhost:60001"
-        };
+        protected const string Appsettings = "appsettings";
 
-        public string UrlTenant1 { get; } = "/tenant-1-1";
-        public string UrlTenant2 { get; } = "/tenant-2-1";
+        //internal string UrlTenant1 { get; } = "/tenant-1-1";
 
-        public TestServer Server { get; }
-        public HttpClient ClientTransient { get; }
-        public HttpClient ClientSingleton { get; }
-        public HttpClient ClientScoped { get; }
-
-        public HttpClient ClientOverrideTransient { get; }
-        public HttpClient ClientOverrideSingleton { get; }
-
-        private const string appsettingsForTest = "appsettings";
+        //internal string UrlTenant2 { get; } = "/tenant-2-1";
 
         public MultitenancyAbstractIntegrationBaseTestServerFixtureBase()
             : base()
         {
-            // Arrange
-            this.Server = new TestServer(CreateWebHostBuilder<TestTransientStartup, TestTenant, TestTenantMemoryCacheResolver>());
-            this.ClientTransient = Server.CreateClient();
-
-            this.ClientSingleton = new TestServer(CreateWebHostBuilder<TestSingletonStartup, TestTenant, TestTenantMemoryCacheResolver>()).CreateClient();
-            this.ClientScoped = new TestServer(CreateWebHostBuilder<TestScopedStartup, TestTenant, TestTenantMemoryCacheResolver>()).CreateClient();
-
-            /**/
-            this.ClientOverrideTransient = new TestServer(CreateWebHostBuilder<TestOverrideTransientPerTenantStartup, TestTenant, TestTenantMemoryCacheResolver>()).CreateClient();
-            this.ClientOverrideSingleton = new TestServer(CreateWebHostBuilder<TestOverrideSingletonPerTenantStartup, TestTenant, TestTenantMemoryCacheResolver>()).CreateClient();
         }
+
+        protected internal TestServer Server { get; } = new TestServer(CreateWebHostBuilder<TestTransientStartup, TestTenant, TestTenantMemoryCacheResolver>());
+
+        protected internal HttpClient ClientTransient { get; } = new TestServer(CreateWebHostBuilder<TestTransientStartup, TestTenant, TestTenantMemoryCacheResolver>()).CreateClient();
+
+        protected internal HttpClient ClientSingleton { get; } = new TestServer(CreateWebHostBuilder<TestSingletonStartup, TestTenant, TestTenantMemoryCacheResolver>()).CreateClient();
+
+        protected internal HttpClient ClientScoped { get; } = new TestServer(CreateWebHostBuilder<TestScopedStartup, TestTenant, TestTenantMemoryCacheResolver>()).CreateClient();
+
+        protected internal HttpClient ClientOverrideSingleton { get; } = new TestServer(CreateWebHostBuilder<TestOverrideSingletonPerTenantStartup, TestTenant, TestTenantMemoryCacheResolver>()).CreateClient();
+
+        protected internal HttpClient ClientOverrideTransient { get; } = new TestServer(CreateWebHostBuilder<TestOverrideTransientPerTenantStartup, TestTenant, TestTenantMemoryCacheResolver>()).CreateClient();
 
         public void Dispose()
         {
-            this.Server?.Dispose();
-            //
-            this.ClientTransient?.Dispose();
-            this.ClientSingleton?.Dispose();
-            this.ClientScoped?.Dispose();
+            Server?.Dispose();
+            ClientTransient?.Dispose();
+            ClientSingleton?.Dispose();
+            ClientScoped?.Dispose();
+
+            ClientOverrideTransient?.Dispose();
+            ClientOverrideSingleton?.Dispose();
         }
 
         /// <summary>
@@ -62,10 +51,7 @@ namespace PuzzleCMS.UnitsTests.Base
         /// </summary>
         private class ValueTransientService
         {
-            public ValueTransientService(string value)
-            {
-                Value = value;
-            }
+            public ValueTransientService(string value) => Value = value;
 
             public string Value { get; }
         }
@@ -75,10 +61,7 @@ namespace PuzzleCMS.UnitsTests.Base
         /// </summary>
         private class ValueSingletonService
         {
-            public ValueSingletonService(string value)
-            {
-                Value = value;
-            }
+            public ValueSingletonService(string value) => Value = value;
 
             public string Value { get; }
         }
@@ -88,10 +71,7 @@ namespace PuzzleCMS.UnitsTests.Base
         /// </summary>
         private class ValueScopedService
         {
-            public ValueScopedService(string value)
-            {
-                Value = value;
-            }
+            public ValueScopedService(string value) => Value = value;
 
             public string Value { get; }
         }
@@ -102,13 +82,11 @@ namespace PuzzleCMS.UnitsTests.Base
             {
             }
 
-            /// <inheritdoc />
             public void ConfigureServices(IServiceCollection services)
             {
                 services.AddTransient(typeof(ValueTransientService), (s) => new ValueTransientService(nameof(ValueTransientService) + Guid.NewGuid()));
             }
 
-            /// <inheritdoc />
             public void Configure(IApplicationBuilder application)
             {
                 application.UsePerTenant<TestTenant>((context, builder) =>
@@ -118,8 +96,8 @@ namespace PuzzleCMS.UnitsTests.Base
 
                 application.Run(async ctx =>
                 {
-                    var service = ctx.RequestServices.GetRequiredService<ValueTransientService>();
-                    await ctx.Response.WriteAsync(service?.Value ?? "<null>");
+                    ValueTransientService service = ctx.RequestServices.GetRequiredService<ValueTransientService>();
+                    await ctx.Response.WriteAsync(service?.Value ?? "<null>").ConfigureAwait(false);
                 });
             }
         }
@@ -130,13 +108,11 @@ namespace PuzzleCMS.UnitsTests.Base
             {
             }
 
-            /// <inheritdoc />
             public void ConfigureServices(IServiceCollection services)
             {
                 services.AddTransient(typeof(ValueTransientService), (s) => new ValueTransientService(nameof(ValueTransientService) + Guid.NewGuid()));
             }
 
-            /// <inheritdoc />
             public void ConfigurePerTenantServices(IServiceCollection services, TestTenant tenant)
             {
                 if (tenant.Name == "Tenant 1")
@@ -149,7 +125,6 @@ namespace PuzzleCMS.UnitsTests.Base
                 }
             }
 
-            /// <inheritdoc />
             public void Configure(IApplicationBuilder application)
             {
                 application.UsePerTenant<TestTenant>((context, builder) =>
@@ -159,8 +134,8 @@ namespace PuzzleCMS.UnitsTests.Base
 
                 application.Run(async ctx =>
                 {
-                    var service = ctx.RequestServices.GetRequiredService<ValueTransientService>();
-                    await ctx.Response.WriteAsync(service?.Value ?? "<null>");
+                    ValueTransientService service = ctx.RequestServices.GetRequiredService<ValueTransientService>();
+                    await ctx.Response.WriteAsync(service?.Value ?? "<null>").ConfigureAwait(false);
                 });
             }
         }
@@ -171,13 +146,11 @@ namespace PuzzleCMS.UnitsTests.Base
             {
             }
 
-            /// <inheritdoc />
             public void ConfigureServices(IServiceCollection services)
             {
                 services.AddSingleton(typeof(ValueTransientService), (s) => new ValueTransientService(nameof(ValueTransientService) + Guid.NewGuid()));
             }
 
-            /// <inheritdoc />
             public void ConfigurePerTenantServices(IServiceCollection services, TestTenant tenant)
             {
                 if (tenant.Name == "Tenant 1")
@@ -190,7 +163,6 @@ namespace PuzzleCMS.UnitsTests.Base
                 }
             }
 
-            /// <inheritdoc />
             public void Configure(IApplicationBuilder application)
             {
                 application.UsePerTenant<TestTenant>((context, builder) =>
@@ -200,8 +172,8 @@ namespace PuzzleCMS.UnitsTests.Base
 
                 application.Run(async ctx =>
                 {
-                    var service = ctx.RequestServices.GetRequiredService<ValueTransientService>();
-                    await ctx.Response.WriteAsync(service?.Value ?? "<null>");
+                    ValueTransientService service = ctx.RequestServices.GetRequiredService<ValueTransientService>();
+                    await ctx.Response.WriteAsync(service?.Value ?? "<null>").ConfigureAwait(false);
                 });
             }
         }
@@ -212,15 +184,13 @@ namespace PuzzleCMS.UnitsTests.Base
             {
             }
 
-            /// <inheritdoc />
             public void ConfigureServices(IServiceCollection services)
             {
-                var key = nameof(ValueSingletonService) + Guid.NewGuid();
-                var instance = new ValueSingletonService(key);
+                string key = nameof(ValueSingletonService) + Guid.NewGuid();
+                ValueSingletonService instance = new ValueSingletonService(key);
                 services.AddSingleton(typeof(ValueSingletonService), (s) => instance);
             }
 
-            /// <inheritdoc />
             public void Configure(IApplicationBuilder application)
             {
                 application.UsePerTenant<TestTenant>((context, builder) =>
@@ -230,9 +200,9 @@ namespace PuzzleCMS.UnitsTests.Base
 
                 application.Run(async ctx =>
                 {
-                    //ctx.Response.StatusCode = (int)HttpStatusCode.OK;
-                    var service = ctx.RequestServices.GetRequiredService<ValueSingletonService>();
-                    await ctx.Response.WriteAsync(service?.Value ?? "<null>");
+                    // ctx.Response.StatusCode = (int)HttpStatusCode.OK;
+                    ValueSingletonService service = ctx.RequestServices.GetRequiredService<ValueSingletonService>();
+                    await ctx.Response.WriteAsync(service?.Value ?? "<null>").ConfigureAwait(false);
                 });
             }
         }
@@ -243,18 +213,15 @@ namespace PuzzleCMS.UnitsTests.Base
             {
             }
 
-            /// <inheritdoc />
             public void ConfigureServices(IServiceCollection services)
             {
                 services.AddScoped(typeof(ValueScopedService), (s) => new ValueScopedService(nameof(ValueScopedService) + Guid.NewGuid()));
             }
 
-            /// <inheritdoc />
             public void ConfigurePerTenantServices(IServiceCollection services, TestTenant tenant)
             {
             }
 
-            /// <inheritdoc />
             public void Configure(IApplicationBuilder application)
             {
                 application.UsePerTenant<TestTenant>((context, builder) =>
@@ -264,8 +231,8 @@ namespace PuzzleCMS.UnitsTests.Base
 
                 application.Run(async ctx =>
                 {
-                    var service = ctx.RequestServices.GetRequiredService<ValueScopedService>();
-                    await ctx.Response.WriteAsync(service?.Value ?? "<null>");
+                    ValueScopedService service = ctx.RequestServices.GetRequiredService<ValueScopedService>();
+                    await ctx.Response.WriteAsync(service?.Value ?? "<null>").ConfigureAwait(false);
                 });
             }
         }
@@ -273,48 +240,41 @@ namespace PuzzleCMS.UnitsTests.Base
 
     internal class TestStartup
     {
-        #region Constructors
-
-        /// <inheritdoc />
         public TestStartup()
         {
         }
-
-        #endregion Constructors
-
-        #region Public Methods
 
         public void ConfigureTestServices(IServiceCollection services)
         {
         }
 
-        /// <inheritdoc />
         public void ConfigureServices(IServiceCollection services)
         {
         }
 
-        /// <inheritdoc />
         public void Configure(IApplicationBuilder application)
         {
             application.Run(async ctx =>
             {
-                await ctx.Response.WriteAsync(": Test");
+                await ctx.Response.WriteAsync(": Test").ConfigureAwait(false);
             });
         }
-
-        #endregion Public Methods
     }
 
     internal class TestTenant : IDisposable
     {
         public string Name { get; set; }
+
         public string[] Hostnames { get; set; }
+
         public string Theme { get; set; }
+
         public string ConnectionString { get; set; }
 
         public bool Disposed { get; set; }
 
-        public CancellationTokenSource Cts = new CancellationTokenSource();
+        protected CancellationTokenSource cts = new CancellationTokenSource();
+
 
         public void Dispose()
         {
@@ -331,7 +291,7 @@ namespace PuzzleCMS.UnitsTests.Base
 
             if (disposing)
             {
-                Cts.Cancel();
+                cts.Cancel();
             }
 
             Disposed = true;
@@ -351,8 +311,8 @@ namespace PuzzleCMS.UnitsTests.Base
 
         public async Task Invoke(HttpContext context)
         {
-            await context.Response.WriteAsync($"{name}::");
-            await next(context);
+            await context.Response.WriteAsync($"{name}::").ConfigureAwait(false);
+            await next(context).ConfigureAwait(false);
         }
     }
 }

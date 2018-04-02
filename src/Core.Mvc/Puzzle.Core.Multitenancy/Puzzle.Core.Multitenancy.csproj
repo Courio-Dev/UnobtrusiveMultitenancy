@@ -15,4 +15,26 @@
     <PackageReference Include="ReportGenerator" Version="3.1.2" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <CodeAnalysisRuleSet>$(SolutionDir)\CodeAnalysis.ruleset</CodeAnalysisRuleSet>
+    <Features>IOperation</Features>
+    <NoWarn></NoWarn>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <!--<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <TreatSpecificWarningsAsErrors />-->
+  </PropertyGroup>
+  
+  <!--
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+      <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+      <WarningsAsErrors />
+      <NoWarn>1701;1702;1705</NoWarn>
+      <DocumentationFile>bin\Debug\netcoreapp2.0\WebApplication.xml</DocumentationFile>
+    </PropertyGroup>
+  -->
+  
+  <ItemGroup>
+    <AdditionalFiles Include="$(SolutionDir)\Stylecop.json" Link="Stylecop.json" />
+    <AdditionalFiles Include="$(SolutionDir)\GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
+  </ItemGroup>
 </Project>

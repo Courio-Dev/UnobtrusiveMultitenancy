@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace Puzzle.Core.Multitenancy
+﻿namespace Puzzle.Core.Multitenancy
 {
+    using System;
+
     public class TenantPipelineBuilderContext<TTenant>
     {
         private readonly TenantContext<TTenant> tenantContext;

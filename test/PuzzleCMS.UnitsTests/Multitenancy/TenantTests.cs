@@ -1,15 +1,15 @@
-﻿using Puzzle.Core.Multitenancy.Internal;
-using System;
-using Xunit;
-
-namespace PuzzleCMS.UnitsTests.Multitenancy
+﻿namespace PuzzleCMS.UnitsTests.Multitenancy
 {
-    public class TeanantTests
+    using System;
+    using Puzzle.Core.Multitenancy.Internal;
+    using Xunit;
+
+    public class TenantTests
     {
         [Fact]
         public void WhenNullNameSsGiven_AndUseTenant_ThenThrowArgumentNullException()
         {
-            var tenant = new AppTenant()
+            AppTenant tenant = new AppTenant()
             {
                 Name = null
             };
@@ -29,7 +29,7 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
         [InlineData("Tenant. test", "tenant-test")]
         public void EnsureNameIsSlugifyToGenerateId_WhenUseTenant(string name, string expectedId)
         {
-            var tenant = new AppTenant()
+            AppTenant tenant = new AppTenant()
             {
                 Name = name
             };
@@ -40,11 +40,11 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
         [Fact]
         public void EnsureSameTenantIsReturned_WhenTenantWrapper()
         {
-            var tenant = new AppTenant()
+            AppTenant tenant = new AppTenant()
             {
                 Name = "Name"
             };
-            var tenantWrapper = new TenantWrapper<AppTenant>(tenant);
+            TenantWrapper<AppTenant> tenantWrapper = new TenantWrapper<AppTenant>(tenant);
 
             Assert.Same(tenant, tenantWrapper.Value);
         }

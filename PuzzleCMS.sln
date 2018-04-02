@@ -13,6 +13,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core.Mvc", "Core.Mvc", "{4C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solutions Items", "Solutions Items", "{81CBA0A8-63C5-47E1-A9D8-741F81C6ED78}"
 	ProjectSection(SolutionItems) = preProject
+		CodeAnalysis.ruleset = CodeAnalysis.ruleset
+		GlobalSuppressions.cs = GlobalSuppressions.cs
+		Stylecop.json = Stylecop.json
 		testsandcoverage.bat = testsandcoverage.bat
 	EndProjectSection
 EndProject

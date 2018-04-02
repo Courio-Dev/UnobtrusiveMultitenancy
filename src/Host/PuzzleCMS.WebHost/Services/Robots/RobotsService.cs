@@ -1,7 +1,7 @@
 ﻿namespace PuzzleCMS.WebHost.Services
 {
-    using Microsoft.AspNetCore.Mvc;
     using System.Text;
+    using Microsoft.AspNetCore.Mvc;
 
     public sealed class RobotsService : IRobotsService
     {

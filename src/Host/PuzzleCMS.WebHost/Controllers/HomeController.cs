@@ -1,49 +1,32 @@
 ﻿namespace PuzzleCMS.WebHost.Controllers
 {
+    using System.Text;
+    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Options;
     using PuzzleCMS.WebHost.Constants;
     using PuzzleCMS.WebHost.Settings;
-    using System.Text;
-    using System.Threading.Tasks;
 
     public class HomeController : Controller
     {
-        #region Fields
-
         private readonly IOptions<AppSettings> appSettings;
-
-        #endregion Fields
-
-        #region Constructors
 
         public HomeController(IOptions<AppSettings> appSettings)
         {
             this.appSettings = appSettings;
         }
 
-        #endregion Constructors
-
         [Route("")]
         [Route("Home")]
         [Route("Home/Index")]
         [HttpGet("", Name = HomeControllerRoute.GetIndex)]
-        public IActionResult Index()
-        {
-            return this.View(HomeControllerAction.Index);
-        }
+        public IActionResult Index() => View(HomeControllerAction.Index);
 
         [HttpGet("about", Name = HomeControllerRoute.GetAbout)]
-        public IActionResult About()
-        {
-            return this.View(HomeControllerAction.About);
-        }
+        public IActionResult About() => View(HomeControllerAction.About);
 
         [HttpGet("contact", Name = HomeControllerRoute.GetContact)]
-        public IActionResult Contact()
-        {
-            return this.View(HomeControllerAction.Contact);
-        }
+        public IActionResult Contact() => View(HomeControllerAction.Contact);
 
         /// <summary>
         /// Tells search engines (or robots) how to index your site.
@@ -55,11 +38,7 @@
         /// <returns>The robots text for the current site.</returns>
         [ResponseCache(CacheProfileName = CacheProfileName.RobotsText)]
         [Route("robots.txt", Name = HomeControllerRoute.GetRobotsText)]
-        public IActionResult RobotsText()
-        {
-            string content = "";
-            return this.Content(content, "text/plain", Encoding.UTF8);
-        }
+        public IActionResult RobotsText() => Content(string.Empty, "text/plain", Encoding.UTF8);
 
         /// <summary>
         /// Gets the Open Search XML for the current site. You can customize the contents of this XML here. The open
@@ -70,11 +49,7 @@
         /// <returns>The Open Search XML for the current site.</returns>
         [ResponseCache(CacheProfileName = CacheProfileName.OpenSearchXml)]
         [Route("opensearch.xml", Name = HomeControllerRoute.GetOpenSearchXml)]
-        public IActionResult OpenSearchXml()
-        {
-            string content = "";
-            return this.Content(content, "application/xml", Encoding.UTF8);
-        }
+        public IActionResult OpenSearchXml() => Content(string.Empty, "application/xml", Encoding.UTF8);
 
         /// <summary>
         /// Gets the sitemap XML for the current site. You can customize the contents of this XML from the
@@ -87,15 +62,15 @@
         [Route("sitemap.xml", Name = HomeControllerRoute.GetSitemapXml)]
         public async Task<IActionResult> SitemapXml(int? index = null)
         {
-            await Task.Delay(1000);
+            await Task.Delay(1000).ConfigureAwait(false);
             string content = "application / xml";
 
             if (content == null)
             {
-                return this.BadRequest("Sitemap index is out of range.");
+                return BadRequest("Sitemap index is out of range.");
             }
 
-            return this.Content(content, "application/xml", Encoding.UTF8);
+            return Content(content, "application/xml", Encoding.UTF8);
         }
 
         /// <summary>
@@ -108,10 +83,6 @@
         /// <returns>The manifest JSON for the current site.</returns>
         [ResponseCache(CacheProfileName = CacheProfileName.ManifestJson)]
         [Route("manifest.json", Name = HomeControllerRoute.GetManifestJson)]
-        public ContentResult ManifestJson()
-        {
-            string content = "";
-            return this.Content(content, "application/json", Encoding.UTF8);
-        }
+        public ContentResult ManifestJson() => Content(string.Empty, "application/json", Encoding.UTF8);
     }
 }

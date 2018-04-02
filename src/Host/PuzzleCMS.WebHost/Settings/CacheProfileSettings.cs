@@ -1,7 +1,7 @@
 ﻿namespace PuzzleCMS.WebHost.Settings
 {
-    using Microsoft.AspNetCore.Mvc;
     using System.Collections.Generic;
+    using Microsoft.AspNetCore.Mvc;
 
     /// <summary>
     /// The caching settings for the application.

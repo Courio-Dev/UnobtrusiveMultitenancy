@@ -1,13 +1,13 @@
-﻿using Microsoft.AspNetCore.Hosting.Internal;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Puzzle.Core.Multitenancy.Extensions;
-using System;
-using System.Diagnostics;
-using System.Threading.Tasks;
-
-namespace Puzzle.Core.Multitenancy.Internal.Middlewares
+﻿namespace Puzzle.Core.Multitenancy.Internal.Middlewares
 {
+    using System;
+    using System.Diagnostics;
+    using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Hosting.Internal;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.Extensions.DependencyInjection;
+    using Puzzle.Core.Multitenancy.Extensions;
+
     internal class MultitenancyRequestServicesContainerMiddleware<TTenant>
     {
         private readonly RequestDelegate next;
@@ -24,7 +24,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Middlewares
         /// <summary>
         /// Invokes the middleware using the specified context.
         /// </summary>
-        /// <param name="context">
+        /// <param name="httpContext">
         /// The request context to process through the middleware.
         /// </param>
         /// <returns>
@@ -32,26 +32,29 @@ namespace Puzzle.Core.Multitenancy.Internal.Middlewares
         /// </returns>
         public async Task Invoke(HttpContext httpContext)
         {
-            Debug.Assert(httpContext != null);
-            if (serviceFactoryForMultitenancy == null) throw new ArgumentNullException(nameof(serviceFactoryForMultitenancy));
+            Debug.Assert(httpContext != null, nameof(httpContext));
+            if (serviceFactoryForMultitenancy == null)
+            {
+                throw new ArgumentNullException(nameof(serviceFactoryForMultitenancy));
+            }
 
-            var tenantContext = httpContext.GetTenantContext<TTenant>();
+            TenantContext<TTenant> tenantContext = httpContext.GetTenantContext<TTenant>();
             if (tenantContext != null)
             {
-                var existingRequestServices = httpContext.RequestServices;
+                IServiceProvider existingRequestServices = httpContext.RequestServices;
 
-                using (var feature = new RequestServicesFeature(serviceFactoryForMultitenancy.Build(tenantContext).GetRequiredService<IServiceScopeFactory>()))
+                using (RequestServicesFeature feature = new RequestServicesFeature(serviceFactoryForMultitenancy.Build(tenantContext).GetRequiredService<IServiceScopeFactory>()))
                 {
                     try
                     {
                         // Replace the request IServiceProvider created by IServiceScopeFactory
                         httpContext.RequestServices = feature.RequestServices;
-                        await this.next.Invoke(httpContext);
+                        await next.Invoke(httpContext).ConfigureAwait(false);
                     }
                     finally
                     {
-                        //httpContext.RequestServices = feature.RequestServices;
-                        //httpContext.RequestServices = existingRequestServices;
+                        // httpContext.RequestServices = feature.RequestServices;
+                        // httpContext.RequestServices = existingRequestServices;
                     }
                 }
             }

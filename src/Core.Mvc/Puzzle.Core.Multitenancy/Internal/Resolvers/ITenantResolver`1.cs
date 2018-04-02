@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.Threading.Tasks;
-
-namespace Puzzle.Core.Multitenancy.Internal.Resolvers
+﻿namespace Puzzle.Core.Multitenancy.Internal.Resolvers
 {
+    using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Http;
+
     public interface ITenantResolver<TTenant>
     {
         Task<TenantContext<TTenant>> ResolveAsync(HttpContext context);
