@@ -53,10 +53,10 @@
 
         public async Task Invoke(HttpContext httpContext)
         {
-            if (httpContext == null)
-            {
-                throw new ArgumentNullException($"Argument {nameof(httpContext)} must not be null");
-            }
+            //if (httpContext == null)
+            //{
+            //    throw new ArgumentNullException($"Argument {nameof(httpContext)} must not be null");
+            //}
 
             TenantContext<TTenant> tenantContext = httpContext.GetTenantContext<TTenant>();
             if (tenantContext != null)
@@ -66,8 +66,6 @@
                     new Lazy<RequestDelegate>(() => BuildTenantPipeline(httpContext, tenantContext)));
                 await tenantPipeline.Value(httpContext).ConfigureAwait(false);
             }
-
-            // await next(context);
         }
 
         private RequestDelegate BuildTenantPipeline(HttpContext httpContext, TenantContext<TTenant> tenantContext)

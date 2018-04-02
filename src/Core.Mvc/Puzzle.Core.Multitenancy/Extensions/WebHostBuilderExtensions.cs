@@ -143,17 +143,6 @@
                         // manage IStartup
                         services.RemoveAll<IStartup>();
 
-                        ServiceDescriptor staruptDescriptor = new ServiceDescriptor(
-                        typeof(IStartup),
-                        (IServiceProvider provider) =>
-                        {
-                            IHostingEnvironment hostingEnvironment = provider.GetRequiredService<IHostingEnvironment>();
-                            StartupMethodsMultitenant<TTenant> methods = StartupLoaderMultitenant.LoadMethods<TTenant>(provider, startupType, hostingEnvironment.EnvironmentName);
-                            return new ConventionMultitenantBasedStartup<TTenant>(methods);
-                        },
-                        lifetime: ServiceLifetime.Singleton);
-                        services.Add(staruptDescriptor);
-
                         ServiceDescriptor descriptor = new ServiceDescriptor(
                         typeof(IStartupFilter),
                         sp =>
@@ -163,6 +152,18 @@
                         },
                         lifetime: ServiceLifetime.Transient);
                         services.Insert(0, descriptor);
+
+                        ServiceDescriptor staruptDescriptor = new ServiceDescriptor(
+                        typeof(IStartup),
+                        (IServiceProvider provider) =>
+                        {
+                            IHostingEnvironment hostingEnvironment = provider.GetRequiredService<IHostingEnvironment>();
+                            StartupMethodsMultitenant<TTenant> methods = StartupLoaderMultitenant.LoadMethods<TTenant>(provider, startupType, hostingEnvironment.EnvironmentName);
+                            return new ConventionMultitenantBasedStartup<TTenant>(methods);
+                        },
+                        lifetime: ServiceLifetime.Singleton);
+                        //services.Add(staruptDescriptor);
+                        services.Insert(0, staruptDescriptor);
                     }
                 })
                 ;

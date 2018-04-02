@@ -25,7 +25,7 @@
         public ServiceFactoryForMultitenancy(
             IServiceCollection services, Action<IServiceCollection, TTenant> configurePerTenantServicesDelegate, IOptionsMonitor<MultitenancyOptions> optionsMonitor)
             : this()
-        {  
+        {
             this.optionsMonitor = optionsMonitor ?? throw new ArgumentNullException($"Argument {nameof(optionsMonitor)} must not be null");
             this.optionsMonitor.OnChange(vals =>
             {
@@ -58,15 +58,10 @@
             ServiceProvider provider = collectionClone.BuildServiceProvider();
             IServiceProviderFactory<IServiceCollection> factory = provider.GetService<IServiceProviderFactory<IServiceCollection>>();
 
-            if (factory != null)
+            using (provider)
             {
-                using (provider)
-                {
-                    return factory.CreateServiceProvider(factory.CreateBuilder(collectionClone));
-                }
+                return factory.CreateServiceProvider(factory.CreateBuilder(collectionClone));
             }
-
-            return provider;
         }
 
         private class LazyConcurrentDictionary<TKey, TValue>
