@@ -104,9 +104,8 @@ Task("Clean")
     CleanDirectory(paths.Directories.ArtifactsBinNetCoreapp20);
     CleanDirectory(paths.Directories.ArtifactsBinNetCoreapp21);
     CleanDirectory(paths.Directories.ArtifactsBinDir);
-    //CleanDirectory(paths.Directories.Artifacts);
-    DeleteDirectories(GetDirectories("**/bin"), new DeleteDirectorySettings() { Force = true, Recursive = true });
-    DeleteDirectories(GetDirectories("**/obj"), new DeleteDirectorySettings() { Force = true, Recursive = true });
+    CleanDirectories(GetDirectories("**/bin"));
+    CleanDirectories(GetDirectories("**/obj"));
     CleanDirectories(paths.Directories.ToClean);
 });
 
@@ -185,6 +184,7 @@ Task("Test-OpenCover")
             var dotNetTestSettings = new DotNetCoreTestSettings
             {
                /* Configuration = "Debug",*/
+               Configuration = configuration,
                 NoBuild = true,
                 NoRestore = true,
                 ArgumentCustomization = args => args
