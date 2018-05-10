@@ -1,0 +1,82 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+  <!--<PropertyGroup>
+    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">2.0.0</NetStandardImplicitPackageVersion>
+  </PropertyGroup>-->
+  <!-- Framework constants -->
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
+    <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">
+    <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <Import Project="Directory.Version.props" />
+  <Import Project="Directory.CodeAnalysis.props" />
+
+  <PropertyGroup Label="Package Versions">
+    <AspNetCoreVersion>2.1.0-preview1-final</AspNetCoreVersion>
+    <XunitVersion>2.3.1</XunitVersion>
+    <XunitAnalyzersVersion>0.8.0</XunitAnalyzersVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="$(AspNetCoreVersion)" />
+    <PackageReference Include="Serilog" Version="2.6.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="2.0.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="2.1.1" />
+    <PackageReference Include="Serilog.Formatting.Compact" Version="1.0.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="2.6.1" />
+    <PackageReference Include="Serilog.Sinks.ColoredConsole" Version="3.0.1" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="4.0.0" />
+    <PackageReference Include="Serilog.Sinks.Literate" Version="3.0.0" />
+  </ItemGroup>
+
+  <!--<PropertyGroup>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+  </PropertyGroup>-->
+
+  <!--<Target Name="ShowReservedProperties" AfterTargets="BeforeBuild">  
+      <Message Text=" SolutionDir  = $(SolutionDir)" Importance="high" />
+      <Message Text=" MSBuildProjectDirectory  = $(MSBuildProjectDirectory)" Importance="high" />
+      <Message Text=" MSBuildThisFileDirectory  = $(MSBuildThisFileDirectory)" Importance="high" />         
+      <Message Text=" MSBuildProjectFile  = $(MSBuildProjectFile)" Importance="high" /> 
+      <Message Text=" MSBuildThisFileName  = $(MSBuildThisFileName)" Importance="high" />    
+      <Message Text=" MSBuildProjectExtension  = $(MSBuildProjectExtension)" Importance="high" />     
+      <Message Text=" MSBuildProjectFullPath  = $(MSBuildProjectFullPath)" Importance="high" />   
+      <Message Text=" MSBuildProjectName  = $(MSBuildProjectName)" Importance="high" />   
+      <Message Text=" MSBuildBinPath  = $(MSBuildBinPath)" Importance="high" />   
+      <Message Text=" MSBuildProjectDefaultTargets  = $(MSBuildProjectDefaultTargets)" Importance="high" />   
+      <Message Text=" MSBuildExtensionsPath  = $(MSBuildExtensionsPath)" Importance="high" />     
+      <Message Text=" MSBuildStartupDirectory  = $(MSBuildStartupDirectory)" Importance="high"/>  
+  </Target>-->
+
+    <!--<Target Name="ShowOtherProperties">  
+      <Message Text="  " />
+      <Message Text="  " />
+      <Message Text=" Environment (SET) Variables*       " />
+      <Message Text=" ============================       " />
+      <Message Text=" COMPUTERNAME = *$(COMPUTERNAME)*   " />
+      <Message Text=" USERDNSDOMAIN = *$(USERDNSDOMAIN)* " />
+      <Message Text=" USERDOMAIN = *$(USERDOMAIN)*       " />
+      <Message Text=" USERNAME = *$(USERNAME)*           " />
+  </Target>-->
+
+</Project>

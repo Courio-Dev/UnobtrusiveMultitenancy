@@ -50,7 +50,7 @@
                 return tenantContext.Tenant;
             }
 
-            return default(TTenant);
+            return default;
         }
     }
 }

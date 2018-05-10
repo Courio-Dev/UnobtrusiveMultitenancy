@@ -136,10 +136,16 @@
                         services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
                         services.AddSingleton((s) => multitenancyConfig);
+                        /*
                         services.AddSingleton<IConfigureOptions<MultitenancyOptions>, MultitenancyOptionsSetup>();
                         //services.Configure<MultitenancyOptions>(multitenancyConfig.Config.GetSection(nameof(MultitenancyOptions)));
                         services.AddScoped(cfg => cfg.GetService<IOptionsMonitor<MultitenancyOptions>>().CurrentValue);
                         services.AddSingleton<IOptionsMonitor<MultitenancyOptions>, MonitorMultitenancyOptions>();
+                        */
+
+                        // Register multitenancy options.
+                        services.AddMultitenancyOptions(multitenancyConfig);
+
                         services.AddMultitenancy<TTenant, TResolver>();
 
                         // manage IStartup
@@ -164,7 +170,8 @@
                             return new ConventionMultitenantBasedStartup<TTenant>(methods);
                         },
                         lifetime: ServiceLifetime.Singleton);
-                        //services.Add(staruptDescriptor);
+
+                        // services.Add(staruptDescriptor);
                         services.Insert(0, staruptDescriptor);
                     }
                 })

@@ -26,16 +26,15 @@
 
         public async Task Invoke(HttpContext context)
         {
-            //if (next == null)
-            //{
+            // if (next == null)
+            // {
             //    throw new ArgumentNullException($"Argument {nameof(next)} must not be null");
-            //}
+            // }
 
-            //if (TenantResolver == null)
-            //{
+            // if (TenantResolver == null)
+            // {
             //    throw new ArgumentNullException($"Argument {nameof(TenantResolver)} must not be null");
-            //}
-
+            // }
             Logger.LogDebug("Resolving TenantContext using {loggerType}.", TenantResolver.GetType().Name);
 
             TenantContext<TTenant> tenantContext = await TenantResolver.ResolveAsync(context).ConfigureAwait(false);

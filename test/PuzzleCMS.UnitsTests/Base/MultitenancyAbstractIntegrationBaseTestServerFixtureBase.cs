@@ -14,10 +14,8 @@
     {
         protected const string Appsettings = "appsettings";
 
-        //internal string UrlTenant1 { get; } = "/tenant-1-1";
-
-        //internal string UrlTenant2 { get; } = "/tenant-2-1";
-
+        // internal string UrlTenant1 { get; } = "/tenant-1-1";
+        // internal string UrlTenant2 { get; } = "/tenant-2-1";
         public MultitenancyAbstractIntegrationBaseTestServerFixtureBase()
             : base()
         {
@@ -235,84 +233,6 @@
                     await ctx.Response.WriteAsync(service?.Value ?? "<null>").ConfigureAwait(false);
                 });
             }
-        }
-    }
-
-    internal class TestStartup
-    {
-        public TestStartup()
-        {
-        }
-
-        public void ConfigureTestServices(IServiceCollection services)
-        {
-        }
-
-        public void ConfigureServices(IServiceCollection services)
-        {
-        }
-
-        public void Configure(IApplicationBuilder application)
-        {
-            application.Run(async ctx =>
-            {
-                await ctx.Response.WriteAsync(": Test").ConfigureAwait(false);
-            });
-        }
-    }
-
-    internal class TestTenant : IDisposable
-    {
-        public string Name { get; set; }
-
-        public string[] Hostnames { get; set; }
-
-        public string Theme { get; set; }
-
-        public string ConnectionString { get; set; }
-
-        public bool Disposed { get; set; }
-
-        protected CancellationTokenSource cts = new CancellationTokenSource();
-
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (Disposed)
-            {
-                return;
-            }
-
-            if (disposing)
-            {
-                cts.Cancel();
-            }
-
-            Disposed = true;
-        }
-    }
-
-    internal class AddTenantNameMiddleware
-    {
-        private RequestDelegate next;
-        private string name;
-
-        public AddTenantNameMiddleware(RequestDelegate next, string name)
-        {
-            this.next = next;
-            this.name = name;
-        }
-
-        public async Task Invoke(HttpContext context)
-        {
-            await context.Response.WriteAsync($"{name}::").ConfigureAwait(false);
-            await next(context).ConfigureAwait(false);
         }
     }
 }

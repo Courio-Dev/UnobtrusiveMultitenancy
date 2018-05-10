@@ -16,13 +16,15 @@
 
     public class PuzzleCoreMultitenancyTests : IClassFixture<MultitenancyAbstractIntegrationBaseTestServerFixtureBase>
     {
+        protected const string Appsettings = "appsettings";
+
         public PuzzleCoreMultitenancyTests(MultitenancyAbstractIntegrationBaseTestServerFixtureBase testServerFixture)
         {
             ClientTransient = testServerFixture.ClientTransient;
             ClientSingleton = testServerFixture.ClientSingleton;
             ClientScoped = testServerFixture.ClientScoped;
 
-            server = testServerFixture.Server;
+            Server = testServerFixture.Server;
 
             UrlTenant1 = testServerFixture.UrlTenant1;
             UrlTenant2 = testServerFixture.UrlTenant2;
@@ -33,11 +35,9 @@
             TestServerFixture = testServerFixture;
         }
 
-        protected const string Appsettings = "appsettings";
-
-        protected readonly TestServer server;
-
         public MultitenancyAbstractIntegrationBaseTestServerFixtureBase TestServerFixture { get; }
+
+        protected TestServer Server { get; }
 
         protected HttpClient ClientTransient { get; }
 

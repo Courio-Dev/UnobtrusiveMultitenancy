@@ -30,17 +30,9 @@
         public string GetManifestJson()
         {
             JObject document = new JObject(
-                new JProperty("short_name", this.appSettings.Value.SiteShortTitle),
-                new JProperty("name", this.appSettings.Value.SiteTitle),
-                new JProperty(
-                    "icons",
-                    new JArray(
-                        GetIconJObject("~/img/icons/android-chrome-36x36.png", "36x36", "image/png", "0.75"),
-                        GetIconJObject("~/img/icons/android-chrome-48x48.png", "48x48", "image/png", "1.0"),
-                        GetIconJObject("~/img/icons/android-chrome-72x72.png", "72x72", "image/png", "1.5"),
-                        GetIconJObject("~/img/icons/android-chrome-96x96.png", "96x96", "image/png", "2.0"),
-                        GetIconJObject("~/img/icons/android-chrome-144x144.png", "144x144", "image/png", "3.0"),
-                        GetIconJObject("~/img/icons/android-chrome-192x192.png", "192x192", "image/png", "4.0"))));
+                new JProperty("short_name", appSettings.Value.SiteShortTitle),
+                new JProperty("name", appSettings.Value.SiteTitle),
+                new JProperty("icons", new JArray(GetObjectParams())));
 
             return document.ToString(Formatting.Indented);
         }
@@ -56,10 +48,23 @@
         private JObject GetIconJObject(string iconPath, string sizes, string type, string density)
         {
             return new JObject(
-                new JProperty("src", this.urlHelper.Content(iconPath)),
+                new JProperty("src", urlHelper.Content(iconPath)),
                 new JProperty("sizes", sizes),
                 new JProperty("type", type),
                 new JProperty("density", density));
+        }
+
+        private object[] GetObjectParams()
+        {
+            return new object[]
+            {
+                GetIconJObject("~/img/icons/android-chrome-36x36.png", "36x36", "image/png", "0.75"),
+                GetIconJObject("~/img/icons/android-chrome-48x48.png", "48x48", "image/png", "1.0"),
+                GetIconJObject("~/img/icons/android-chrome-72x72.png", "72x72", "image/png", "1.5"),
+                GetIconJObject("~/img/icons/android-chrome-96x96.png", "96x96", "image/png", "2.0"),
+                GetIconJObject("~/img/icons/android-chrome-144x144.png", "144x144", "image/png", "3.0"),
+                GetIconJObject("~/img/icons/android-chrome-192x192.png", "192x192", "image/png", "4.0")
+            };
         }
     }
 }

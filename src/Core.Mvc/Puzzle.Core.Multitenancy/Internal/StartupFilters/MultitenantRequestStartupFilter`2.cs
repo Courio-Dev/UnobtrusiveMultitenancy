@@ -11,10 +11,10 @@
     using Puzzle.Core.Multitenancy.Internal.Options;
 
     /// <summary>
-    /// MultitenantRequestStartupFilter
-    /// <typeparamref name="TStartup" />
-    /// <typeparamref name="TTenant"/>
+    /// The StartupFilter for multitenant.
     /// </summary>
+    /// <typeparam  name="TStartup">The startup class.</typeparam >
+    /// <typeparam  name="TTenant">The tenant object.</typeparam >
     internal sealed class MultitenantRequestStartupFilter<TStartup, TTenant> : IStartupFilter
          where TStartup : class
          where TTenant : class

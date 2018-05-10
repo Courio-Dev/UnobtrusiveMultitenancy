@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Puzzle.Core.Multitenancy.Internal.Configurations;
-
-namespace Puzzle.Core.Multitenancy.Internal.Options
+﻿namespace Puzzle.Core.Multitenancy.Internal.Options
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Options;
+    using Puzzle.Core.Multitenancy.Internal.Configurations;
+
     /// <summary>
     /// https://shazwazza.com/post/using-aspnet5-optionsmodel/
     /// https://github.com/Shazwazza/Smidge/blob/master/src/Smidge/Options/SmidgeOptionsSetup.cs
@@ -21,14 +21,22 @@ namespace Puzzle.Core.Multitenancy.Internal.Options
         private readonly IServiceProvider serviceProvider;
         private readonly IServiceScopeFactory serviceScopeFactory;
 
-        //private readonly ObjectPoolProvider objectPoolProvider;
-        public MultitenancyOptionsSetup(IServiceScopeFactory serviceScopeFactory
-            , IServiceProvider serviceProvider
-            , MultiTenancyConfig config)
+        public MultitenancyOptionsSetup(
+            IServiceScopeFactory serviceScopeFactory,
+            IServiceProvider serviceProvider,
+            MultiTenancyConfig config)
             : base(options => ConfigureMultitenancyOptions(options, OrSection(config, nameof(MultitenancyOptions))))
         {
-            if (config == null) throw new ArgumentNullException(nameof(config));
-            if (config.Config == null) throw new ArgumentNullException(nameof(config.Config));
+            if (config == null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
+
+            if (config.Config == null)
+            {
+                throw new ArgumentNullException(nameof(config.Config));
+            }
+
             this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
         }
@@ -36,6 +44,8 @@ namespace Puzzle.Core.Multitenancy.Internal.Options
         /// <summary>
         /// Set the default options
         /// </summary>
+        /// <param name="options">The MultitenancyOptions.</param>
+        /// <param name="config">The configuration which contains MultitenancyOptions.</param>
         public static void ConfigureMultitenancyOptions(MultitenancyOptions options, IConfiguration config)
         {
             // then we set the properties
@@ -45,6 +55,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Options
         /// <summary>
         /// Allows for configuring the options instance before options are set
         /// </summary>
+        /// <param name="options">The MultitenancyOptions.</param>
         public override void Configure(MultitenancyOptions options)
         {
             base.Configure(options);

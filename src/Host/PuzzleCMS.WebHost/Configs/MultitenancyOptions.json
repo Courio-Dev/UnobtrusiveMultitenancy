@@ -1,5 +1,8 @@
 ﻿{
   "MultitenancyOptions": {
+    "OtherTokens": {
+      "TenantFolder": "App_Tenants_Override"
+    },
     "Tenants": [
       {
         "Name": "Tenant 1",
@@ -8,8 +11,8 @@
           "localhost:44301",
           "localhost:60000"
         ],
-        "Theme": "",
-        "ConnectionString": ""
+        "Theme": "{DS}",
+        "ConnectionString": "{TenantFolder}"
       },
       {
         "Name": "Tenant 2",

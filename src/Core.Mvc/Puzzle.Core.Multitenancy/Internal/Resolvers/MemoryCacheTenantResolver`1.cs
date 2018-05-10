@@ -43,11 +43,10 @@
             // Obtain the key used to identify cached tenants from the current request
             string cacheKey = GetContextIdentifier(context);
 
-            //if (cacheKey == null)
-            //{
+            // if (cacheKey == null)
+            // {
             //    return null;
-            //}
-
+            // }
             if (string.IsNullOrWhiteSpace(cacheKey))
             {
                 return null;

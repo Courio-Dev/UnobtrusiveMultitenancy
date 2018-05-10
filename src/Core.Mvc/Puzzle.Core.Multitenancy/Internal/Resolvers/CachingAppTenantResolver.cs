@@ -12,23 +12,23 @@
 
     internal class CachingAppTenantResolver : MemoryCacheTenantResolver<AppTenant>
     {
-        //private readonly IEnumerable<AppTenant> Tenants;
+        // private readonly IEnumerable<AppTenant> Tenants;
         private readonly IOptionsMonitor<MultitenancyOptions> optionsMonitor;
 
         public CachingAppTenantResolver(
-            IMemoryCache cache, 
-            ILoggerFactory loggerFactory, 
+            IMemoryCache cache,
+            ILoggerFactory loggerFactory,
             IOptionsMonitor<MultitenancyOptions> optionsMonitor)
             : base(cache, loggerFactory)
         {
             this.optionsMonitor = optionsMonitor ?? throw new ArgumentNullException($"Argument {nameof(optionsMonitor)} must not be null");
-            //this.Tenants = this.optionsMonitor.CurrentValue.Tenants;
+
+            // this.Tenants = this.optionsMonitor.CurrentValue.Tenants;
             this.optionsMonitor.OnChange(vals =>
             {
                 // TODO : find a way to clear a cache.
                 loggerFactory.CreateLogger<CachingAppTenantResolver>().LogDebug($"Config changed: {string.Join(", ", vals)}");
             });
-
         }
 
         protected IEnumerable<AppTenant> Tenants => optionsMonitor.CurrentValue.Tenants;

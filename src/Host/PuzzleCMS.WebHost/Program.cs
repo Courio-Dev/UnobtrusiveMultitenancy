@@ -1,22 +1,52 @@
 ﻿namespace PuzzleCMS.WebHost
 {
+    using System;
     using System.IO;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using Puzzle.Core.Multitenancy.Extensions;
+    using Serilog;
+    using Serilog.Events;
 
     public sealed class Program
     {
         private const string BasePathName = "Configs";
         private const string HostingJsonFileName = "hosting.json";
 
-        public static void Main(string[] args)
+        public static int Main(string[] args)
         {
-            CreateWebHostBuilder(args)
+            IConfigurationRoot configuration = new ConfigurationBuilder()
+                    .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), BasePathName))
+                    .AddJsonFile("config.json", optional: false, reloadOnChange: true)
+                    .AddEnvironmentVariables()
+                    .AddCommandLine(args)
+                    .Build();
+
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(configuration)
+                .CreateLogger();
+
+            try
+            {
+                Log.Information("Starting web host");
+
+                CreateWebHostBuilder(args)
                 .Build()
                 .Run();
+
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Host terminated unexpectedly");
+                return 1;
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args)
@@ -29,25 +59,26 @@
                     .Build();
 
             return Microsoft.AspNetCore.WebHost
-              .CreateDefaultBuilder()
-              .CaptureStartupErrors(false)
-              .SuppressStatusMessages(false)
-              .UseSetting(WebHostDefaults.DetailedErrorsKey, value: true.ToString().ToLower())
-              .UseConfiguration(config)
-              .ConfigureAppConfiguration((context, configBuilder) =>
-               {
-                   ConfigureConfigurationBuilder(context, configBuilder, args);
-               })
-              .UseDefaultServiceProvider((context, options) =>
-              {
-                  options.ValidateScopes = context.HostingEnvironment.IsDevelopment();
-              })
-              .UseIISIntegration()
-              .UseAzureAppServices()
+                  .CreateDefaultBuilder()
+                  .CaptureStartupErrors(false)
+                  .SuppressStatusMessages(false)
+                  .UseSetting(WebHostDefaults.DetailedErrorsKey, value: true.ToString().ToLower())
+                  .UseConfiguration(config)
+                  .UseSerilog()
+                  .ConfigureAppConfiguration((context, configBuilder) =>
+                   {
+                       ConfigureConfigurationBuilder(context, configBuilder, args);
+                   })
+                  .UseDefaultServiceProvider((context, options) =>
+                  {
+                      options.ValidateScopes = context.HostingEnvironment.IsDevelopment();
+                  })
+                  .UseIISIntegration()
+                  .UseAzureAppServices()
 
-              // .PreferHostingUrls(false)
-              .UseUnobtrusiveMulitenancyStartupWithDefaultConvention<Startup>()
-              ;
+                  // .PreferHostingUrls(false)
+                  .UseUnobtrusiveMulitenancyStartupWithDefaultConvention<Startup>()
+                  ;
         }
 
         private static void ConfigureConfigurationBuilder(WebHostBuilderContext ctx, IConfigurationBuilder config, string[] args)

@@ -37,7 +37,7 @@
         {
             this.next = next ?? throw new ArgumentNullException($"Argument {nameof(next)} must not be null");
             this.rootApp = rootApp ?? throw new ArgumentNullException($"Argument {nameof(rootApp)} must not be null");
-            this.logger = rootApp.ApplicationServices.GetRequiredService<ILoggerFactory>().CreateLogger<TenantPipelineMiddleware<TTenant>>();
+            logger = rootApp.ApplicationServices.GetRequiredService<ILoggerFactory>().CreateLogger<TenantPipelineMiddleware<TTenant>>();
             this.serviceFactoryForMultitenancy = serviceFactoryForMultitenancy ?? throw new ArgumentNullException(nameof(serviceFactoryForMultitenancy));
 
             this.configuration = configuration ?? throw new ArgumentNullException($"Argument {nameof(configuration)} must not be null");
@@ -53,11 +53,10 @@
 
         public async Task Invoke(HttpContext httpContext)
         {
-            //if (httpContext == null)
-            //{
+            // if (httpContext == null)
+            // {
             //    throw new ArgumentNullException($"Argument {nameof(httpContext)} must not be null");
-            //}
-
+            // }
             TenantContext<TTenant> tenantContext = httpContext.GetTenantContext<TTenant>();
             if (tenantContext != null)
             {

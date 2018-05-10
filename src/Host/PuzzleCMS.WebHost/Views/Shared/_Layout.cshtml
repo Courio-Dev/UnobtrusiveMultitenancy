@@ -108,13 +108,6 @@
         <link rel="stylesheet" href="@ContentDeliveryNetwork.MaxCdn.FontAwesomeUrl"
               asp-subresource-integrity-href="~/css/font-awesome.css" />
     </environment>
-    @* Add Azure Application Insights JavaScript script tag. *@
-    @* Do not move this file to a CDN. See https://github.com/Microsoft/ApplicationInsights-aspnet5/issues/120 *@
-    <script asp-append-version="true"
-            crossorigin="anonymous"
-            src="~/js/application-insights.js"></script>
-
-    <script type="text/javascript" src="~/js/admin/route.js"></script>
 
     @* Description - Used by search engines. Aim for more than 160 characters. *@
     <meta name="description" content="@ViewBag.Description">

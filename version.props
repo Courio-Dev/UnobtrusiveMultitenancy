@@ -1,0 +1,10 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Version>0.1.1</Version>
+    <AssemblyVersion>$(Version)</AssemblyVersion>
+    <FileVersion>$(Version)</FileVersion>
+    <VersionPrefix>$(Version)</VersionPrefix>
+    <VersionSuffix>-*</VersionSuffix>
+    <ExperimentalProjectVersionPrefix>$(Version)</ExperimentalProjectVersionPrefix>
+  </PropertyGroup>
+</Project>

@@ -1,4 +1,9 @@
 
+using Cake.Core;
+using Cake.Core.Annotations;
+using Cake.Common.Tools.NuGet.Pack;
+using System.Xml;
+using System.Xml.Linq;
 
 #load "./parameters.cake"
 
@@ -34,61 +39,79 @@ public class BuildPaths
     public BuildDirectories Directories { get; private set; }
 
     private static FilePath SolutionFile => "./PuzzleCMS.sln";
+    private static FilePath VersionFile => "./version.props";
 
     public static FilePath ArtifactCodeCoverageResultFile => "coverage.xml";
     public static DirectoryPath ArtifactCodeCoverageReportDirectory => "coverage";
 
 
-  public static BuildDirectories GetBuildDirectories(ICakeContext context)
+    public static BuildDirectories GetBuildDirectories(ICakeContext context)
     {
         var rootDir = (DirectoryPath)context.Directory("./");
-        var artifacts = rootDir.Combine("./artifacts");
-        var artifactsTestResults = artifacts.Combine("./Test-Results");
-        DirectoryPath artifactCodeCoverageReportDirectory = artifacts.Combine("./Coverage");
+        var artifactsDir = rootDir.Combine("./artifacts");
+        //var artifactsDir = (DirectoryPath)(context.Directory("./artifacts") + context.Directory("v" + semVersion));
+        var artifactsTestResults = artifactsDir.Combine("./Test-Results");
+        
+        var artifactsBinDir = artifactsDir.Combine("bin");
+        var artifactsBinFullFx = artifactsBinDir.Combine("net461");        
+        var artifactsBinNetStandard20 = artifactsBinDir.Combine("netstandard2.0");        
+        var artifactsBinNetCoreapp20 = artifactsBinDir.Combine("netcoreapp2.0");
+        var artifactsBinNetCoreapp21 = artifactsBinDir.Combine("netcoreapp2.1");    
+
+        DirectoryPath artifactsNugetsDirectory = artifactsDir.Combine("./Nugets");
+        DirectoryPath artifactCodeCoverageReportDirectory = artifactsDir.Combine("./Coverage");
         FilePath artifactCodeCoverageResultFile =Combine(artifactCodeCoverageReportDirectory,"coverage.xml") ;
         
-/*
-        var integrationTestsDir = rootDir.Combine(context.Directory("NETCoreCodeCoverage.Tests.Integration"));
-        var unitTestsDir = rootDir.Combine(context.Directory("NETCoreCodeCoverage.Tests.Unit"));
-        var mainProjectDir = rootDir.Combine(context.Directory("NETCoreCodeCoverage"));
-*/
-        /*var testDirs = new []{
-                                unitTestsDir,
-                                integrationTestsDir
-                            };
-                            */
         var toClean = new[] {
                                  artifactsTestResults,
-                                 artifactCodeCoverageReportDirectory
-                                 //integrationTestsDir.Combine("bin"),
-                                 //integrationTestsDir.Combine("obj"),
-                                 //unitTestsDir.Combine("bin"),
-                                 //unitTestsDir.Combine("obj"),
-                                 //mainProjectDir.Combine("bin"),
-                                 //mainProjectDir.Combine("obj"),
+                                 artifactCodeCoverageReportDirectory,
+                                 artifactsNugetsDirectory,
+                                 artifactsBinNetStandard20,
+                                 artifactsBinNetCoreapp20,
+                                 artifactsBinNetCoreapp21,
+                                 artifactsBinDir
                             };
         return new BuildDirectories(rootDir,
-                                    artifacts,
+                                    artifactsDir,
                                     artifactsTestResults,
                                     artifactCodeCoverageResultFile,
                                     artifactCodeCoverageReportDirectory,
+                                    artifactsNugetsDirectory,
                                     //new DirectoryPath[],//testDirs, 
+                                    artifactsBinDir,
+                                    artifactsBinNetStandard20,
+                                    artifactsBinNetCoreapp20,
+                                    artifactsBinNetCoreapp21,
                                     toClean);
     }
 
     public static BuildPaths GetPaths(ICakeContext context, BuildParameters parameters)
     {
+
+        string allProjectsPatternFiles="./src/**/*.csproj";
+        string allTestProjectsPatternFiles="./test/**/*.csproj";
+
+        FilePathCollection allProjects = context.GetFiles(allProjectsPatternFiles);
         FilePathCollection unitTestProjects = context.GetFiles("./test/**/*.csproj");
         FilePathCollection integrationTestProjects = context.GetFiles("./test/*IntegrationTests/**/*.csproj");
+
+        FilePathCollection allProjectsToPack =
+        context.GetFiles(allProjectsPatternFiles) - context.GetFiles(allTestProjectsPatternFiles);
+
+        //https://github.com/cake-build/cake/issues/1037
 
         var configuration =  parameters.Configuration;
         var buildDirectories = GetBuildDirectories(context);
         var testProjects =(new[]{unitTestProjects,integrationTestProjects}).SelectMany(p => p).ToList();
 
         var buildFiles = new BuildFiles(
+            VersionFile,
             SolutionFile,
             buildDirectories.ArtifactCodeCoverageResultFile,
             buildDirectories.ArtifactCodeCoverageReportDirectory,
+            allProjectsPatternFiles,
+            allProjects.ToList(),
+            GetProjectFilesWithNuspecs(context,allProjectsToPack).ToList(),
             testProjects);
         
         return new BuildPaths
@@ -98,24 +121,71 @@ public class BuildPaths
         };
     }
 
-  
+    private static FilePathCollection GetProjectFilesWithNuspecs(
+        ICakeContext context,
+        FilePathCollection allProjectsToPack, 
+        string path = "**/*.nuspec")
+    {
+        bool ReadIsPackableFromProject(ICakeContext localContext,string projectFilePath)
+        {
+            XNamespace xmlns = "http://schemas.microsoft.com/developer/msbuild/2003";
+            XDocument projDefinition = XDocument.Load(projectFilePath);           
+            IEnumerable<XNode> assemblyResultsEnumerable = projDefinition
+                ?.Element(xmlns  + "Project")
+                ?.Elements(xmlns + "PropertyGroup")
+                ?.Elements(xmlns + "IsPackable")
+                ;
+
+            var isPackableNode=assemblyResultsEnumerable?.FirstOrDefault();
+            if(isPackableNode==null){ return false;}
+
+            var valueIsPackableNode=((XElement) isPackableNode).Value;
+            bool.TryParse(valueIsPackableNode,out bool result);
+            return result;
+        }
+
+        var csprojs=allProjectsToPack;
+        var nuspecs = csprojs
+            .Where(csproj =>csproj!=null &&  ReadIsPackableFromProject(context,csproj.FullPath)) 
+            .Select(csproj =>csproj.ChangeExtension(".nuspec") )
+            .Where(filePath =>{ 
+                return filePath!=null && System.IO.File.Exists(filePath?.FullPath);
+            })
+            .Select(x => x)
+            .ToList();
+
+        return new FilePathCollection(nuspecs, PathComparer.Default);
+    }
 }
 
 public class BuildFiles
 {
+    public FilePath VersionFile { get; private set; }
     public FilePath Solution { get; private set; }
     public FilePath ArtifactCodeCoverageResultFile{ get; private set; }
     public DirectoryPath ArtifactCodeCoverageReportDirectory{ get; private set; }
+
+    public string AllProjectsPatternFiles { get; private set; }
+    public ICollection<FilePath> AllProjects { get; private set; }
+    public ICollection<FilePath> AllNuspecsProjects { get; private set; }
     public ICollection<FilePath> TestProjects { get; private set; }
 
-    public BuildFiles(FilePath solution,
+    public BuildFiles(FilePath versionFile,
+                      FilePath solution,
                       FilePath artifactCodeCoverageResultFile,
                       DirectoryPath artifactCodeCoverageReportDirectory,
+                      string allProjectsPatternFiles,
+                      ICollection<FilePath> allProjects,
+                      ICollection<FilePath> allNuspecsProjects,
                       ICollection<FilePath> testProjects)
     {
+        VersionFile=versionFile;
         Solution = solution;
         ArtifactCodeCoverageResultFile=artifactCodeCoverageResultFile;
         ArtifactCodeCoverageReportDirectory=artifactCodeCoverageReportDirectory;
+        AllProjectsPatternFiles=allProjectsPatternFiles;
+        AllProjects=allProjects;
+        AllNuspecsProjects=allNuspecsProjects;
         TestProjects = testProjects;
     }
 }
@@ -127,7 +197,13 @@ public class BuildDirectories
     public DirectoryPath ArtifactsTestResults { get; private set; }
     public FilePath ArtifactCodeCoverageResultFile{ get; private set; }
     public DirectoryPath ArtifactCodeCoverageReportDirectory{ get; private set; }
+    public DirectoryPath ArtifactNugetsDirectory{ get; private set; }
     //public ICollection<DirectoryPath> TestDirs { get; private set; }
+
+    public    DirectoryPath ArtifactsBinDir{ get; private set; }
+    public    DirectoryPath ArtifactsBinNetStandard20{ get; private set; }
+    public    DirectoryPath ArtifactsBinNetCoreapp20{ get; private set; }
+    public    DirectoryPath ArtifactsBinNetCoreapp21{ get; private set; }
     public ICollection<DirectoryPath> ToClean { get; private set; }
 
     public BuildDirectories(
@@ -136,7 +212,11 @@ public class BuildDirectories
         DirectoryPath artifactsTestResults,
         FilePath artifactCodeCoverageResultFile,
         DirectoryPath artifactCodeCoverageReportDirectory,
-        //ICollection<DirectoryPath> testDirs,
+        DirectoryPath artifactNugetsDirectory,
+        DirectoryPath artifactsBinDir,
+        DirectoryPath artifactsBinNetStandard20,
+        DirectoryPath artifactsBinNetCoreapp20,
+        DirectoryPath artifactsBinNetCoreapp21,
         ICollection<DirectoryPath> toClean)
     {
         RootDir = rootDir;
@@ -145,6 +225,11 @@ public class BuildDirectories
         ArtifactCodeCoverageResultFile=artifactCodeCoverageResultFile;
         ArtifactCodeCoverageReportDirectory=artifactCodeCoverageReportDirectory;
         //TestDirs = testDirs;
+        ArtifactNugetsDirectory=artifactNugetsDirectory;
+        ArtifactsBinDir=artifactsBinDir;
+        ArtifactsBinNetStandard20=artifactsBinNetStandard20;
+        ArtifactsBinNetCoreapp20=artifactsBinNetCoreapp20;
+        ArtifactsBinNetCoreapp21=artifactsBinNetCoreapp21;
         ToClean = toClean;
     }
 }

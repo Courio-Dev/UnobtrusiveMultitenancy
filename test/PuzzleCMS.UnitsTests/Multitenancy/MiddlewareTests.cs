@@ -1,20 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.Configuration;
-using Puzzle.Core.Multitenancy.Extensions;
-using Puzzle.Core.Multitenancy.Internal.Middlewares;
-using PuzzleCMS.UnitsTests.Base;
-using Xunit;
-
-namespace PuzzleCMS.UnitsTests.Multitenancy
+﻿namespace PuzzleCMS.UnitsTests.Multitenancy
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Net.Http;
+    using System.Text;
+    using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.TestHost;
+    using Microsoft.Extensions.Configuration;
+    using Puzzle.Core.Multitenancy.Extensions;
+    using Puzzle.Core.Multitenancy.Internal.Middlewares;
+    using PuzzleCMS.UnitsTests.Base;
+    using Xunit;
+
     public class MiddlewareTests : MultitenancyBaseTest
     {
         public MiddlewareTests(MultitenancyBaseFixture testBaseFixture)
@@ -33,13 +33,15 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
 
             // Act
             // Assert
-            Task res() => Task.Run(() => {
+            Task res() => Task.Run(() =>
+            {
                 TestServer server = new TestServer(builder);
             });
 
             Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(res).ConfigureAwait(false);
             Assert.Contains("configuration", ex.Message);
         }
+
         [Fact]
         public async Task ThrowExceptionWhenUserPertenant_HasAppNullParameter()
         {
@@ -51,7 +53,8 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
 
             // Act
             // Assert
-            Task res() => Task.Run(() =>{
+            Task res() => Task.Run(() =>
+            {
                 TestServer server = new TestServer(builder);
             });
 
@@ -70,7 +73,8 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
 
             // Act
             // Assert
-            Task res() => Task.Run(() => {
+            Task res() => Task.Run(() =>
+            {
                 TestServer server = new TestServer(builder);
             });
 
@@ -83,8 +87,8 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
         {
             // Arrange
             // Act
-            
-            Task res() => Task.Run(() => {
+            Task res() => Task.Run(() =>
+            {
                 Puzzle.Core.Multitenancy.Extensions.WebHostBuilderExtensions.UseUnobtrusiveMulitenancyStartupWithDefaultConvention<TestStartup>(null);
             });
 
@@ -98,8 +102,8 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
         {
             // Arrange
             // Act
-
-            Task res() => Task.Run(() => {
+            Task res() => Task.Run(() =>
+            {
                 Puzzle.Core.Multitenancy.Extensions.WebHostBuilderExtensions.
                 UseUnobtrusiveMulitenancyStartup<TestStartup, TestTenant, TestTenantMemoryCacheResolver>(null);
             });
@@ -114,8 +118,8 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
         {
             // Arrange
             // Act
-
-            Task res() => Task.Run(() => {
+            Task res() => Task.Run(() =>
+            {
                 MultitenancyServiceCollectionExtensions.AddMultitenancy<TestTenant, TestTenantMemoryCacheResolver>(null);
             });
 
@@ -144,9 +148,9 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
                 builder.Configure(app => {
                   //  app.ApplicationServices.GetService(typeof(TenantResolutionMiddleware<TestTenant>));
                 });
-                
 
-            
+
+
 
             // Act
             using (TestServer server = new TestServer(builder))

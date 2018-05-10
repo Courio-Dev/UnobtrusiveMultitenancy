@@ -1,0 +1,24 @@
+<Project>
+
+  <ItemGroup>
+    <PackageReference Include="StyleCop.Analyzers" Version="1.0.2">
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <CodeAnalysisRuleSet>$(SolutionDir)\CodeAnalysis.ruleset</CodeAnalysisRuleSet>
+    <Features>IOperation</Features>
+    <NoWarn>1701;1702;1705</NoWarn>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+    <TreatSpecificWarningsAsErrors />
+  </PropertyGroup>
+   
+  <ItemGroup>
+    <AdditionalFiles Include="$(SolutionDir)\Stylecop.json" Link="Stylecop.json" />
+    <AdditionalFiles Include="$(SolutionDir)\GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
+  </ItemGroup>
+
+</Project>

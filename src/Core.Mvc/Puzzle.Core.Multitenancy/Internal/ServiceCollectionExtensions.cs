@@ -14,6 +14,10 @@
             IServiceCollection clone = new ServiceCollection();
             foreach (ServiceDescriptor service in serviceCollection)
             {
+                // ServiceDescriptor clonedService = new ServiceDescriptor(
+                //    service.ServiceType,
+                //    service.ImplementationType,
+                //    service.Lifetime);
                 clone.Add(service);
             }
 
