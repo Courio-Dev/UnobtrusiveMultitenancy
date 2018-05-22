@@ -47,7 +47,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
     /// <summary>
     /// NLogLogProvider.
     /// </summary>
-    [ExcludeFromCoverage]
+    [Multitenancy.ExcludeFromCodeCoverage]
     internal class NLogLogProvider : LogProviderBase
     {
         private static bool providerIsAvailableOverride = true;

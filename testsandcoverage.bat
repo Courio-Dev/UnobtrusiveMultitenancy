@@ -35,7 +35,7 @@ exit /b %errorlevel%
 -mergeoutput ^
 -register:user ^
 -mergebyhash ^
--excludebyattribute:*.ExcludeFromCoverage* ^
+-excludebyattribute:*.ExcludeFromCodeCoverage* ^
 -output:"%~dp0\GeneratedReports\artifacts\Coverage\coverage.xml"
 exit /b %errorlevel%
 

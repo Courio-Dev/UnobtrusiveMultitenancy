@@ -45,7 +45,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
     /// <summary>
     /// TypeExtensions.
     /// </summary>
-    [ExcludeFromCoverage]
+    [ExcludeFromCodeCoverage]
     internal static class TypeExtensions
     {
         internal static ConstructorInfo GetConstructorPortable(this Type type, params Type[] types)

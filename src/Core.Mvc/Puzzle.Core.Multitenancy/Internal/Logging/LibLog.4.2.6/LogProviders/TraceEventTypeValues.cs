@@ -45,7 +45,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
     /// <summary>
     /// TraceEventTypeValues.
     /// </summary>
-    [ExcludeFromCoverage]
+    [Multitenancy.ExcludeFromCodeCoverage]
     internal static class TraceEventTypeValues
     {
         internal static readonly Type Type;

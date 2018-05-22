@@ -59,7 +59,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog
     /// <summary>
     /// Simple interface that represent a logger.
     /// </summary>
-    [ExcludeFromCoverage]
+    [ExcludeFromCodeCoverage]
     public interface ILog
     {
         /// <summary>
@@ -79,7 +79,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog
         bool Log(LogLevel logLevel, Func<string> messageFunc, Exception exception = null, params object[] formatParameters);
     }
 
-    [ExcludeFromCoverage]
+    [ExcludeFromCodeCoverage]
     internal class NoopLogger : ILog
     {
         public bool Log(LogLevel logLevel, Func<string> messageFunc, Exception exception = null, params object[] formatParameters) => true;

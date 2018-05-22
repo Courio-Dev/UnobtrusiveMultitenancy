@@ -46,7 +46,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
     /// <summary>
     /// SerilogLogProvider.
     /// </summary>
-    [ExcludeFromCoverage]
+    [Multitenancy.ExcludeFromCodeCoverage]
     internal class SerilogLogProvider : LogProviderBase
     {
         private static bool providerIsAvailableOverride = true;

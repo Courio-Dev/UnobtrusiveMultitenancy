@@ -45,7 +45,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog
     /// <summary>
     /// Provides a mechanism to create instances of <see cref="ILog" /> objects.
     /// </summary>
-    [ExcludeFromCoverage]
+    [Multitenancy.ExcludeFromCodeCoverage]
     internal static class LogProvider
     {
         internal static readonly List<Tuple<IsLoggerAvailable, CreateLogProvider>> LogProviderResolvers =

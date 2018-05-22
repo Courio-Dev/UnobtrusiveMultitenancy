@@ -11,7 +11,7 @@
     /// Generally used to enable activation of a named <see cref="ILog"/> from dependency injection.
     /// </summary>
     /// <typeparam name="TCategoryName">The type who's name is used for the logger category name.</typeparam>
-    [ExcludeFromCoverage]
+    [ExcludeFromCodeCoverage]
     public interface ILog<out TCategoryName> : ILog
     {
     }

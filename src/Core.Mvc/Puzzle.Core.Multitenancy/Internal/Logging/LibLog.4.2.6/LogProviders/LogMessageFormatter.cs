@@ -46,7 +46,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
     /// <summary>
     /// LogMessageFormatter.
     /// </summary>
-    [ExcludeFromCoverage]
+    [ExcludeFromCodeCoverage]
     internal static class LogMessageFormatter
     {
         private static readonly Regex Pattern = new Regex(@"(?<!{){@?(?<arg>[^\d{][^ }]*)}");

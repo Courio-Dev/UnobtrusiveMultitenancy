@@ -44,7 +44,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
     /// <summary>
     /// Provider for build logger for console.
     /// </summary>
-    [ExcludeFromCoverage]
+    [ExcludeFromCodeCoverage]
     public class ColoredConsoleLogProvider : ILogProvider
     {
         private static readonly Dictionary<LogLevel, ConsoleColor> Colors = new Dictionary<LogLevel, ConsoleColor>

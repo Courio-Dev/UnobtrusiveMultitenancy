@@ -43,7 +43,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
     /// <summary>
     /// LogProviderBase.
     /// </summary>
-    [ExcludeFromCoverage]
+    [ExcludeFromCodeCoverage]
     internal abstract class LogProviderBase : ILogProvider
     {
         private static readonly IDisposable NoopDisposableInstance = new DisposableAction();

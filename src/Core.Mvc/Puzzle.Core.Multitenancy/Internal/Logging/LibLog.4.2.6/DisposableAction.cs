@@ -7,7 +7,7 @@
     /// <summary>
     /// DisposableAction.
     /// </summary>
-    [ExcludeFromCoverage]
+    [ExcludeFromCodeCoverage]
     internal class DisposableAction : IDisposable
     {
         private readonly Action onDispose;

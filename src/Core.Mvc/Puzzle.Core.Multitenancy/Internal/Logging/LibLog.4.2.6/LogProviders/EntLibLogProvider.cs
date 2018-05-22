@@ -47,7 +47,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
     /// <summary>
     /// EntLibLogProvider
     /// </summary>
-    [ExcludeFromCoverage]
+    [Multitenancy.ExcludeFromCodeCoverage]
     internal class EntLibLogProvider : LogProviderBase
     {
         private const string TypeTemplate = "Microsoft.Practices.EnterpriseLibrary.Logging.{0}, Microsoft.Practices.EnterpriseLibrary.Logging";

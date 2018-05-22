@@ -159,10 +159,11 @@ Task("Test-OpenCover")
         Register = "user",
         SkipAutoProps = true
     }
+    .ExcludeByAttribute("*.ExcludeFromCodeCoverage*")
     .WithFilter("+[*]* -[*.UnitsTests]*")
     .WithFilter("-[xunit.*]*")
     .WithFilter("-[*.*Tests]*")
-    .ExcludeByAttribute("*.ExcludeFromCodeCoverage*")
+    //.AdditionalArguments("-hideskipped:All")
     ;
  
     foreach(var project in paths.Files.TestProjects)

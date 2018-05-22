@@ -47,7 +47,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
     /// <summary>
     /// Log4NetLogProvider.
     /// </summary>
-    [ExcludeFromCoverage]
+    [Multitenancy.ExcludeFromCodeCoverage]
     internal class Log4NetLogProvider : LogProviderBase
     {
         private static bool providerIsAvailableOverride = true;

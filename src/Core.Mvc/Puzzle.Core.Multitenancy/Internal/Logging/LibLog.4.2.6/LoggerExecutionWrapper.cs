@@ -44,7 +44,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog
     /// <summary>
     /// LoggerExecutionWrapper.
     /// </summary>
-    [ExcludeFromCoverage]
+    [Multitenancy.ExcludeFromCodeCoverage]
     internal class LoggerExecutionWrapper : ILog
     {
         internal const string FailedToGenerateLogMessage = "Failed to generate log message";

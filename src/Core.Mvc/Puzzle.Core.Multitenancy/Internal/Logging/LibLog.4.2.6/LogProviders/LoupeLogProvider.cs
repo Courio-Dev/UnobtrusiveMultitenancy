@@ -44,7 +44,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
     /// <summary>
     /// LoupeLogProvider.
     /// </summary>
-    [ExcludeFromCoverage]
+    [ExcludeFromCodeCoverage]
     internal class LoupeLogProvider : LogProviderBase
     {
         private static bool providerIsAvailableOverride = true;

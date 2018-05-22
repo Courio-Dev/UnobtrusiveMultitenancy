@@ -43,7 +43,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog
     /// <summary>
     /// Extenisons methos for class ILog.
     /// </summary>
-    [ExcludeFromCoverage]
+    [ExcludeFromCodeCoverage]
     internal static partial class LogExtensions
     {
         public static bool IsDebugEnabled(this ILog logger)

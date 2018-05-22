@@ -4,7 +4,7 @@
         <name>Puzzle.Core.Multitenancy</name>
     </assembly>
     <members>
-        <member name="T:Puzzle.Core.Multitenancy.ExcludeFromCoverageAttribute">
+        <member name="T:Puzzle.Core.Multitenancy.ExcludeFromCodeCoverageAttribute">
             <summary>
             Attribute to exclude from code coverage.
             </summary>
