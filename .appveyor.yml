@@ -1,7 +1,4 @@
 # AppVeyor documentation https://www.appveyor.com/docs
-platform:
-  - Any CPU
-
 configuration:
   - Release
 
