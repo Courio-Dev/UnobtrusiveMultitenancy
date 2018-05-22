@@ -1,10 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <IsPackable>false</IsPackable>
-    <DebugType>full</DebugType>
-    <debugsymbols>True</debugsymbols>
+  <PropertyGroup>
+    <IsPackable>False</IsPackable>
+    <DebugType>Full</DebugType>
+    <Debugsymbols>True</Debugsymbols>
   </PropertyGroup>
+
   
   <ItemGroup>
     <None Remove="appsettings.json" />
@@ -18,21 +19,14 @@
     <None Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.1.0-preview1-final" />
-    <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.500-preview2-1-003177" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.0" />
-    <PackageReference Include="OpenCover" Version="4.6.519" />
-    
-    <PackageReference Include="xunit" Version="$(XunitVersion)" />
-    <PackageReference Include="xunit.analyzers" Version="$(XunitAnalyzersVersion)" />
-    <PackageReference Include="xunit.runner.console" Version="$(XunitVersion)" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="$(XunitVersion)" />
-    <DotNetCliToolReference Include="dotnet-xunit" Version="$(XunitVersion)" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Core.Mvc\Puzzle.Core.Multitenancy\Puzzle.Core.Multitenancy.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Folder Include="LibLog\" />
   </ItemGroup>
 
 </Project>

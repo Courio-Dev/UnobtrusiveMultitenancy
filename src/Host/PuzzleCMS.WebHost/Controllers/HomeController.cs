@@ -7,24 +7,40 @@
     using PuzzleCMS.WebHost.Constants;
     using PuzzleCMS.WebHost.Settings;
 
+    /// <summary>
+    /// HomeController.
+    /// </summary>
     public class HomeController : Controller
     {
         private readonly IOptions<AppSettings> appSettings;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HomeController"/> class.
+        /// Contructor of HomeController.
+        /// </summary>
         public HomeController(IOptions<AppSettings> appSettings)
         {
             this.appSettings = appSettings;
         }
 
+        /// <summary>
+        /// Index.
+        /// </summary>
         [Route("")]
         [Route("Home")]
         [Route("Home/Index")]
         [HttpGet("", Name = HomeControllerRoute.GetIndex)]
         public IActionResult Index() => View(HomeControllerAction.Index);
 
+        /// <summary>
+        /// About.
+        /// </summary>
         [HttpGet("about", Name = HomeControllerRoute.GetAbout)]
         public IActionResult About() => View(HomeControllerAction.About);
 
+        /// <summary>
+        /// Contact.
+        /// </summary>
         [HttpGet("contact", Name = HomeControllerRoute.GetContact)]
         public IActionResult Contact() => View(HomeControllerAction.Contact);
 
@@ -33,7 +49,7 @@
         /// The reason for dynamically generating this code is to enable generation of the full absolute sitemap URL
         /// and also to give you added flexibility in case you want to disallow search engines from certain paths. The
         /// sitemap is cached for one day, adjust this time to whatever you require. See
-        /// http://rehansaeed.com/dynamically-generating-robots-txt-using-asp-net-mvc/
+        /// http://rehansaeed.com/dynamically-generating-robots-txt-using-asp-net-mvc/.
         /// </summary>
         /// <returns>The robots text for the current site.</returns>
         [ResponseCache(CacheProfileName = CacheProfileName.RobotsText)]
@@ -44,7 +60,7 @@
         /// Gets the Open Search XML for the current site. You can customize the contents of this XML here. The open
         /// search action is cached for one day, adjust this time to whatever you require. See
         /// http://www.hanselman.com/blog/CommentView.aspx?guid=50cc95b1-c043-451f-9bc2-696dc564766d
-        /// http://www.opensearch.org
+        /// http://www.opensearch.org.
         /// </summary>
         /// <returns>The Open Search XML for the current site.</returns>
         [ResponseCache(CacheProfileName = CacheProfileName.OpenSearchXml)]
@@ -52,9 +68,8 @@
         public IActionResult OpenSearchXml() => Content(string.Empty, "application/xml", Encoding.UTF8);
 
         /// <summary>
-        /// Gets the sitemap XML for the current site. You can customize the contents of this XML from the
-        /// <see cref="SitemapService"/>. The sitemap is cached for one day, adjust this time to whatever you require.
-        /// http://www.sitemaps.org/protocol.html
+        /// Gets the sitemap XML for the current site. You can customize the contents of this XML from the.
+        /// http://www.sitemaps.org/protocol.html.
         /// </summary>
         /// <param name="index">The index of the sitemap to retrieve. <c>null</c> if you want to retrieve the root
         /// sitemap file, which may be a sitemap index file.</param>

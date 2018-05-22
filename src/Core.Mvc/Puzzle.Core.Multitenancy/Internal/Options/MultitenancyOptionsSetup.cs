@@ -14,7 +14,7 @@
     /// https://rimdev.io/strongly-typed-configuration-settings-in-asp-net-core-part-ii/
     /// http://henkmollema.github.io/advanced-options-configuration-in-asp.net-core/
     /// https://andrewlock.net/access-services-inside-options-and-startup-using-configureoptions/
-    /// http://blog.soat.fr/2015/09/asp-net-5-la-librairie-optionsmodel/
+    /// http://blog.soat.fr/2015/09/asp-net-5-la-librairie-optionsmodel/.
     /// </summary>
     internal class MultitenancyOptionsSetup : ConfigureOptions<MultitenancyOptions>
     {
@@ -42,7 +42,7 @@
         }
 
         /// <summary>
-        /// Set the default options
+        /// Set the default options.
         /// </summary>
         /// <param name="options">The MultitenancyOptions.</param>
         /// <param name="config">The configuration which contains MultitenancyOptions.</param>
@@ -53,7 +53,7 @@
         }
 
         /// <summary>
-        /// Allows for configuring the options instance before options are set
+        /// Allows for configuring the options instance before options are set.
         /// </summary>
         /// <param name="options">The MultitenancyOptions.</param>
         public override void Configure(MultitenancyOptions options)

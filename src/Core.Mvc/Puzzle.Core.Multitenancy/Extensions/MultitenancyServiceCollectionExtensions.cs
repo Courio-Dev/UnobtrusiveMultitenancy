@@ -15,12 +15,12 @@
         /// https://github.com/saaskit/saaskit/issues/68
         /// https://github.com/saaskit/saaskit/pull/69/files
         ///
-        /// https://github.com/aspnet/HttpAbstractions/blob/ab0185a0b8d0b7a80a6169fd78a45f00a28e057d/src/Microsoft.AspNetCore.Http.Extensions/UriHelper.cs
+        /// https://github.com/aspnet/HttpAbstractions/blob/ab0185a0b8d0b7a80a6169fd78a45f00a28e057d/src/Microsoft.AspNetCore.Http.Extensions/UriHelper.cs.
         /// </summary>
-        /// <typeparam name="TTenant">The Tenant class</typeparam>
-        /// <typeparam name="TResolver">The Resolver which resoles tenant</typeparam>
-        /// <param name="services">An IServiceCollection</param>
-        /// <returns>IServiceCollection</returns>
+        /// <typeparam name="TTenant">The Tenant class.</typeparam>
+        /// <typeparam name="TResolver">The Resolver which resoles tenant.</typeparam>
+        /// <param name="services">An IServiceCollection.</param>
+        /// <returns>IServiceCollection.</returns>
         public static IServiceCollection AddMultitenancy<TTenant, TResolver>(this IServiceCollection services)
             where TResolver : class, ITenantResolver<TTenant>
             where TTenant : class

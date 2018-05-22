@@ -8,7 +8,6 @@
     using System.Threading;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.FileProviders;
-    using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
     using Puzzle.Core.Multitenancy.Extensions;
     using Puzzle.Core.Multitenancy.Internal.Options;
@@ -104,9 +103,9 @@
 
         private void OverrideLoggerFactoryForTenant(IServiceCollection collectionClone, ServiceProvider provider, TTenant tenant)
         {
-            ILoggerFactory loggerFactory = new LoggerFactory();
+            /*ILoggerFactory loggerFactory = new LoggerFactory();
             loggerFactory.AddTenantLogger(tenant, provider, LogLevel.Trace);
-            collectionClone.AddSingleton(loggerFactory);
+            collectionClone.AddSingleton(loggerFactory);*/
         }
 
         private IServiceProvider GetProviderFromFactory(IServiceCollection collectionClone, TenantContext<TTenant> tenantContext)

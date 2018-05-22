@@ -10,29 +10,57 @@
     using Microsoft.AspNetCore.TestHost;
     using Microsoft.Extensions.DependencyInjection;
 
+    /// <summary>
+    /// Base class for multitenancy test.
+    /// </summary>
     public class MultitenancyAbstractIntegrationBaseTestServerFixtureBase : MultitenancyBaseFixture
     {
+        /// <summary>
+        /// The name of the settings file json.
+        /// </summary>
         protected const string Appsettings = "appsettings";
 
-        // internal string UrlTenant1 { get; } = "/tenant-1-1";
-        // internal string UrlTenant2 { get; } = "/tenant-2-1";
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MultitenancyAbstractIntegrationBaseTestServerFixtureBase"/> class.
+        /// </summary>
         public MultitenancyAbstractIntegrationBaseTestServerFixtureBase()
             : base()
         {
         }
 
+        /// <summary>
+        /// Gets object TestServer.
+        /// </summary>
         protected internal TestServer Server { get; } = new TestServer(CreateWebHostBuilder<TestTransientStartup, TestTenant, TestTenantMemoryCacheResolver>());
 
+        /// <summary>
+        /// Gets test base HttpClient for transient registry.
+        /// </summary>
         protected internal HttpClient ClientTransient { get; } = new TestServer(CreateWebHostBuilder<TestTransientStartup, TestTenant, TestTenantMemoryCacheResolver>()).CreateClient();
 
+        /// <summary>
+        /// Gets test base HttpClient for singleton registry.
+        /// </summary>
         protected internal HttpClient ClientSingleton { get; } = new TestServer(CreateWebHostBuilder<TestSingletonStartup, TestTenant, TestTenantMemoryCacheResolver>()).CreateClient();
 
+        /// <summary>
+        /// Gets test base HttpClient for scope registry.
+        /// </summary>
         protected internal HttpClient ClientScoped { get; } = new TestServer(CreateWebHostBuilder<TestScopedStartup, TestTenant, TestTenantMemoryCacheResolver>()).CreateClient();
 
+        /// <summary>
+        /// Gets test base HttpClient for override singleton registry.
+        /// </summary>
         protected internal HttpClient ClientOverrideSingleton { get; } = new TestServer(CreateWebHostBuilder<TestOverrideSingletonPerTenantStartup, TestTenant, TestTenantMemoryCacheResolver>()).CreateClient();
 
+        /// <summary>
+        /// Gets test base HttpClient for override transient registry.
+        /// </summary>
         protected internal HttpClient ClientOverrideTransient { get; } = new TestServer(CreateWebHostBuilder<TestOverrideTransientPerTenantStartup, TestTenant, TestTenantMemoryCacheResolver>()).CreateClient();
 
+        /// <summary>
+        /// Do the dispose.
+        /// </summary>
         public void Dispose()
         {
             Server?.Dispose();

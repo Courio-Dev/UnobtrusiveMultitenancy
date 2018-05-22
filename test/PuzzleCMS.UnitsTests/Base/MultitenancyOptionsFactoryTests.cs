@@ -8,6 +8,9 @@
     using Puzzle.Core.Multitenancy.Internal;
     using Puzzle.Core.Multitenancy.Internal.Options;
 
+    /// <summary>
+    /// Factory for MultitenancyOptions test.
+    /// </summary>
     public class MultitenancyOptionsFactoryTests : IOptionsFactory<MultitenancyOptions>
     {
         private readonly List<AppTenant> tenantList = new List<AppTenant>()
@@ -18,8 +21,8 @@
                    {
                       "/tenant-1-1",
                       "/tenant-1-2",
-                      "/tenant-1-3"
-                  }
+                      "/tenant-1-3",
+                  },
                },
               new AppTenant()
               {
@@ -27,22 +30,26 @@
                    {
                       "/tenant-2-1",
                       "/tenant-2-1",
-                      "/tenant-2-1"
-                  }
+                      "/tenant-2-1",
+                  },
                },
               new AppTenant()
               {
                    Name = "Tenant 2", Hostnames = new string[]
                    {
-                  }
-               }
+                  },
+               },
         };
 
+        /// <summary>
+        /// Returns MultitenancyOptions for test.
+        /// </summary>
+        /// <returns>MultitenancyOptions.</returns>
         public MultitenancyOptions Create(string name)
         {
             return new MultitenancyOptions()
             {
-                Tenants = new Collection<AppTenant>(tenantList)
+                Tenants = new Collection<AppTenant>(tenantList),
             };
         }
     }

@@ -19,6 +19,7 @@ if %errorlevel% equ 0 (
 )
  
 REM Launch the report
+REM -filter:"+[*]* -[*.UnitsTests]*" ^
 if %errorlevel% equ 0 (
  call :RunLaunchReport
 )
@@ -27,16 +28,17 @@ exit /b %errorlevel%
 :RunOpenCoverUnitTestMetrics
 "%~dp0\tools\OpenCover.4.6.519\tools\OpenCover.Console.exe" ^
 -target:"C:\Program Files\dotnet\dotnet.exe" ^
--targetargs:"test \"%~dp0\test\PuzzleCMS.UnitsTests\PuzzleCMS.UnitsTests.csproj\"" ^
--filter:"+[*]* -[*.UnitsTests]*" ^
+-targetargs:"test \"%~dp0\test\PuzzleCMS.UnitsTests\PuzzleCMS.UnitsTests.csproj\" --configuration DEBUG /p:DebugType=Full --verbosity normal"  ^
+-filter:"+[*]* -[*.UnitsTests]* -[xunit.*]* -[*.*Tests]*" ^
 -skipautoprops ^
 -oldStyle ^
 -mergeoutput ^
 -register:user ^
 -mergebyhash ^
+-excludebyattribute:*.ExcludeFromCoverage* ^
 -output:"%~dp0\GeneratedReports\artifacts\Coverage\coverage.xml"
 exit /b %errorlevel%
- 
+
 :RunReportGeneratorOutput
 "%~dp0\tools\ReportGenerator.3.1.2\tools\ReportGenerator.exe" ^
 -reports:"%~dp0\GeneratedReports\artifacts\Coverage\coverage.xml" ^

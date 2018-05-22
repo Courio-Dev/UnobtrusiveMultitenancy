@@ -1,5 +1,8 @@
 ﻿namespace PuzzleCMS.WebHost.Services
 {
+    /// <summary>
+    /// Service for manifest.
+    /// </summary>
     public interface IManifestService
     {
         /// <summary>

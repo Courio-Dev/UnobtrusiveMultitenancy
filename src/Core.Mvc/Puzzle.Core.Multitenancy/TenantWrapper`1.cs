@@ -3,7 +3,7 @@
     /// <summary>
     /// ITenant wrapper that returns the tenant instance.
     /// </summary>
-    /// <typeparam name="TTenant">The tenant object</typeparam>
+    /// <typeparam name="TTenant">The tenant object.</typeparam>
     public class TenantWrapper<TTenant> : ITenant<TTenant>
     {
         /// <summary>

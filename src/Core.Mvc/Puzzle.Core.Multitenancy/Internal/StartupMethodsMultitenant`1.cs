@@ -11,9 +11,9 @@
         public StartupMethodsMultitenant(StartupMethods methods, Action<IServiceCollection, TTenant> configurePerTenantServices)
             : this(
                 methods.StartupInstance,
-                 methods.ConfigureDelegate,
-                 methods.ConfigureServicesDelegate,
-                 configurePerTenantServices)
+                methods.ConfigureDelegate,
+                methods.ConfigureServicesDelegate,
+                configurePerTenantServices)
         {
         }
 

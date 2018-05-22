@@ -20,21 +20,20 @@
         {
             string pertenantKey = "PerTenant";
             string methodName = $@"Configure{pertenantKey}{{0}}Services";
-            MethodInfo servicesMethod = FindMethod(startupType, methodName, environmentName, typeof(IServiceProvider), required: false)
-                ?? FindMethod(startupType, methodName, environmentName, typeof(void), required: false);
+            MethodInfo servicesMethod = FindMethod(startupType, methodName, environmentName, typeof(IServiceProvider))
+                ?? FindMethod(startupType, methodName, environmentName, typeof(void));
             return new ConfigureMultitenantServicesBuilder<TTenant>(servicesMethod);
         }
 
         /// <summary>
-        /// Take from :https://github.com/aspnet/Hosting/blob/rel/1.1.0/src/Microsoft.AspNetCore.Hosting/Internal/StartupLoader.cs
+        /// Take from :https://github.com/aspnet/Hosting/blob/rel/1.1.0/src/Microsoft.AspNetCore.Hosting/Internal/StartupLoader.cs.
         /// </summary>
-        /// <param name="startupType">The type of the Startup Class</param>
-        /// <param name="methodName">The name of method to find in startup class</param>
-        /// <param name="environmentName">The environment(Dev,etc..)</param>
-        /// <param name="returnType">The type of return method</param>
-        /// <param name="required">Tell if method find is required or not, if required and not found then throw</param>
-        /// <returns>MethodInfo</returns>
-        private static MethodInfo FindMethod(Type startupType, string methodName, string environmentName, Type returnType = null, bool required = true)
+        /// <param name="startupType">The type of the Startup Class.</param>
+        /// <param name="methodName">The name of method to find in startup class.</param>
+        /// <param name="environmentName">The environment(Dev,etc..).</param>
+        /// <param name="returnType">The type of return method.</param>
+        /// <returns>MethodInfo.</returns>
+        private static MethodInfo FindMethod(Type startupType, string methodName, string environmentName, Type returnType = null)
         {
             // Copy the find method.
             // See https://github.com/aspnet/Hosting/blob/rel/1.1.0/src/Microsoft.AspNetCore.Hosting/Internal/StartupLoader.cs.
@@ -60,29 +59,11 @@
             MethodInfo methodInfo = selectedMethods.FirstOrDefault();
             if (methodInfo == null)
             {
-                if (required)
-                {
-                    throw new InvalidOperationException(string.Format(
-                        "A public method named '{0}' or '{1}' could not be found in the '{2}' type.",
-                        methodNameWithEnv,
-                        methodNameWithNoEnv,
-                        startupType.FullName));
-                }
-
                 return null;
             }
 
             if (returnType != null && methodInfo.ReturnType != returnType)
             {
-                if (required)
-                {
-                    throw new InvalidOperationException(string.Format(
-                        "The '{0}' method in the type '{1}' must have a return type of '{2}'.",
-                        methodInfo.Name,
-                        startupType.FullName,
-                        returnType.Name));
-                }
-
                 return null;
             }
 

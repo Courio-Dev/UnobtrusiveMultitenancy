@@ -6,14 +6,15 @@
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
     using Puzzle.Core.Multitenancy.Extensions;
+    using Puzzle.Core.Multitenancy.Internal.Logging;
+    using Puzzle.Core.Multitenancy.Internal.Logging.LibLog;
     using Puzzle.Core.Multitenancy.Internal.Options;
 
     internal class TenantPipelineMiddleware<TTenant>
     {
-        private readonly ILogger<TenantPipelineMiddleware<TTenant>> logger;
+        private readonly ILog<TenantPipelineMiddleware<TTenant>> logger;
         private readonly RequestDelegate next;
         private readonly IApplicationBuilder rootApp;
         private readonly IOptionsMonitor<MultitenancyOptions> optionsMonitor;
@@ -33,11 +34,12 @@
             IApplicationBuilder rootApp,
             Action<TenantPipelineBuilderContext<TTenant>,
             IApplicationBuilder> configuration, IOptionsMonitor<MultitenancyOptions> optionsMonitor,
+            ILog<TenantPipelineMiddleware<TTenant>> logger,
             IServiceFactoryForMultitenancy<TTenant> serviceFactoryForMultitenancy)
         {
             this.next = next ?? throw new ArgumentNullException($"Argument {nameof(next)} must not be null");
             this.rootApp = rootApp ?? throw new ArgumentNullException($"Argument {nameof(rootApp)} must not be null");
-            logger = rootApp.ApplicationServices.GetRequiredService<ILoggerFactory>().CreateLogger<TenantPipelineMiddleware<TTenant>>();
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.serviceFactoryForMultitenancy = serviceFactoryForMultitenancy ?? throw new ArgumentNullException(nameof(serviceFactoryForMultitenancy));
 
             this.configuration = configuration ?? throw new ArgumentNullException($"Argument {nameof(configuration)} must not be null");
@@ -47,7 +49,7 @@
                 pipelinesBranchBuilder.Clear();
 
                 // log change.
-                logger.LogDebug($"Config changed: {string.Join(", ", vals)}");
+                this.logger.Debug($"Config changed: {string.Join(", ", vals)}");
             });
         }
 

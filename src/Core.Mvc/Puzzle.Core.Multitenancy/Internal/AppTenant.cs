@@ -5,23 +5,41 @@
     using System.Text;
     using System.Text.RegularExpressions;
 
+    /// <summary>
+    /// The tenant object.
+    /// </summary>
     public class AppTenant
     {
+        /// <summary>
+        /// Gets or sets the name of tenant.
+        /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// Gets the id of tenant, thid must be unique.
+        /// </summary>
         public string Id => GenerateSlug(Name).ToLowerInvariant();
 
+        /// <summary>
+        /// Gets or sets list of hostname hosted by tenant.
+        /// </summary>
         public string[] Hostnames { get; set; }
 
+        /// <summary>
+        /// Gets or sets theme of tenant.
+        /// </summary>
         public string Theme { get; set; }
 
+        /// <summary>
+        /// Gets or sets connection string of tenant.
+        /// </summary>
         public string ConnectionString { get; set; }
 
         /// <summary>
-        /// Credit for this method goes to http://stackoverflow.com/questions/2920744/url-slugify-alrogithm-in-cs
+        /// Credit for this method goes to http://stackoverflow.com/questions/2920744/url-slugify-alrogithm-in-cs.
         /// </summary>
-        /// <param name="value">value</param>
-        /// <returns>string</returns>
+        /// <param name="value">value.</param>
+        /// <returns>string.</returns>
         private static string GenerateSlug(string value)
         {
             // prepare string, remove accents, lower case and convert hyphens to whitespace

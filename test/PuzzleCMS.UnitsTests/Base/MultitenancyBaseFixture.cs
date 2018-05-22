@@ -16,13 +16,20 @@
     using Puzzle.Core.Multitenancy;
     using Puzzle.Core.Multitenancy.Extensions;
     using Puzzle.Core.Multitenancy.Internal;
+    using Puzzle.Core.Multitenancy.Internal.Logging;
     using Puzzle.Core.Multitenancy.Internal.Options;
     using Puzzle.Core.Multitenancy.Internal.Resolvers;
     using Xunit;
     using static PuzzleCMS.UnitsTests.Base.MultitenancyBaseFixture;
 
+    /// <summary>
+    /// The common fixture for multitenancy test.
+    /// </summary>
     public class MultitenancyBaseFixture
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MultitenancyBaseFixture"/> class.
+        /// </summary>
         public MultitenancyBaseFixture()
         {
             TestHarness harness = new TestHarness();
@@ -34,6 +41,9 @@
 
         internal string UrlTenant2 { get; } = "/tenant-2-1";
 
+        /// <summary>
+        /// Gets the config.
+        /// </summary>
         protected static IConfigurationRoot Config { get; } = new ConfigurationBuilder()
                                                           .SetBasePath(Directory.GetCurrentDirectory())
                                                           .AddJsonFile($"appsettings.json", optional: false, reloadOnChange: true)
@@ -44,8 +54,8 @@
 
         internal static WebHostBuilder CreateWebHostBuilder<TStartup, TTenant, TResolver>()
             where TStartup : class
-             where TTenant : class
-             where TResolver : class, ITenantResolver<TTenant>
+            where TTenant : class
+            where TResolver : class, ITenantResolver<TTenant>
         {
             WebHostBuilder webHostBuilder = new WebHostBuilder();
             webHostBuilder.UseEnvironment("IntegrationTest");
@@ -68,7 +78,7 @@
             public TestHarness(bool disposeOnEviction = true, int cacheExpirationInSeconds = 10, bool evictAllOnExpiry = true)
             {
                 MemoryCacheTenantResolverOptions options = new MemoryCacheTenantResolverOptions { DisposeOnEviction = disposeOnEviction, EvictAllEntriesOnExpiry = evictAllOnExpiry };
-                Resolver = new TestTenantMemoryCacheResolver(Cache, LoggerFactory, options, cacheExpirationInSeconds);
+                Resolver = new TestTenantMemoryCacheResolver(Cache, new Log<TestTenantMemoryCacheResolver>(), options, cacheExpirationInSeconds);
 
                 ServiceProvider services = new ServiceCollection()
                         .AddSingleton<IOptionsFactory<MultitenancyOptions>, MultitenancyOptionsFactoryTests>()
@@ -76,21 +86,21 @@
                         .BuildServiceProvider();
 
                 IOptionsMonitor<MultitenancyOptions> monitor = services.GetRequiredService<IOptionsMonitor<MultitenancyOptions>>();
-                CachingAppTenantResolver = new CachingAppTenantResolver(Cache, LoggerFactory, monitor);
+                CachingAppTenantResolver = new CachingAppTenantResolver(Cache, new Log<CachingAppTenantResolver>(), monitor);
             }
 
             public IMemoryCache Cache { get; } = new MemoryCache(new MemoryCacheOptions()
             {
                 // for testing purposes, we'll scan every 100 milliseconds
                 ExpirationScanFrequency = TimeSpan.FromMilliseconds(100),
-                Clock = new Microsoft.Extensions.Internal.SystemClock()
+                Clock = new Microsoft.Extensions.Internal.SystemClock(),
             });
 
             public ITenantResolver<TestTenant> Resolver { get; }
 
             public ITenantResolver<AppTenant> CachingAppTenantResolver { get; }
 
-            protected static ILoggerFactory LoggerFactory { get; } = new LoggerFactory().AddConsole();
+            protected static ILog<MultitenancyBaseFixture> Logger { get; } = new Log<MultitenancyBaseFixture>();
         }
     }
 }

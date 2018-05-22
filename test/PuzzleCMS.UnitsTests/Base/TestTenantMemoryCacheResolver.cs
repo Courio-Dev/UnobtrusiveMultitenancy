@@ -11,11 +11,12 @@
     using Microsoft.Extensions.Caching.Memory;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
     using Puzzle.Core.Multitenancy;
     using Puzzle.Core.Multitenancy.Extensions;
     using Puzzle.Core.Multitenancy.Internal;
+    using Puzzle.Core.Multitenancy.Internal.Logging;
+    using Puzzle.Core.Multitenancy.Internal.Logging.LibLog;
     using Puzzle.Core.Multitenancy.Internal.Options;
     using Puzzle.Core.Multitenancy.Internal.Resolvers;
     using Xunit;
@@ -31,8 +32,8 @@
                                                     {
                                                        "/tenant-1-1",
                                                        "/tenant-1-2",
-                                                       "/tenant-1-3"
-                                                   }
+                                                       "/tenant-1-3",
+                                                   },
                                                 },
                                                new TestTenant()
                                                 {
@@ -40,26 +41,26 @@
                                                     {
                                                        "/tenant-2-1",
                                                        "/tenant-2-1",
-                                                       "/tenant-2-1"
-                                                   }
+                                                       "/tenant-2-1",
+                                                   },
                                                 },
                                                new TestTenant()
                                                 {
                                                     Name = "Tenant 2", Hostnames = new string[]
                                                     {
-                                                    }
-                                                }
+                                                    },
+                                                },
                                            };
 
         private readonly int cacheExpirationInSeconds;
 
-        public TestTenantMemoryCacheResolver(IMemoryCache cache, ILoggerFactory loggerFactory, int cacheExpirationInSeconds = 10)
-           : this(cache, loggerFactory, new MemoryCacheTenantResolverOptions(), cacheExpirationInSeconds)
+        public TestTenantMemoryCacheResolver(IMemoryCache cache, ILog<TestTenantMemoryCacheResolver> logger, int cacheExpirationInSeconds = 10)
+           : this(cache, logger, new MemoryCacheTenantResolverOptions(), cacheExpirationInSeconds)
         {
         }
 
-        public TestTenantMemoryCacheResolver(IMemoryCache cache, ILoggerFactory loggerFactory, MemoryCacheTenantResolverOptions options, int cacheExpirationInSeconds = 10)
-            : base(cache, loggerFactory, options)
+        public TestTenantMemoryCacheResolver(IMemoryCache cache, ILog log, MemoryCacheTenantResolverOptions options, int cacheExpirationInSeconds = 10)
+            : base(cache, log, options)
         {
             this.cacheExpirationInSeconds = cacheExpirationInSeconds;
         }
@@ -89,7 +90,7 @@
             {
                  tenantContext = new TenantContext<TestTenant>(tenant);
 
-                tenantContext.Properties.Add("Created", DateTime.UtcNow);
+                 tenantContext.Properties.Add("Created", DateTime.UtcNow);
             }
 
             return Task.FromResult(tenantContext);

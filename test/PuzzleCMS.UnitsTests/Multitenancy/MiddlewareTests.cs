@@ -33,12 +33,12 @@
 
             // Act
             // Assert
-            Task res() => Task.Run(() =>
+            Task Res() => Task.Run(() =>
             {
                 TestServer server = new TestServer(builder);
             });
 
-            Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(res).ConfigureAwait(false);
+            Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(Res).ConfigureAwait(false);
             Assert.Contains("configuration", ex.Message);
         }
 
@@ -53,12 +53,12 @@
 
             // Act
             // Assert
-            Task res() => Task.Run(() =>
+            Task Res() => Task.Run(() =>
             {
                 TestServer server = new TestServer(builder);
             });
 
-            Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(res).ConfigureAwait(false);
+            Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(Res).ConfigureAwait(false);
             Assert.Contains("app", ex.Message);
         }
 
@@ -73,12 +73,12 @@
 
             // Act
             // Assert
-            Task res() => Task.Run(() =>
+            Task Res() => Task.Run(() =>
             {
                 TestServer server = new TestServer(builder);
             });
 
-            Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(res).ConfigureAwait(false);
+            Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(Res).ConfigureAwait(false);
             Assert.Contains("app", ex.Message);
         }
 
@@ -87,13 +87,13 @@
         {
             // Arrange
             // Act
-            Task res() => Task.Run(() =>
+            Task Res() => Task.Run(() =>
             {
                 Puzzle.Core.Multitenancy.Extensions.WebHostBuilderExtensions.UseUnobtrusiveMulitenancyStartupWithDefaultConvention<TestStartup>(null);
             });
 
             // Assert
-            Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(res).ConfigureAwait(false);
+            Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(Res).ConfigureAwait(false);
             Assert.Contains("hostBuilder", ex.Message);
         }
 
@@ -102,14 +102,14 @@
         {
             // Arrange
             // Act
-            Task res() => Task.Run(() =>
+            Task Res() => Task.Run(() =>
             {
                 Puzzle.Core.Multitenancy.Extensions.WebHostBuilderExtensions.
                 UseUnobtrusiveMulitenancyStartup<TestStartup, TestTenant, TestTenantMemoryCacheResolver>(null);
             });
 
             // Assert
-            Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(res).ConfigureAwait(false);
+            Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(Res).ConfigureAwait(false);
             Assert.Contains("hostBuilder", ex.Message);
         }
 
@@ -118,13 +118,13 @@
         {
             // Arrange
             // Act
-            Task res() => Task.Run(() =>
+            Task Res() => Task.Run(() =>
             {
                 MultitenancyServiceCollectionExtensions.AddMultitenancy<TestTenant, TestTenantMemoryCacheResolver>(null);
             });
 
             // Assert
-            Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(res).ConfigureAwait(false);
+            Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(Res).ConfigureAwait(false);
             Assert.Contains("services", ex.Message);
         }
 

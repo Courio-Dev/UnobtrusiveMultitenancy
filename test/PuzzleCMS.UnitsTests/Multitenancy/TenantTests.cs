@@ -11,7 +11,7 @@
         {
             AppTenant tenant = new AppTenant()
             {
-                Name = null
+                Name = null,
             };
 
             Exception ex = Assert.Throws<ArgumentNullException>(() => tenant.Id);
@@ -31,7 +31,7 @@
         {
             AppTenant tenant = new AppTenant()
             {
-                Name = name
+                Name = name,
             };
 
             Assert.Equal(expectedId, tenant.Id);
@@ -42,7 +42,7 @@
         {
             AppTenant tenant = new AppTenant()
             {
-                Name = "Name"
+                Name = "Name",
             };
             TenantWrapper<AppTenant> tenantWrapper = new TenantWrapper<AppTenant>(tenant);
 

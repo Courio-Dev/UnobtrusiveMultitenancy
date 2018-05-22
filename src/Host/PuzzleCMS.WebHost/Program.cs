@@ -10,11 +10,17 @@
     using Serilog;
     using Serilog.Events;
 
+    /// <summary>
+    /// Program class.
+    /// </summary>
     public sealed class Program
     {
         private const string BasePathName = "Configs";
         private const string HostingJsonFileName = "hosting.json";
 
+        /// <summary>
+        /// The entry point.
+        /// </summary>
         public static int Main(string[] args)
         {
             IConfigurationRoot configuration = new ConfigurationBuilder()
@@ -49,6 +55,9 @@
             }
         }
 
+        /// <summary>
+        /// Build the IWebHostBuilder.
+        /// </summary>
         public static IWebHostBuilder CreateWebHostBuilder(string[] args)
         {
             IConfigurationRoot config = new ConfigurationBuilder()
@@ -68,6 +77,11 @@
                   .ConfigureAppConfiguration((context, configBuilder) =>
                    {
                        ConfigureConfigurationBuilder(context, configBuilder, args);
+                   })
+                  .ConfigureLogging((context, logging) =>
+                  {
+                       // clear all previously registered providers
+                       logging.ClearProviders();
                    })
                   .UseDefaultServiceProvider((context, options) =>
                   {

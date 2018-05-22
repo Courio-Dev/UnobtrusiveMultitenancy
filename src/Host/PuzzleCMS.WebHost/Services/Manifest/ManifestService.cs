@@ -6,11 +6,17 @@
     using Newtonsoft.Json.Linq;
     using PuzzleCMS.WebHost.Settings;
 
+    /// <inheritdoc/>
     public class ManifestService : IManifestService
     {
         private readonly IOptions<AppSettings> appSettings;
         private readonly IUrlHelper urlHelper;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ManifestService"/> class.
+        /// </summary>
+        /// <param name="appSettings">The settings of the application.</param>
+        /// <param name="urlHelper">Url helper.</param>
         public ManifestService(
             IOptions<AppSettings> appSettings,
             IUrlHelper urlHelper)
@@ -63,7 +69,7 @@
                 GetIconJObject("~/img/icons/android-chrome-72x72.png", "72x72", "image/png", "1.5"),
                 GetIconJObject("~/img/icons/android-chrome-96x96.png", "96x96", "image/png", "2.0"),
                 GetIconJObject("~/img/icons/android-chrome-144x144.png", "144x144", "image/png", "3.0"),
-                GetIconJObject("~/img/icons/android-chrome-192x192.png", "192x192", "image/png", "4.0")
+                GetIconJObject("~/img/icons/android-chrome-192x192.png", "192x192", "image/png", "4.0"),
             };
         }
     }

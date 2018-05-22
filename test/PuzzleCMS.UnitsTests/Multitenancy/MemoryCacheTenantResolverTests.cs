@@ -11,6 +11,8 @@
     using Microsoft.Extensions.Logging;
     using Puzzle.Core.Multitenancy;
     using Puzzle.Core.Multitenancy.Internal;
+    using Puzzle.Core.Multitenancy.Internal.Logging;
+    using Puzzle.Core.Multitenancy.Internal.Logging.LibLog;
     using Puzzle.Core.Multitenancy.Internal.Resolvers;
     using PuzzleCMS.UnitsTests.Base;
     using Xunit;
@@ -30,14 +32,14 @@
         [Theory]
         [ClassData(typeof(CacheTenantResolverTestData))]
         public async Task CannotResolveMemoryCaheAppTenantResolver_IfParamsIsnNull(
-            IMemoryCache cache, ILoggerFactory loggerFactory, MemoryCacheTenantResolverOptions options)
+            IMemoryCache cache, ILog log, MemoryCacheTenantResolverOptions options)
         {
-            Task res() => Task.Run(() =>
+            Task Res() => Task.Run(() =>
             {
-                TestTenantMemoryCacheResolver resolver = new TestTenantMemoryCacheResolver(cache, loggerFactory, options, cacheExpirationInSeconds: 1);
+                TestTenantMemoryCacheResolver resolver = new TestTenantMemoryCacheResolver(cache, log, options, cacheExpirationInSeconds: 1);
             });
 
-            Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(res).ConfigureAwait(false);
+            Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(Res).ConfigureAwait(false);
             Assert.NotNull(ex);
             Assert.NotNull(ex.Message);
         }
@@ -50,13 +52,13 @@
             HttpContext context = CreateContext(Fixture.UrlTenant1);
 
             // Act
-            Task res() => Task.Run(async () =>
+            Task Res() => Task.Run(async () =>
             {
                 TenantContext<TestTenant> tenantContext = await harness.Resolver.ResolveAsync(null);
             });
 
             // Assert
-            Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(res).ConfigureAwait(false);
+            Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(Res).ConfigureAwait(false);
             Assert.NotNull(ex);
             Assert.Contains("context", ex.Message);
         }
@@ -69,13 +71,13 @@
             HttpContext context = CreateContext(Fixture.UrlTenant1);
 
             // Act
-            Task res() => Task.Run(async () =>
+            Task Res() => Task.Run(async () =>
             {
                 TenantContext<AppTenant> tenantContext = await harness.CachingAppTenantResolver.ResolveAsync(null);
             });
 
             // Assert
-            Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(res).ConfigureAwait(false);
+            Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(Res).ConfigureAwait(false);
             Assert.NotNull(ex);
             Assert.Contains("context", ex.Message);
         }
@@ -140,15 +142,15 @@
             // Arrange
             TestHarness harness = new TestHarness();
 
-            Task res() => Task.Run(() =>
+            Task Res() => Task.Run(() =>
             {
                 CachingAppTenantResolver cachingAppTenantResolver = new CachingAppTenantResolver(
                harness.Cache,
-               new LoggerFactory().AddConsole(),
+               new Log<CachingAppTenantResolver>(),
                null);
             });
 
-            Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(res).ConfigureAwait(false);
+            Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(Res).ConfigureAwait(false);
             Assert.Contains("optionsMonitor", ex.Message);
         }
 
@@ -319,9 +321,9 @@
         {
             public IEnumerator<object[]> GetEnumerator()
             {
-                yield return new object[] { null, new LoggerFactory().AddConsole(), new MemoryCacheTenantResolverOptions() };
+                yield return new object[] { null, LogProvider.For<CacheTenantResolverTestData>(), new MemoryCacheTenantResolverOptions() };
                 yield return new object[] { new TestHarness().Cache, null, new MemoryCacheTenantResolverOptions() };
-                yield return new object[] { new TestHarness().Cache, new LoggerFactory().AddConsole(), null };
+                yield return new object[] { new TestHarness().Cache, LogProvider.For<CacheTenantResolverTestData>(), null };
                 yield return new object[] { null, null, null };
             }
 

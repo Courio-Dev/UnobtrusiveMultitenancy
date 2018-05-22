@@ -15,6 +15,8 @@
     using Puzzle.Core.Multitenancy.Constants;
     using Puzzle.Core.Multitenancy.Internal;
     using Puzzle.Core.Multitenancy.Internal.Configurations;
+    using Puzzle.Core.Multitenancy.Internal.Logging;
+    using Puzzle.Core.Multitenancy.Internal.Logging.LibLog;
     using Puzzle.Core.Multitenancy.Internal.Options;
     using Puzzle.Core.Multitenancy.Internal.Resolvers;
     using Puzzle.Core.Multitenancy.Internal.StartupFilters;
@@ -27,10 +29,10 @@
         /// <summary>
         /// Add multitenancy feature.
         /// </summary>
-        /// <typeparam name="TStartup">The stratup class</typeparam>
-        /// <param name="hostBuilder">The hostbuilder class</param>
-        /// <param name="multitenancyConfiguration">The configuration which contains MultitenancyOptions</param>
-        /// <returns>IWebHostBuilder</returns>
+        /// <typeparam name="TStartup">The stratup class.</typeparam>
+        /// <param name="hostBuilder">The hostbuilder class.</param>
+        /// <param name="multitenancyConfiguration">The configuration which contains MultitenancyOptions.</param>
+        /// <returns>IWebHostBuilder.</returns>
         public static IWebHostBuilder UseUnobtrusiveMulitenancyStartup<TStartup>(this IWebHostBuilder hostBuilder, IConfiguration multitenancyConfiguration)
             where TStartup : class
         {
@@ -46,12 +48,12 @@
         /// <summary>
         /// Add multitenancy feature.
         /// </summary>
-        /// <typeparam name="TStartup">The stratup class</typeparam>
-        /// <typeparam name="TTenant">The tenant class</typeparam>
-        /// <typeparam name="TResolver">The Resolver tenant</typeparam>
-        /// <param name="hostBuilder">hostBuilder</param>
-        /// <param name="multitenancyConfiguration">The configuration which contains MultitenancyOptions</param>
-        /// <returns>IWebHostBuilder</returns>
+        /// <typeparam name="TStartup">The stratup class.</typeparam>
+        /// <typeparam name="TTenant">The tenant class.</typeparam>
+        /// <typeparam name="TResolver">The Resolver tenant.</typeparam>
+        /// <param name="hostBuilder">hostBuilder.</param>
+        /// <param name="multitenancyConfiguration">The configuration which contains MultitenancyOptions.</param>
+        /// <returns>IWebHostBuilder.</returns>
         public static IWebHostBuilder UseUnobtrusiveMulitenancyStartup<TStartup, TTenant, TResolver>(
             this IWebHostBuilder hostBuilder, IConfiguration multitenancyConfiguration = null)
                 where TStartup : class
@@ -71,9 +73,9 @@
         /// <summary>
         /// Add multitenancy feature.
         /// </summary>
-        /// <typeparam name="TStartup">The stratup class</typeparam>
-        /// <param name="hostBuilder">hostBuilder</param>
-        /// <returns>IWebHostBuilder</returns>
+        /// <typeparam name="TStartup">The stratup class.</typeparam>
+        /// <param name="hostBuilder">hostBuilder.</param>
+        /// <returns>IWebHostBuilder.</returns>
         public static IWebHostBuilder UseUnobtrusiveMulitenancyStartupWithDefaultConvention<TStartup>(this IWebHostBuilder hostBuilder)
         where TStartup : class
         {
@@ -89,13 +91,13 @@
         /// <summary>
         /// Add multitenancy feature.
         /// </summary>
-        /// <typeparam name="TStartup">The stratup class</typeparam>
-        /// <typeparam name="TTenant">The tenant class</typeparam>
-        /// <typeparam name="TResolver">The Resolver tenant</typeparam>
-        /// <param name="hostBuilder">hostBuilder</param>
-        /// <param name="startupType">The type of the startup class</param>
-        /// <param name="multitenancyConfiguration">The configuration which contains MultitenancyOptions</param>
-        /// <returns>IWebHostBuilder</returns>
+        /// <typeparam name="TStartup">The stratup class.</typeparam>
+        /// <typeparam name="TTenant">The tenant class.</typeparam>
+        /// <typeparam name="TResolver">The Resolver tenant.</typeparam>
+        /// <param name="hostBuilder">hostBuilder.</param>
+        /// <param name="startupType">The type of the startup class.</param>
+        /// <param name="multitenancyConfiguration">The configuration which contains MultitenancyOptions.</param>
+        /// <returns>IWebHostBuilder.</returns>
         private static IWebHostBuilder UseUnobtrusiveMulitenancyStartup<TStartup, TTenant, TResolver>(
             this IWebHostBuilder hostBuilder,
             Type startupType,
@@ -134,14 +136,10 @@
                     {
                         services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
                         services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
-
-                        services.AddSingleton((s) => multitenancyConfig);
-                        /*
-                        services.AddSingleton<IConfigureOptions<MultitenancyOptions>, MultitenancyOptionsSetup>();
+                        /*services.AddSingleton<IConfigureOptions<MultitenancyOptions>, MultitenancyOptionsSetup>();
                         //services.Configure<MultitenancyOptions>(multitenancyConfig.Config.GetSection(nameof(MultitenancyOptions)));
                         services.AddScoped(cfg => cfg.GetService<IOptionsMonitor<MultitenancyOptions>>().CurrentValue);
-                        services.AddSingleton<IOptionsMonitor<MultitenancyOptions>, MonitorMultitenancyOptions>();
-                        */
+                        services.AddSingleton<IOptionsMonitor<MultitenancyOptions>, MonitorMultitenancyOptions>();*/
 
                         // Register multitenancy options.
                         services.AddMultitenancyOptions(multitenancyConfig);
@@ -168,11 +166,23 @@
                             IHostingEnvironment hostingEnvironment = provider.GetRequiredService<IHostingEnvironment>();
                             StartupMethodsMultitenant<TTenant> methods = StartupLoaderMultitenant.LoadMethods<TTenant>(provider, startupType, hostingEnvironment.EnvironmentName);
                             return new ConventionMultitenantBasedStartup<TTenant>(methods);
-                        },
-                        lifetime: ServiceLifetime.Singleton);
+                        }, lifetime: ServiceLifetime.Singleton);
 
                         // services.Add(staruptDescriptor);
                         services.Insert(0, staruptDescriptor);
+
+                        services.TryAdd(ServiceDescriptor.Singleton(typeof(ILog<>), typeof(Log<>)));
+
+                        services.AddSingleton<MultiTenancyConfig>(serviceProvider =>
+                        {
+                            /*// LogProvider logProvider = serviceProvider.GetService<LogProvider>();
+                            if (logProvider != null)
+                            {
+                                // multitenancyConfig.UseLogProvider(new AspNetCoreMultiTenantLogProvider(loggerFactory));
+                            }*/
+
+                            return multitenancyConfig;
+                        });
                     }
                 })
                 ;

@@ -1,22 +1,25 @@
 <Project>
 
-  <ItemGroup>
-    <PackageReference Include="StyleCop.Analyzers" Version="1.0.2">
+  <!--<ItemGroup>
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta007">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-  </ItemGroup>
+  </ItemGroup>-->
 
   <PropertyGroup>
     <CodeAnalysisRuleSet>$(SolutionDir)\CodeAnalysis.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>$(OutputPath)$(AssemblyName).xml</DocumentationFile>
     <Features>IOperation</Features>
-    <NoWarn>1701;1702;1705</NoWarn>
+    <NoWarn>$(NoWarn);1701;1702;1705;1101;1633</NoWarn>
+    <!--<NoWarn>$(NoWarn),1573,1591,1712</NoWarn>-->
     <RunCodeAnalysis>false</RunCodeAnalysis>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
     <WarningsAsErrors />
     <TreatSpecificWarningsAsErrors />
   </PropertyGroup>
    
   <ItemGroup>
+    <AdditionalFiles Include="$(SolutionDir)\CodeAnalysis.ruleset" Link="CodeAnalysis.ruleset" />
     <AdditionalFiles Include="$(SolutionDir)\Stylecop.json" Link="Stylecop.json" />
     <AdditionalFiles Include="$(SolutionDir)\GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
   </ItemGroup>

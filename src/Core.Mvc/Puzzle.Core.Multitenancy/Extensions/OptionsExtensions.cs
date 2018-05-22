@@ -11,11 +11,11 @@
     internal static class OptionsExtensions
     {
         /// <summary>
-        /// Add MultitenanCy Options
+        /// Add MultitenanCy Options.
         /// </summary>
-        /// <param name="services">An IServiceCollection</param>
+        /// <param name="services">An IServiceCollection.</param>
         /// <param name="multitenancyConfig">The object which containd multitenant config.</param>
-        /// <returns>IServiceCollection</returns>
+        /// <returns>IServiceCollection.</returns>
         internal static IServiceCollection AddMultitenancyOptions(this IServiceCollection services, MultiTenancyConfig multitenancyConfig)
         {
             if (services == null)

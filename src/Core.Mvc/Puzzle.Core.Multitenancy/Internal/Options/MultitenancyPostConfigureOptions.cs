@@ -13,6 +13,9 @@
     using Newtonsoft.Json.Converters;
     using Newtonsoft.Json.Serialization;
 
+    /// <summary>
+    /// Represents something that post configures the MultitenancyOptions type.
+    /// </summary>
     public class MultitenancyPostConfigureOptions : IPostConfigureOptions<MultitenancyOptions>
     {
         private const string OpenTokenReplacement = "{";
@@ -31,17 +34,25 @@
             StringEscapeHandling = StringEscapeHandling.EscapeHtml,
             Formatting = Newtonsoft.Json.Formatting.Indented,
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-            PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.Objects
+            PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.Objects,
         };
 
+        /// <summary>
+        /// Gets list of tokens replacement.
+        /// </summary>
         public Dictionary<string, string> TokenList { get; } = new Dictionary<string, string>()
         {
             // Default tokens.
             [string.Format(FormatReplacement, "DS")] = new string(DirectorySeparator, 2),
             [string.Format(FormatReplacement, "Env")] = string.Empty,
-            [string.Format(FormatReplacement, "TenantFolder")] = "App_Tenants"
+            [string.Format(FormatReplacement, "TenantFolder")] = "App_Tenants",
         };
 
+        /// <summary>
+        /// Invoked to configure a MultitenancyOptions instance.
+        /// </summary>
+        /// <param name="name">The name of the options instance being configured.</param>
+        /// <param name="options">The MultitenancyOptions instance to configured.</param>
         public void PostConfigure(string name, MultitenancyOptions options)
         {
             if (options == null)
@@ -94,10 +105,10 @@
         }
 
         /// <summary>
-        /// Convert object To Json String
+        /// Convert object To Json String.
         /// </summary>
-        /// <param name="obj">The object</param>
-        /// <returns>The json as string</returns>
+        /// <param name="obj">The object.</param>
+        /// <returns>The json as string.</returns>
         private string DumpToJsonString(object obj)
         {
             return JsonConvert.SerializeObject(obj, settings);

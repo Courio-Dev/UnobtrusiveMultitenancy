@@ -12,12 +12,23 @@
     using Puzzle.Core.Multitenancy;
     using Puzzle.Core.Multitenancy.Internal;
 
+    /// <summary>
+    /// The main start-up class for the application.
+    /// </summary>
     public class Startup
     {
         private readonly IConfiguration configuration;
         private readonly IHostingEnvironment hostingEnvironment;
         private readonly ILoggerFactory loggerFactory;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Startup"/> class.
+        /// </summary>
+        /// <param name="configuration">The configuration of the application.</param>
+        /// <param name="hostingEnvironment">The environment the application is running under. This can be Development,
+        /// Staging or Production by default.</param>
+        /// /// <param name="loggerFactory">The type used to configure the applications logging system.
+        /// See http://docs.asp.net/en/latest/fundamentals/logging.html.</param>
         public Startup(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
         {
             this.hostingEnvironment = hostingEnvironment ?? throw new ArgumentException(nameof(hostingEnvironment));
@@ -25,10 +36,23 @@
             this.loggerFactory = loggerFactory ?? throw new ArgumentException(nameof(loggerFactory));
         }
 
+        /// <summary>
+        /// Configures the services to add to the ASP.NET Core Injection of Control (IoC) container. This method gets
+        /// called by the ASP.NET runtime. See
+        /// http://blogs.msdn.com/b/webdev/archive/2014/06/17/dependency-injection-in-asp-net-vnext.aspx.
+        /// </summary>
+        /// <param name="services">The services collection or IoC container.</param>
         public void ConfigureServices(IServiceCollection services)
         {
         }
 
+        /// <summary>
+        /// Configures the services for specific tenant to add to the ASP.NET Core Injection of Control (IoC) container. This method gets
+        /// called by the ASP.NET runtime. See
+        /// http://blogs.msdn.com/b/webdev/archive/2014/06/17/dependency-injection-in-asp-net-vnext.aspx.
+        /// </summary>
+        /// <param name="services">The services collection or IoC container.</param>
+        /// <param name="tenant">The tenant object.</param>
         public void ConfigurePerTenantServices(IServiceCollection services, AppTenant tenant)
         {
             if (tenant.Id.ToUpperInvariant() == "Tenant-1".ToUpperInvariant())
@@ -40,6 +64,10 @@
             }
         }
 
+        /// <summary>
+        /// Configures the application and HTTP request pipeline. Configure is called after ConfigureServices is
+        /// called by the ASP.NET runtime.
+        /// </summary>
         public void Configure(IApplicationBuilder application, IApplicationLifetime appLifetime)
         {
             if (hostingEnvironment.IsDevelopment())

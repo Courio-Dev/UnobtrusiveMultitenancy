@@ -1,4 +1,9 @@
-﻿namespace Puzzle.Core.Multitenancy.Extensions
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace PuzzleCMS.WebHost.Infrastructure.Logging
 {
     using System;
     using System.Collections.Generic;
@@ -14,7 +19,7 @@
             this ILoggerFactory factory,
             TTenant tenant,
             IServiceProvider serviceProvider,
-            LogLevel minLevel)
+            Microsoft.Extensions.Logging.LogLevel minLevel)
         {
             IHttpContextAccessor httpContextAccessor = serviceProvider.GetService<IHttpContextAccessor>();
             AddTenantLogger(
@@ -30,9 +35,12 @@
             this ILoggerFactory factory,
             TTenant tenant,
             IHttpContextAccessor httpContextAccessor,
-            Func<string, LogLevel, bool> filter = null)
+            Func<string, Microsoft.Extensions.Logging.LogLevel, bool> filter = null)
         {
+            /*
             factory.AddProvider(new MultitenantLoggerProvider<TTenant>(tenant, factory, filter, httpContextAccessor));
+            */
+
             return factory;
         }
     }

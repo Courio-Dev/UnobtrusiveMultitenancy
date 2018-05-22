@@ -10,7 +10,7 @@
     using Serilog;
     using Serilog.Extensions.Logging;
     using ILogger = Microsoft.Extensions.Logging.ILogger;
-
+    /*
     internal class MultiTenantLogger<TTenant> : ILogger
     {
         private readonly ILogger logger;
@@ -60,4 +60,5 @@
             }
         }
     }
+    */
 }

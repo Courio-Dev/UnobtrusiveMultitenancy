@@ -1,4 +1,3 @@
-
 #tool nuget:?package=xunit.runner.console&version=2.3.1
 #tool nuget:?package=xunit.runner.visualstudio&version=2.3.1
 #tool nuget:?package=OpenCover&version=4.6.519
@@ -19,6 +18,9 @@ var configuration =
     HasArgument("Configuration") ? Argument<string>("Configuration") :
     EnvironmentVariable("Configuration") != null ? EnvironmentVariable("Configuration") : "Release";
 
+var parameters = BuildParameters.GetParameters(Context,target,configuration);
+var paths = BuildPaths.GetPaths(Context, parameters);
+
 // The build number to use in the version number of the built NuGet packages.
 // There are multiple ways this value can be passed, this is a common pattern.
 // 1. If command line parameter parameter passed, use that.
@@ -26,28 +28,26 @@ var configuration =
 // 3. Otherwise if running on Travis CI, get it's build number.
 // 4. Otherwise if an Environment variable exists, use that.
 // 5. Otherwise default the build number to 0.
+BuildVersion buildVersion=ReadVersionNumberFromProject(Context,paths.Files.VersionFile);
+var tempVersionSuffix = buildVersion.VersionSuffix;
+
 var preReleaseSuffix =
     HasArgument("PreReleaseSuffix") ? Argument<string>("PreReleaseSuffix") :
     (AppVeyor.IsRunningOnAppVeyor && AppVeyor.Environment.Repository.Tag.IsTag) ? null :
     EnvironmentVariable("PreReleaseSuffix") != null ? EnvironmentVariable("PreReleaseSuffix") :
-    "beta";
+    tempVersionSuffix;
 var buildNumber = HasArgument("BuildNumber") ?
     Argument<int>("BuildNumber") :
     AppVeyor.IsRunningOnAppVeyor ? AppVeyor.Environment.Build.Number :
     EnvironmentVariable("BuildNumber") != null ? int.Parse(EnvironmentVariable("BuildNumber")) :
     0;
 
-var parameters = BuildParameters.GetParameters(Context,target,configuration);
-var paths = BuildPaths.GetPaths(Context, parameters);
-
-BuildVersion buildVersion=ReadVersionNumberFromProject(Context,paths.Files.VersionFile);
- var revision = buildNumber.ToString("D4");
-var versionElement = string.IsNullOrEmpty(preReleaseSuffix) ? null : $"-{preReleaseSuffix}-{revision}";
 
 var finalVersionPrefix = buildVersion.VersionPrefix;
-var finalVersionSuffix = buildVersion.VersionSuffix.Replace("-*", versionElement);
+var finalVersionSuffix = string.IsNullOrEmpty(preReleaseSuffix) ? null :$"-{preReleaseSuffix}-{buildNumber.ToString("D4")}";
 
 var finalVersion= $"{finalVersionPrefix}{finalVersionSuffix}";
+
 
  var msBuildSettings = new DotNetCoreMSBuildSettings()
             .WithProperty("Version", finalVersion)
@@ -114,6 +114,7 @@ Task("Clean")
 Task("NuGet-Restore")
     .IsDependentOn("Clean")
     .Does(() =>NuGetRestore(paths.Files.Solution.ToString()));
+
 // NuGet restore packages for .NET Core projects only
 Task("DotNet-Core-Package-Restore")
     .IsDependentOn("NuGet-Restore")
@@ -124,17 +125,7 @@ Task("DotNet-Core-Package-Restore")
             Verbosity = DotNetCoreVerbosity.Minimal,            
         });
     });
-/*
-Task("Create-Version-Info").Does(() =>
-{
-    CreateAssemblyInfo(File("AssemblyVersionInfo.cs"), new AssemblyInfoSettings
-    {
-        Version = parameters.AssemblyVersion,
-        FileVersion = parameters.Version,
-        InformationalVersion = parameters.FullVersion
-    });
-});
-*/
+
 Task("Build")
     .Does(() =>DotNetCoreBuild(paths.Files.Solution.ToString(), dotNetCoreBuildSettings));
 // Look under a 'Tests' folder and run dotnet test against all of those projects.
@@ -171,7 +162,7 @@ Task("Test-OpenCover")
     .WithFilter("+[*]* -[*.UnitsTests]*")
     .WithFilter("-[xunit.*]*")
     .WithFilter("-[*.*Tests]*")
-    //.ExcludeByAttribute("*.ExcludeFromCodeCoverage*")
+    .ExcludeByAttribute("*.ExcludeFromCodeCoverage*")
     ;
  
     foreach(var project in paths.Files.TestProjects)
@@ -183,7 +174,6 @@ Task("Test-OpenCover")
             var projectFile = MakeAbsolute(project).ToString();
             var dotNetTestSettings = new DotNetCoreTestSettings
             {
-               /* Configuration = "Debug",*/
                Configuration = configuration,
                 NoBuild = true,
                 NoRestore = true,
@@ -294,6 +284,7 @@ Task("Copy-Files")
         //CopyFileToDirectory("./LICENSE", outputDirectory21); 
 
     });
+
 // Run dotnet pack to produce NuGet packages from our projects. Versions the package
 // using the build number argument on the script which is used as the revision number 
 // (Last number in 1.0.0.0). The packages are dropped in the Artifacts directory.
@@ -304,33 +295,9 @@ Task("Package-NuGet")
     .IsDependentOn("Copy-Files")
     .DoesForEach(paths.Files.AllNuspecsProjects,projectNuSpecToPack => 
     {
-        /*
-        var nuspecFile = projectNuSpecToPack.FullPath;
-        var nuspecContent = System.IO.File.ReadAllText(nuspecFile);
-        var nuspecDocument = XDocument.Parse(nuspecContent);
-        var ns = XNamespace.Get("http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd");
-        var versionElement = nuspecDocument.Element(ns + "package").Element(ns + "metadata").Element(ns + "version");
-        var finalVersion= versionElement.Value.Replace("-*", finalVersionSuffix);
-        versionElement.Value = finalVersion;
-        System.IO.File.WriteAllText(nuspecFile, nuspecDocument.ToString());
-        */
-
         // .NET Core
         var nuspecFile=projectNuSpecToPack.FullPath;
         var fullBasePath = GetOutputArtifactFromProjectFile(paths.Directories.ArtifactsBinNetCoreapp21,nuspecFile);
-
-        /*DotNetCorePack(projectNuSpecToPack.ChangeExtension(".csproj").FullPath,new DotNetCorePackSettings()
-        {
-            NoBuild = true,
-            NoRestore = true,
-            Configuration = configuration,
-            OutputDirectory = paths.Directories.ArtifactNugetsDirectory,
-            VersionSuffix = finalVersionSuffix,//finalVersion,
-            MSBuildSettings= msBuildSettings,
-            ArgumentCustomization = args => args
-                        .AppendSwitch("/p:NuspecFile","=",$"{nuspecFile}") 
-        });*/
-        
         // normal
         NuGetPack(nuspecFile, new NuGetPackSettings {
             Version = finalVersion,
@@ -339,9 +306,6 @@ Task("Package-NuGet")
             Symbols = false,
             NoPackageAnalysis = true
         });
-        
-        
-        //System.IO.File.WriteAllText(nuspecFile, nuspecContent);
     });
 
 //////////////////////////////////////////////////////////////////////

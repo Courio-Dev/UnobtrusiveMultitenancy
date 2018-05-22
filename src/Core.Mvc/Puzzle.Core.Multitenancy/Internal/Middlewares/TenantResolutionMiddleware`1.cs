@@ -3,24 +3,25 @@
     using System;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Http;
-    using Microsoft.Extensions.Logging;
     using Puzzle.Core.Multitenancy.Extensions;
+    using Puzzle.Core.Multitenancy.Internal.Logging;
+    using Puzzle.Core.Multitenancy.Internal.Logging.LibLog;
     using Puzzle.Core.Multitenancy.Internal.Resolvers;
 
     internal class TenantResolutionMiddleware<TTenant>
     {
         private readonly RequestDelegate next;
-        private readonly ILogger<TenantResolutionMiddleware<TTenant>> logger;
+        private readonly ILog<TenantResolutionMiddleware<TTenant>> logger;
         private readonly ITenantResolver<TTenant> tenantResolver;
 
-        public TenantResolutionMiddleware(RequestDelegate next, ILogger<TenantResolutionMiddleware<TTenant>> logger, ITenantResolver<TTenant> tenantResolver)
+        public TenantResolutionMiddleware(RequestDelegate next, ILog<TenantResolutionMiddleware<TTenant>> logger, ITenantResolver<TTenant> tenantResolver)
         {
             this.next = next ?? throw new ArgumentNullException($"Argument {nameof(next)} must not be null");
             this.logger = logger ?? throw new ArgumentNullException($"Argument {nameof(logger)} must not be null");
             this.tenantResolver = tenantResolver ?? throw new ArgumentNullException($"Argument {nameof(tenantResolver)} must not be null");
         }
 
-        public ILogger<TenantResolutionMiddleware<TTenant>> Logger => logger;
+        public ILog<TenantResolutionMiddleware<TTenant>> Logger => logger;
 
         public ITenantResolver<TTenant> TenantResolver => tenantResolver;
 
@@ -35,18 +36,18 @@
             // {
             //    throw new ArgumentNullException($"Argument {nameof(TenantResolver)} must not be null");
             // }
-            Logger.LogDebug("Resolving TenantContext using {loggerType}.", TenantResolver.GetType().Name);
+            Logger.Debug($"Resolving TenantContext using {TenantResolver.GetType().Name}.");
 
             TenantContext<TTenant> tenantContext = await TenantResolver.ResolveAsync(context).ConfigureAwait(false);
 
             if (tenantContext != null)
             {
-                Logger.LogDebug("TenantContext Resolved. Adding to HttpContext.");
+                Logger.Debug("TenantContext Resolved. Adding to HttpContext.");
                 context.SetTenantContext(tenantContext);
             }
             else
             {
-                Logger.LogDebug("TenantContext Not Resolved.");
+                Logger.Debug("TenantContext Not Resolved.");
             }
 
             await next.Invoke(context).ConfigureAwait(false);

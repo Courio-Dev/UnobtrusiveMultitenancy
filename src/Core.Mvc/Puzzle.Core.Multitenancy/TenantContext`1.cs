@@ -3,10 +3,18 @@
     using System;
     using System.Collections.Generic;
 
+    /// <summary>
+    /// Context of the tenant.
+    /// </summary>
+    /// <typeparam name="TTenant">Tenant object.</typeparam>
     public class TenantContext<TTenant> : IDisposable
     {
         private bool disposed;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TenantContext{TTenant}"/> class.
+        /// </summary>
+        /// <param name="tenant">Tenant object.</param>
         public TenantContext(TTenant tenant)
         {
             if (tenant == null)
@@ -18,18 +26,33 @@
             Properties = new Dictionary<string, object>();
         }
 
+        /// <summary>
+        /// Gets uniqueId that identify the tenant.
+        /// </summary>
         public string Id { get; } = Guid.NewGuid().ToString();
 
+        /// <summary>
+        /// Gets tenant object.
+        /// </summary>
         public TTenant Tenant { get; private set; }
 
+        /// <summary>
+        /// Gets additional store data for a tenant.
+        /// </summary>
         public IDictionary<string, object> Properties { get; }
 
+        /// <summary>
+        /// Dispose.
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Dispose.
+        /// </summary>
         protected virtual void Dispose(bool disposing)
         {
             if (disposed)

@@ -1,10 +1,25 @@
+# AppVeyor documentation https://www.appveyor.com/docs
+platform:
+  - Any CPU
+
+configuration:
+  - Release
+
+assembly_info:
+  patch: false
+
 # Build script
 version: '{build}'
 image: Previous Visual Studio 2017
 os: Previous Visual Studio 2017
+
+# branches to build
 branches:
+  # whitelist
   only:
-  - master
+    - master
+    - dev
+
 clone_depth: 1
 environment:
   global:
@@ -35,6 +50,9 @@ install:
   - ps: Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory($tempFileCurrent, $env:DOTNET_INSTALL_DIR)
   - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
 
+#---------------------------------#
+#       build configuration       #
+#---------------------------------#
 before_build:
   # Display .NET Core version
   - cmd: dotnet --version
@@ -49,8 +67,42 @@ after_build:
 on_finish :
   # any cleanup in here
 
-test: 'off'
-deploy: 'off'
+#---------------------------------#
+#       tests configuration       #
+#---------------------------------#
+
+test: off
+
+#---------------------------------#
+#      artifacts configuration    #
+#---------------------------------#
+
+artifacts:
+  - path: 'artifacts\Nugets\**\*.nupkg'
+  - path: 'build\**\*.zip'
+
+#---------------------------------#
+#      deployment configuration   #
+#---------------------------------#
+
+deploy:
+  - provider: GitHub
+    auth_token:
+      secure: xxx
+    artifact: /.*\.zip/
+    draft: true
+    on:
+      appveyor_repo_tag: true
+
+  - provider: NuGet
+    api_key: 
+      secure: xxx
+    on:
+      appveyor_repo_tag: true
+
+#---------------------------------#
+#      cache configuration        #
+#---------------------------------#
 
 cache:
 - tools -> build.cake
