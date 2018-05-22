@@ -23,7 +23,11 @@ osx_image: xcode9.2
 mono:
   - latest
 
-dotnet: 2.1.300-preview1-008174
+# dotnet: 2.1.300-preview1-008174
+dotnet: 2.1.4
+# sudo apt-get install apt-transport-https
+# sudo apt-get update
+# sudo apt-get install dotnet-sdk-2.1.300-preview2-008533
 
 env:
     # Set the DOTNET_SKIP_FIRST_TIME_EXPERIENCE environment variable to stop wasting time caching packages
