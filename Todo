@@ -2,15 +2,23 @@
 Target :
 ===
 
-Qui :  It technophile (dev , ...)
+Qui :  It technophile (dev asp.net core, ...)
 
 Quoi : Construire une application Multitenant avec Asp.net Core
 
+
 Où : Monde, 
 
-Quand : Ete 2018
+Quand : Début de projet, sur une application déjà existante
 
-Pourquoi : Réduire les coûts, Eviter de dupliquer le travail
+Pourquoi : Réduire les coûts, Eviter de dupliquer le travail, Time saving
+
+Message : Implémentation Multitenant avec asp.net core
+          Avantages et inconvénients d'une application multitenant (Fonctionnelle)
+         
+         
+         "Avec une architecture multi-tenant,concevoir un logiciel pour partitionner virtuellement ses données et sa configuration, 
+         et chaque organisation cliente travaille avec une instance virtuelle adaptée à ses besoins."
 
 Comment : 
       C#
@@ -20,4 +28,20 @@ Comment :
       
  Définition  Wikipedia ==>
       
+      En informatique, multi-tenant, ou multi-entité désigne un principe d'architecture logicielle permettant à un 
+      logiciel de servir plusieurs organisations clientes1 (tenant en anglais, ou locataire en français) à partir d'une seule installation. 
+      Elle s'oppose à une architecture multi-instance où chaque organisation cliente a sa propre instance d'installation logicielle 
+      (et/ou matérielle)2. 
+      Avec une architecture multi-tenant, un logiciel est conçu pour partitionner virtuellement ses données et sa configuration, 
+      et chaque organisation cliente travaille avec une instance virtuelle adaptée à ses besoins.
+      
+      https://www.linkedin.com/pulse/thinks-remember-while-testing-mulch-tenancy-rakesh-singh
+      
+      
+      https://en.wikipedia.org/wiki/Multitenancy
+      https://fr.wikipedia.org/wiki/Multi-tenant
+      https://www.computerworld.com/article/2517005/data-center/multi-tenancy-in-the-cloud--why-it-matters.html
+      
+      
+      https://www.oracle.com/database/technologies/multitenant.html
       
