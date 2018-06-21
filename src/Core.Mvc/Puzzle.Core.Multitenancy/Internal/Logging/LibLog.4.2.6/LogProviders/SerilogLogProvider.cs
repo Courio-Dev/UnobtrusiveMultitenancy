@@ -37,11 +37,9 @@
 namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
     using System.Reflection;
-    using System.Text;
 
     /// <summary>
     /// SerilogLogProvider.
@@ -269,14 +267,19 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                 {
                     case LogLevel.Fatal:
                         return FatalLevel;
+
                     case LogLevel.Error:
                         return ErrorLevel;
+
                     case LogLevel.Warn:
                         return WarningLevel;
+
                     case LogLevel.Info:
                         return InformationLevel;
+
                     case LogLevel.Trace:
                         return VerboseLevel;
+
                     default:
                         return DebugLevel;
                 }

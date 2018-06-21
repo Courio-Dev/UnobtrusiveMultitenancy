@@ -7,25 +7,46 @@
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Caching.Memory;
     using Microsoft.Extensions.Primitives;
-    using Puzzle.Core.Multitenancy.Internal.Logging;
+    using Puzzle.Core.Multitenancy.Internal.Configurations;
     using Puzzle.Core.Multitenancy.Internal.Logging.LibLog;
+    using Puzzle.Core.Multitenancy.Internal.Options;
 
     internal abstract class MemoryCacheTenantResolver<TTenant> : ITenantResolver<TTenant>
     {
         private readonly IMemoryCache cache;
+        private CancellationTokenSource resetCacheToken = new CancellationTokenSource();
         private readonly Logging.LibLog.ILog log;
         private readonly MemoryCacheTenantResolverOptions options;
+        private readonly IMultitenancyOptionsProvider<TTenant> multitenancyOptionsProvider;
 
-        public MemoryCacheTenantResolver(IMemoryCache cache, Logging.LibLog.ILog log)
-            : this(cache, log, new MemoryCacheTenantResolverOptions())
+        public MemoryCacheTenantResolver(IMultitenancyOptionsProvider<TTenant> multitenancyOptionsProvider,IMemoryCache cache, Logging.LibLog.ILog log)
+            : this(multitenancyOptionsProvider,cache, log, new MemoryCacheTenantResolverOptions())
         {
         }
 
-        public MemoryCacheTenantResolver(IMemoryCache cache, Logging.LibLog.ILog log, MemoryCacheTenantResolverOptions options)
+        public MemoryCacheTenantResolver(
+            IMultitenancyOptionsProvider<TTenant> multitenancyOptionsProvider,
+            IMemoryCache cache, 
+            Logging.LibLog.ILog log, 
+            MemoryCacheTenantResolverOptions options)
         {
             this.log = log ?? throw new ArgumentNullException($"Argument {nameof(log)} must not be null");
             this.cache = cache ?? throw new ArgumentNullException($"Argument {nameof(cache)} must not be null");
             this.options = options ?? throw new ArgumentNullException($"Argument {nameof(options)} must not be null");
+            this.multitenancyOptionsProvider = multitenancyOptionsProvider ?? throw new ArgumentNullException($"Argument {nameof(multitenancyOptionsProvider)} must not be null");
+        }
+
+        /// <inheritdoc />
+        public virtual void Reset()
+        {
+            CancellationTokenSource previousToken = Interlocked.Exchange(ref resetCacheToken, new CancellationTokenSource());
+            if (previousToken != null && !previousToken.IsCancellationRequested && previousToken.Token.CanBeCanceled)
+            {
+                previousToken?.Cancel();
+                previousToken?.Dispose();
+            }
+            
+            multitenancyOptionsProvider?.Reload();
         }
 
         async Task<TenantContext<TTenant>> ITenantResolver<TTenant>.ResolveAsync(HttpContext context)
@@ -37,11 +58,6 @@
 
             // Obtain the key used to identify cached tenants from the current request
             string cacheKey = GetContextIdentifier(context);
-
-            // if (cacheKey == null)
-            // {
-            //    return null;
-            // }
             if (string.IsNullOrWhiteSpace(cacheKey))
             {
                 return null;
@@ -66,7 +82,7 @@
 
                         foreach (string identifier in tenantIdentifiers)
                         {
-                            cache.Set(identifier, tenantContext, cacheEntryOptions);
+                            Set(cache,identifier, tenantContext, cacheEntryOptions,resetCacheToken);
                         }
                     }
                 }
@@ -81,8 +97,7 @@
 
         protected virtual MemoryCacheEntryOptions CreateCacheEntryOptions()
         {
-            return new MemoryCacheEntryOptions()
-                .SetSlidingExpiration(new TimeSpan(1, 0, 0));
+            return new MemoryCacheEntryOptions().SetSlidingExpiration(new TimeSpan(1, 0, 0));
         }
 
         protected virtual void DisposeTenantContext(object cacheKey, TenantContext<TTenant> tenantContext)
@@ -95,6 +110,8 @@
         }
 
         protected abstract string GetContextIdentifier(HttpContext context);
+
+        protected virtual IEnumerable<TTenant> Tenants => multitenancyOptionsProvider?.MultitenancyOptions?.Tenants;
 
         protected abstract IEnumerable<string> GetTenantIdentifiers(TenantContext<TTenant> context);
 
@@ -129,5 +146,15 @@
 
             return cacheEntryOptions;
         }
+
+        private TItem Set<TItem>(IMemoryCache cache, object key, TItem value, MemoryCacheEntryOptions options, CancellationTokenSource token)
+        {
+            MemoryCacheEntryOptions opt = options ?? new MemoryCacheEntryOptions().SetPriority(CacheItemPriority.Normal);
+            opt.AddExpirationToken(new CancellationChangeToken(token.Token));
+
+           return cache.Set(key, value, opt);
+        }
+
+
     }
 }

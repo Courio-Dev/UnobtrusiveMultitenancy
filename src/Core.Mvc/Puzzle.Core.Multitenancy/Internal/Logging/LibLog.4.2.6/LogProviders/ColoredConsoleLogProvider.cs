@@ -39,7 +39,6 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
     using System;
     using System.Collections.Generic;
     using System.Globalization;
-    using System.Text;
 
     /// <summary>
     /// Provider for build logger for console.

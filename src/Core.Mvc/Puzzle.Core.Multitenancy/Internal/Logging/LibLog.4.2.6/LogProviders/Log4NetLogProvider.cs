@@ -42,7 +42,6 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using System.Text;
 
     /// <summary>
     /// Log4NetLogProvider.
@@ -418,14 +417,19 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                     case LogLevel.Trace:
                     case LogLevel.Debug:
                         return levelDebug;
+
                     case LogLevel.Info:
                         return levelInfo;
+
                     case LogLevel.Warn:
                         return levelWarn;
+
                     case LogLevel.Error:
                         return levelError;
+
                     case LogLevel.Fatal:
                         return levelFatal;
+
                     default:
                         throw new ArgumentOutOfRangeException("logLevel", logLevel, null);
                 }

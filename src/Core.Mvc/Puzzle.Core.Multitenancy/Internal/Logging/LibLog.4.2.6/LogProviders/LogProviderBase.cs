@@ -37,8 +37,6 @@
 namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
 {
     using System;
-    using System.Collections.Generic;
-    using System.Text;
 
     /// <summary>
     /// LogProviderBase.

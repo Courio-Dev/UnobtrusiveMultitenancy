@@ -37,8 +37,6 @@
 namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog
 {
     using System;
-    using System.Collections.Generic;
-    using System.Text;
 
     /// <summary>
     /// Extenisons methos for class ILog.

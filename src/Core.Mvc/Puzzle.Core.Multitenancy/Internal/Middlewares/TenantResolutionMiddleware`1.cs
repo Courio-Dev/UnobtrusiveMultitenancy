@@ -2,7 +2,9 @@
 {
     using System;
     using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Http;
+    using Microsoft.Extensions.DependencyInjection;
     using Puzzle.Core.Multitenancy.Extensions;
     using Puzzle.Core.Multitenancy.Internal.Logging;
     using Puzzle.Core.Multitenancy.Internal.Logging.LibLog;
@@ -11,88 +13,36 @@
     internal class TenantResolutionMiddleware<TTenant>
     {
         private readonly RequestDelegate next;
-        private readonly ILog<TenantResolutionMiddleware<TTenant>> logger;
-        private readonly ITenantResolver<TTenant> tenantResolver;
+        private readonly IServiceScopeFactory scopeFactory;
 
-        public TenantResolutionMiddleware(RequestDelegate next, ILog<TenantResolutionMiddleware<TTenant>> logger, ITenantResolver<TTenant> tenantResolver)
+        public TenantResolutionMiddleware(RequestDelegate next, IServiceScopeFactory scopeFactory)
         {
             this.next = next ?? throw new ArgumentNullException($"Argument {nameof(next)} must not be null");
-            this.logger = logger ?? throw new ArgumentNullException($"Argument {nameof(logger)} must not be null");
-            this.tenantResolver = tenantResolver ?? throw new ArgumentNullException($"Argument {nameof(tenantResolver)} must not be null");
+            this.scopeFactory = scopeFactory ?? throw new ArgumentNullException($"Argument {nameof(scopeFactory)} must not be null");
         }
 
-        public ILog<TenantResolutionMiddleware<TTenant>> Logger => logger;
-
-        public ITenantResolver<TTenant> TenantResolver => tenantResolver;
-
-        public async Task Invoke(HttpContext context)
+        public async Task Invoke(
+            HttpContext httpContext,ILog<TenantResolutionMiddleware<TTenant>> logger, ITenantResolver<TTenant> tenantResolver)
         {
-            // if (next == null)
-            // {
-            //    throw new ArgumentNullException($"Argument {nameof(next)} must not be null");
-            // }
-
-            // if (TenantResolver == null)
-            // {
-            //    throw new ArgumentNullException($"Argument {nameof(TenantResolver)} must not be null");
-            // }
-            Logger.Debug($"Resolving TenantContext using {TenantResolver.GetType().Name}.");
-
-            TenantContext<TTenant> tenantContext = await TenantResolver.ResolveAsync(context).ConfigureAwait(false);
-
-            if (tenantContext != null)
+           // using (IServiceScope scope = rootApp.ApplicationServices.CreateScope())
             {
-                Logger.Debug("TenantContext Resolved. Adding to HttpContext.");
-                context.SetTenantContext(tenantContext);
-            }
-            else
-            {
-                Logger.Debug("TenantContext Not Resolved.");
+                // ITenantResolver<TTenant> tenantResolver = scope.ServiceProvider.GetRequiredService<ITenantResolver<TTenant>>();
+                // you have access to ScopedService here but don't let it leak to any middleware
+                logger?.Debug($"Resolving TenantContext using {tenantResolver.GetType().Name}.");
+                TenantContext<TTenant> tenantContext = await tenantResolver.ResolveAsync(httpContext).ConfigureAwait(false);
+
+                if (tenantContext != null)
+                {
+                    logger?.Debug("TenantContext Resolved. Adding to HttpContext.");
+                    httpContext?.SetTenantContext(tenantContext);
+                }
+                else
+                {
+                    logger?.Debug("TenantContext Not Resolved.");
+                }
             }
 
-            await next.Invoke(context).ConfigureAwait(false);
+            await next.Invoke(httpContext).ConfigureAwait(false);
         }
     }
-
-    // public class TenantResolutionMiddleware<TTenant>
-    // {
-    //    private readonly RequestDelegate next;
-    //    private readonly IApplicationBuilder rootApp;
-    //    private readonly ILogger log;
-    //    private readonly ITenantResolver<TTenant> tenantResolver;
-
-    // public TenantResolutionMiddleware(ILoggerFactory loggerFactory, RequestDelegate next, IApplicationBuilder rootApp, ITenantResolver<TTenant> tenantResolver)
-    //    {
-    //        if (loggerFactory == null) throw new ArgumentNullException($"Argument {nameof(loggerFactory)} must not be null");
-    //        if (next == null) throw new ArgumentNullException($"Argument {nameof(next)} must not be null");
-    //        if (rootApp == null) throw new ArgumentNullException($"Argument {nameof(rootApp)} must not be null");
-    //        if (tenantResolver == null) throw new ArgumentNullException($"Argument {nameof(tenantResolver)} must not be null");
-
-    // this.next = next;
-    //        this.rootApp = rootApp;
-    //        this.log = loggerFactory.CreateLogger<TenantResolutionMiddleware<TTenant>>();
-    //        this.tenantResolver = tenantResolver ?? throw new ArgumentNullException(nameof(tenantResolver));
-    //    }
-
-    // public async Task Invoke(HttpContext context)
-    //    {
-    //        if (context == null) throw new ArgumentNullException($"Argument {nameof(context)} must not be null");
-    //        if (tenantResolver == null) throw new ArgumentNullException($"Argument {nameof(tenantResolver)} must not be null");
-
-    // log.LogDebug("Resolving TenantContext using {loggerType}.", tenantResolver.GetType().Name);
-    //        var tenantContext = await tenantResolver.ResolveAsync(context);
-
-    // if (tenantContext != null)
-    //        {
-    //            log.LogDebug("TenantContext Resolved. Adding to HttpContext.");
-    //            context.SetTenantContext(tenantContext);
-    //        }
-    //        else
-    //        {
-    //            log.LogDebug("TenantContext Not Resolved.");
-    //        }
-
-    // await next.Invoke(context);
-    //    }
-    // }
 }

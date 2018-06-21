@@ -40,7 +40,6 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    using System.Text;
 
     /// <summary>
     /// TypeExtensions.
@@ -106,6 +105,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
         }
 
 #if LIBLOG_PORTABLE
+
         internal static MethodInfo GetGetMethod(this PropertyInfo propertyInfo)
         {
             return propertyInfo.GetMethod;
@@ -115,6 +115,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
         {
             return propertyInfo.SetMethod;
         }
+
 #endif
 
 #if !LIBLOG_PORTABLE

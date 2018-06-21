@@ -40,7 +40,6 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
-    using System.Text;
     using System.Text.RegularExpressions;
 
     /// <summary>

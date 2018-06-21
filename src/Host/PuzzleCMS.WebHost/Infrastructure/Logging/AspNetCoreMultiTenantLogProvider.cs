@@ -1,8 +1,6 @@
 ﻿namespace PuzzleCMS.WebHost.Infrastructure.Logging
 {
     using System;
-    using System.Collections.Generic;
-    using System.Text;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Logging.Internal;
     using Puzzle.Core.Multitenancy.Internal.Logging.LibLog;
@@ -82,14 +80,19 @@
                 {
                     case Logging.LibLog.LogLevel.Trace:
                         return Microsoft.Extensions.Logging.LogLevel.Trace;
+
                     case Logging.LibLog.LogLevel.Debug:
                         return Microsoft.Extensions.Logging.LogLevel.Debug;
+
                     case Logging.LibLog.LogLevel.Info:
                         return Microsoft.Extensions.Logging.LogLevel.Information;
+
                     case Logging.LibLog.LogLevel.Warn:
                         return Microsoft.Extensions.Logging.LogLevel.Warning;
+
                     case Logging.LibLog.LogLevel.Error:
                         return Microsoft.Extensions.Logging.LogLevel.Error;
+
                     case Logging.LibLog.LogLevel.Fatal:
                         return Microsoft.Extensions.Logging.LogLevel.Critical;
                 }

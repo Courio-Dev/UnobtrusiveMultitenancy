@@ -42,7 +42,6 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
     using System.Globalization;
     using System.Linq.Expressions;
     using System.Reflection;
-    using System.Text;
 
     /// <summary>
     /// EntLibLogProvider
@@ -213,12 +212,16 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                 {
                     case LogLevel.Fatal:
                         return TraceEventTypeValues.Critical;
+
                     case LogLevel.Error:
                         return TraceEventTypeValues.Error;
+
                     case LogLevel.Warn:
                         return TraceEventTypeValues.Warning;
+
                     case LogLevel.Info:
                         return TraceEventTypeValues.Information;
+
                     default:
                         return TraceEventTypeValues.Verbose;
                 }

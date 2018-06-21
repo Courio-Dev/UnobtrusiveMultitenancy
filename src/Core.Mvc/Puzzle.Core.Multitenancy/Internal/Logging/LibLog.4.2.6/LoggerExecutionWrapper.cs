@@ -37,9 +37,7 @@
 namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using System.Text;
 
     /// <summary>
     /// LoggerExecutionWrapper.

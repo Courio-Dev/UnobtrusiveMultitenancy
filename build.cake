@@ -4,11 +4,8 @@
 #tool nuget:?package=ReportGenerator&version=3.1.2
 #tool nuget:?package=GitVersion.CommandLine&version=3.6.5
 
-#load build/paths.cake
-#load build/urls.cake
-#load build/parameters.cake
-#load build/version.cake
-
+// Load other scripts.
+#load "./build/parameters.cake"
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 ///////////////////////////////////////////////////////////////////////////////
@@ -17,10 +14,6 @@ var target = Argument<string>("Target", "Default");
 var configuration =
     HasArgument("Configuration") ? Argument<string>("Configuration") :
     EnvironmentVariable("Configuration") != null ? EnvironmentVariable("Configuration") : "Release";
-
-var parameters = BuildParameters.GetParameters(Context,target,configuration);
-var paths = BuildPaths.GetPaths(Context, parameters);
-
 // The build number to use in the version number of the built NuGet packages.
 // There are multiple ways this value can be passed, this is a common pattern.
 // 1. If command line parameter parameter passed, use that.
@@ -28,36 +21,38 @@ var paths = BuildPaths.GetPaths(Context, parameters);
 // 3. Otherwise if running on Travis CI, get it's build number.
 // 4. Otherwise if an Environment variable exists, use that.
 // 5. Otherwise default the build number to 0.
-BuildVersion buildVersion=ReadVersionNumberFromProject(Context,paths.Files.VersionFile);
-var tempVersionSuffix = buildVersion.VersionSuffix;
-
 var preReleaseSuffix =
     HasArgument("PreReleaseSuffix") ? Argument<string>("PreReleaseSuffix") :
     (AppVeyor.IsRunningOnAppVeyor && AppVeyor.Environment.Repository.Tag.IsTag) ? null :
     EnvironmentVariable("PreReleaseSuffix") != null ? EnvironmentVariable("PreReleaseSuffix") :
-    tempVersionSuffix;
+    "beta";
 var buildNumber = HasArgument("BuildNumber") ?
     Argument<int>("BuildNumber") :
     AppVeyor.IsRunningOnAppVeyor ? AppVeyor.Environment.Build.Number :
     EnvironmentVariable("BuildNumber") != null ? int.Parse(EnvironmentVariable("BuildNumber")) :
     0;
+static DirectoryPath GetOutputArtifactFromProjectFile(DirectoryPath artifactsBinFolder,FilePath csprojFile)
+{
+    var fileWithoutExtension=System.IO.Path.GetFileNameWithoutExtension(csprojFile.FullPath);
+    return artifactsBinFolder.Combine(fileWithoutExtension);
+}
 
-
-var finalVersionPrefix = buildVersion.VersionPrefix;
-var finalVersionSuffix = string.IsNullOrEmpty(preReleaseSuffix) ? null :$"-{preReleaseSuffix}-{buildNumber.ToString("D4")}";
-
-var finalVersion= $"{finalVersionPrefix}{finalVersionSuffix}";
-
-
- var msBuildSettings = new DotNetCoreMSBuildSettings()
-            .WithProperty("Version", finalVersion)
-            .WithProperty("AssemblyVersion",finalVersionPrefix)
-            .WithProperty("FileVersion", finalVersionPrefix)
-            ;
-var dotNetCoreBuildSettings = new DotNetCoreBuildSettings {
+//////////////////////////////////////////////////////////////////////
+// PARAMETERS
+//////////////////////////////////////////////////////////////////////
+BuildParameters parameters = BuildParameters.GetParameters(Context,target,configuration,preReleaseSuffix,buildNumber);
+BuildPaths paths = parameters.Paths;
+BuildVersion buildVersion = parameters.Version;
+DotNetCoreMSBuildSettings msBuildSettings = new DotNetCoreMSBuildSettings()
+        .WithProperty("Version", buildVersion.Version)
+        .WithProperty("AssemblyVersion",buildVersion.VersionPrefix)
+        .WithProperty("FileVersion", buildVersion.VersionPrefix)
+        ;
+DotNetCoreBuildSettings   dotNetCoreBuildSettings = new DotNetCoreBuildSettings()
+{
         Configuration = configuration,
         NoRestore = true,
-        VersionSuffix =  finalVersionSuffix,
+        VersionSuffix =  buildVersion.VersionSuffix,
         ArgumentCustomization = args => args
                 .Append("--no-restore")
                 .AppendSwitch("/p:DebugType","=","Full")
@@ -65,19 +60,16 @@ var dotNetCoreBuildSettings = new DotNetCoreBuildSettings {
         MSBuildSettings=msBuildSettings
 };
 
-static DirectoryPath GetOutputArtifactFromProjectFile(DirectoryPath artifactsBinFolder,FilePath csprojFile)
-{
-    var fileWithoutExtension=System.IO.Path.GetFileNameWithoutExtension(csprojFile.FullPath);
-    return artifactsBinFolder.Combine(fileWithoutExtension);
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 // SETUP / TEARDOWN
 ///////////////////////////////////////////////////////////////////////////////
 Setup(context =>
 {
-	Information("Running tasks...");  
-    Information($"finalVersion {finalVersion}");  
+    Information($"Running tasks...{parameters}"); 
+    Information($"FinalVersion  {buildVersion.Version}"); 
+    Information($"VersionPrefix {buildVersion.VersionPrefix}");  
+    Information($"VersionSuffix {buildVersion.VersionSuffix}");  
+
     EnsureDirectoryExists(paths.Directories.Artifacts);
     EnsureDirectoryExists(paths.Directories.ArtifactsTestResults);
     EnsureDirectoryExists(paths.Directories.ArtifactCodeCoverageReportDirectory);
@@ -214,11 +206,7 @@ Task("Test-OpenCover")
 });
 
 Task("Report-Coverage")
-    .IsDependentOn("Test-OpenCover")
-    .WithCriteria(() => BuildSystem.IsLocalBuild)
-    .Does(() =>
-{
-});
+    .IsDependentOn("Test-OpenCover").WithCriteria(() => BuildSystem.IsLocalBuild).Does(() =>{});
 
 Task("Test-VSTest")
     .IsDependentOn("Build")
@@ -301,7 +289,7 @@ Task("Package-NuGet")
         var fullBasePath = GetOutputArtifactFromProjectFile(paths.Directories.ArtifactsBinNetCoreapp21,nuspecFile);
         // normal
         NuGetPack(nuspecFile, new NuGetPackSettings {
-            Version = finalVersion,
+            Version = buildVersion.Version,
             BasePath = fullBasePath,
             OutputDirectory = paths.Directories.ArtifactNugetsDirectory,
             Symbols = false,

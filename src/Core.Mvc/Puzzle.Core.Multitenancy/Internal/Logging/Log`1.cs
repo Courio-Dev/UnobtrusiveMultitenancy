@@ -1,8 +1,6 @@
 ﻿namespace Puzzle.Core.Multitenancy.Internal.Logging
 {
     using System;
-    using System.Collections.Generic;
-    using System.Text;
     using Puzzle.Core.Multitenancy.Internal.Logging.LibLog;
 
     /// <summary>
@@ -22,10 +20,9 @@
             log = LogProvider.For<T>();
         }
 
-
         bool ILog.Log(LogLevel logLevel, Func<string> messageFunc, Exception exception, params object[] formatParameters)
         {
-            return true;
+            return log.Log(logLevel, messageFunc, exception, formatParameters);
         }
     }
 }

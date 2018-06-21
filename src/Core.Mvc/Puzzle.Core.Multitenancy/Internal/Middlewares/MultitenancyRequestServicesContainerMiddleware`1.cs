@@ -33,17 +33,13 @@
         public async Task Invoke(HttpContext httpContext)
         {
             Debug.Assert(httpContext != null, nameof(httpContext));
-            if (serviceFactoryForMultitenancy == null)
-            {
-                throw new ArgumentNullException(nameof(serviceFactoryForMultitenancy));
-            }
 
             TenantContext<TTenant> tenantContext = httpContext.GetTenantContext<TTenant>();
             if (tenantContext != null)
             {
                 IServiceProvider existingRequestServices = httpContext.RequestServices;
 
-                using (RequestServicesFeature feature = new RequestServicesFeature(serviceFactoryForMultitenancy.Build(tenantContext).GetRequiredService<IServiceScopeFactory>()))
+                using (RequestServicesFeature feature = new RequestServicesFeature(httpContext,serviceFactoryForMultitenancy.Build(tenantContext).GetRequiredService<IServiceScopeFactory>()))
                 {
                     try
                     {

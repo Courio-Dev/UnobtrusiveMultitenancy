@@ -1,14 +1,19 @@
 ﻿namespace Puzzle.Core.Multitenancy.Internal
 {
     using System;
-    using System.Diagnostics;
+    using System.IO;
     using System.Reflection;
     using System.Runtime.ExceptionServices;
+    using System.Threading;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Options;
+    using Microsoft.Extensions.Primitives;
+    using Puzzle.Core.Multitenancy.Internal.Configurations;
     using Puzzle.Core.Multitenancy.Internal.Options;
+    using Puzzle.Core.Multitenancy.Internal.Resolvers;
 
     internal class ConventionMultitenantBasedStartup<TTenant> : IStartup
     {
@@ -16,15 +21,14 @@
 
         public ConventionMultitenantBasedStartup(StartupMethodsMultitenant<TTenant> methods)
         {
-            Debug.Assert(methods != null, nameof(methods));
-
-            this.methods = methods;
+            this.methods = methods ?? throw new ArgumentNullException($"Argument {nameof(methods)} must not be null");
         }
 
         public void Configure(IApplicationBuilder app)
         {
             try
             {
+                app.ApplicationServices.GetService<IOptionsMonitor<MultitenancyOptions<TTenant>>>();
                 methods.ConfigureDelegate(app);
             }
             catch (Exception ex)
@@ -44,8 +48,8 @@
             {
                 using (ServiceProvider provider = methods.ConfigureServicesDelegate(services) as ServiceProvider)
                 {
-                    IOptionsMonitor<MultitenancyOptions> optionsMonitor = provider.GetRequiredService<IOptionsMonitor<MultitenancyOptions>>();
-                    services.AddSingleton<IServiceFactoryForMultitenancy<TTenant>>(_ =>
+                    IOptionsMonitor<MultitenancyOptions<TTenant>> optionsMonitor = provider.GetRequiredService<IOptionsMonitor<MultitenancyOptions<TTenant>>>();
+                    services.AddScoped<IServiceFactoryForMultitenancy<TTenant>>(_ =>
                     {
                         return new ServiceFactoryForMultitenancy<TTenant>(services.Clone(), methods.ConfigurePerTenantServicesDelegate, optionsMonitor);
                     });

@@ -1,15 +1,5 @@
 ﻿namespace Puzzle.Core.Multitenancy.Internal.Logging
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Text;
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.Extensions.Logging;
-    using Puzzle.Core.Multitenancy.Extensions;
-    using Serilog;
-    using Serilog.Extensions.Logging;
-    using ILogger = Microsoft.Extensions.Logging.ILogger;
     /*
     internal class MultiTenantLogger<TTenant> : ILogger
     {

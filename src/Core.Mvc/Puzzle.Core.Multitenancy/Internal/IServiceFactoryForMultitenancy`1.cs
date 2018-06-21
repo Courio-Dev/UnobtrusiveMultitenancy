@@ -9,28 +9,25 @@
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.FileProviders;
     using Microsoft.Extensions.Options;
-    using Puzzle.Core.Multitenancy.Extensions;
     using Puzzle.Core.Multitenancy.Internal.Options;
     using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
     internal interface IServiceFactoryForMultitenancy<TTenant>
     {
         IServiceProvider Build(TenantContext<TTenant> tenantContext);
+
+        void RemoveAll();
     }
 
     internal class ServiceFactoryForMultitenancy<TTenant> : IServiceFactoryForMultitenancy<TTenant>
     {
-        private readonly IOptionsMonitor<MultitenancyOptions> optionsMonitor;
+        private readonly IOptionsMonitor<MultitenancyOptions<TTenant>> optionsMonitor;
 
         public ServiceFactoryForMultitenancy(
-            IServiceCollection services, Action<IServiceCollection, TTenant> configurePerTenantServicesDelegate, IOptionsMonitor<MultitenancyOptions> optionsMonitor)
+            IServiceCollection services, Action<IServiceCollection, TTenant> configurePerTenantServicesDelegate, IOptionsMonitor<MultitenancyOptions<TTenant>> optionsMonitor)
             : this()
         {
             this.optionsMonitor = optionsMonitor ?? throw new ArgumentNullException($"Argument {nameof(optionsMonitor)} must not be null");
-            this.optionsMonitor.OnChange(vals =>
-            {
-                Cache?.Clear();
-            });
             Services = services;
             ConfigurePerTenantServicesDelegate = configurePerTenantServicesDelegate;
         }
@@ -63,6 +60,8 @@
 
             return value;
         }
+
+        public void RemoveAll() => Cache.Clear();
 
         private static void CreateFolderIfNotExist(string path)
         {
@@ -152,7 +151,7 @@
             return services;
         }
 
-        private IServiceCollection Replace<TService, TImplementation>(IServiceCollection services, ServiceLifetime lifetime)
+        /*private IServiceCollection Replace<TService, TImplementation>(IServiceCollection services, ServiceLifetime lifetime)
             where TService : class
             where TImplementation : class, TService
         {
@@ -161,7 +160,7 @@
             ServiceDescriptor descriptorToAdd = new ServiceDescriptor(typeof(TService), typeof(TImplementation), lifetime);
             services.Add(descriptorToAdd);
             return services;
-        }
+        }*/
 
         private class LazyConcurrentDictionary<TKey, TValue>
         {

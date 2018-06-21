@@ -20,7 +20,7 @@ addons:
 osx_image: xcode7.2
 
 # Ensure that .NET Core is installed
-dotnet: 2.1.105
+dotnet: 2.1.300
 # dotnet: 2.1.300-preview1-008174
 # sudo apt-get install apt-transport-https
 # sudo apt-get update

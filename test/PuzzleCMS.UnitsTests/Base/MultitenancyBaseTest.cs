@@ -1,22 +1,6 @@
 ﻿namespace PuzzleCMS.UnitsTests.Base
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.IO;
-    using System.Linq;
-    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.Extensions.Caching.Memory;
-    using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Options;
-    using Puzzle.Core.Multitenancy;
-    using Puzzle.Core.Multitenancy.Extensions;
-    using Puzzle.Core.Multitenancy.Internal;
-    using Puzzle.Core.Multitenancy.Internal.Options;
     using Puzzle.Core.Multitenancy.Internal.Resolvers;
     using Xunit;
     using static PuzzleCMS.UnitsTests.Base.MultitenancyBaseFixture;

@@ -8,7 +8,6 @@
     using Microsoft.Extensions.Logging;
     using Puzzle.Core.Multitenancy.Extensions;
     using Serilog;
-    using Serilog.Events;
 
     /// <summary>
     /// Program class.
@@ -32,6 +31,7 @@
 
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
+                .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Fatal)
                 .CreateLogger();
 
             try
@@ -69,9 +69,6 @@
 
             return Microsoft.AspNetCore.WebHost
                   .CreateDefaultBuilder()
-                  .CaptureStartupErrors(false)
-                  .SuppressStatusMessages(false)
-                  .UseSetting(WebHostDefaults.DetailedErrorsKey, value: true.ToString().ToLower())
                   .UseConfiguration(config)
                   .UseSerilog()
                   .ConfigureAppConfiguration((context, configBuilder) =>
@@ -80,18 +77,12 @@
                    })
                   .ConfigureLogging((context, logging) =>
                   {
-                       // clear all previously registered providers
-                       logging.ClearProviders();
-                   })
-                  .UseDefaultServiceProvider((context, options) =>
-                  {
-                      options.ValidateScopes = context.HostingEnvironment.IsDevelopment();
+                      // clear all previously registered providers
+                      logging.ClearProviders();
                   })
                   .UseIISIntegration()
-                  .UseAzureAppServices()
-
-                  // .PreferHostingUrls(false)
                   .UseUnobtrusiveMulitenancyStartupWithDefaultConvention<Startup>()
+                  .UseDefaultServiceProvider(options =>options.ValidateScopes = false)
                   ;
         }
 

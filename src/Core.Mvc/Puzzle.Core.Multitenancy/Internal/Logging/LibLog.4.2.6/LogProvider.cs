@@ -39,7 +39,6 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using System.Text;
     using Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders;
 
     /// <summary>
@@ -75,6 +74,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog
         internal delegate ILogProvider CreateLogProvider();
 
 #if !LIBLOG_PROVIDERS_ONLY
+
         /// <summary>
         /// Gets or sets a value indicating whether this is logging is disabled.
         /// </summary>
@@ -195,6 +195,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog
                 ? new DisposableAction(() => { })
                 : logProvider.OpenMappedContext(key, value);
         }
+
 #endif
 
         [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "System.Console.WriteLine(System.String,System.Object,System.Object)", Justification = "Pending")]

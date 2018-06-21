@@ -1,8 +1,6 @@
 ﻿namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog
 {
     using System;
-    using System.Collections.Generic;
-    using System.Text;
 
     /// <summary>
     /// DisposableAction.

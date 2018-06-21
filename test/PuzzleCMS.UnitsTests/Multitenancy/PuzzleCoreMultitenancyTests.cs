@@ -1,16 +1,20 @@
 ﻿namespace PuzzleCMS.UnitsTests.Multitenancy
 {
+    using System.Collections.Generic;
     using System.IO;
     using System.Net.Http;
     using System.Reflection;
+    using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.TestHost;
     using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Options;
     using Puzzle.Core.Multitenancy.Constants;
     using Puzzle.Core.Multitenancy.Extensions;
+    using Puzzle.Core.Multitenancy.Internal.Options;
     using PuzzleCMS.UnitsTests.Base;
     using Xunit;
 
@@ -53,6 +57,9 @@
 
         protected string UrlTenant2 { get; }
 
+
+        protected void SetConfig(Dictionary<string, string> additionnal) => TestServerFixture.SetConfig(additionnal);
+
         [Fact]
         public async Task FallbackToDefaultUseStartupBehavior_WhenMultitenantOptionsIsNotProvided()
         {
@@ -63,7 +70,7 @@
                 webHostBuilder.UseEnvironment("IntegrationTest");
                 webHostBuilder.UseKestrel();
                 webHostBuilder.UseContentRoot(Directory.GetCurrentDirectory());
-                webHostBuilder.UseUnobtrusiveMulitenancyStartup<DefaultTestStartup>(null);
+                webHostBuilder.UseUnobtrusiveMulitenancyStartup<DefaultTestStartup>(null,false);
 
                 return webHostBuilder;
             }
@@ -94,7 +101,7 @@
                 webHostBuilder.UseEnvironment("IntegrationTest");
                 webHostBuilder.UseKestrel();
                 webHostBuilder.UseContentRoot(Directory.GetCurrentDirectory());
-                webHostBuilder.UseUnobtrusiveMulitenancyStartupWithDefaultConvention<DefaultTestStartup>();
+                webHostBuilder.UseUnobtrusiveMulitenancyStartupWithDefaultConvention<DefaultTestStartup>(false);
 
                 return webHostBuilder;
             }
@@ -270,6 +277,60 @@
 
             Assert.Equal("Tenant 1::ValueSingletonService_Override_Tenant1", responseFirstTenant);
             Assert.Equal("Tenant 2::ValueSingletonService_Override_Tenant2", responseSecondTenant);
+        }
+
+        [Fact]
+        public async Task CanRegisterAndOverrideSingletonServiceIsPerTenant_WhenUseMultitenancy2()
+        {
+            // Act    
+            string newAddedTenantUrl = "/tenant-5-1";
+            string newAddedTenantName = "Tenant 5";
+            IOptionsMonitor<MultitenancyOptions<TestTenant>> options= Server
+                .Host
+                .Services
+                .GetService(typeof(IOptionsMonitor<MultitenancyOptions<TestTenant>>)) as IOptionsMonitor<MultitenancyOptions<TestTenant>>;
+
+            //BEFORE
+            string responseNewTenant = await ClientTransient.GetStringAsync(newAddedTenantUrl).ConfigureAwait(false);
+            // protected internal HttpClient ClientTransient { get; } = new TestServer(CreateWebHostBuilder<TestTransientStartup, TestTenant, TestTenantMemoryCacheResolver>()).CreateClient();
+
+            Assert.True(string.IsNullOrWhiteSpace(responseNewTenant));
+            Assert.True(options.CurrentValue.Tenants.Count == 4);
+
+            //Add value in configuration
+            SetConfig(new Dictionary<string, string>()
+            {
+                    {"MultitenancyOptions:Tenants:4:Name", newAddedTenantName},
+                    {"MultitenancyOptions:Tenants:4:Theme",""},
+                    {"MultitenancyOptions:Tenants:4:ConnectionString", "555555555555555"},
+                    {"MultitenancyOptions:Tenants:4:Hostnames:0", newAddedTenantUrl},
+                    {"MultitenancyOptions:Tenants:4:Hostnames:1", "localhost:555555555555555"},
+            });
+
+            //AFTER
+            // wait 1 second
+            Thread.Sleep(1000);
+
+            SetConfig(new Dictionary<string, string>()
+            {
+                    {"MultitenancyOptions:Tenants:4:Name", newAddedTenantName},
+                    {"MultitenancyOptions:Tenants:4:Theme",""},
+                    {"MultitenancyOptions:Tenants:4:ConnectionString", "555555555555555"},
+                    {"MultitenancyOptions:Tenants:4:Hostnames:0", newAddedTenantUrl},
+                    {"MultitenancyOptions:Tenants:4:Hostnames:1", "localhost:555555555555555"},
+            });
+
+            // wait 1 second
+            Thread.Sleep(1000);
+
+            options = Server
+                .Host
+                .Services
+                .GetService(typeof(IOptionsMonitor<MultitenancyOptions<TestTenant>>)) as IOptionsMonitor<MultitenancyOptions<TestTenant>>;
+            responseNewTenant = await ClientTransient.GetStringAsync(newAddedTenantUrl).ConfigureAwait(false);
+
+            //Assert.StartsWith(newAddedTenantName, responseNewTenant);
+            Assert.True(options.CurrentValue.Tenants.Count == 5);
         }
 
         private class DefaultTestStartup

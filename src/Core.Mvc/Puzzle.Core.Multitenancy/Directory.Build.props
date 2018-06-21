@@ -3,5 +3,7 @@
 
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!--<DocumentationFile Condition=" '$(GenerateDocumentationFile)' == 'true' and '$(DocumentationFile)' == '' ">$(OutputPath)/$(AssemblyName).xml</DocumentationFile>-->
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Puzzle.Core.Multitenancy.xml</DocumentationFile>
   </PropertyGroup>
 </Project>

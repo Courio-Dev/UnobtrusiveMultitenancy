@@ -37,8 +37,6 @@
 namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog
 {
     using System;
-    using System.Collections.Generic;
-    using System.Text;
 
     /// <summary>
     /// Represents a way to get a <see cref="ILog"/>

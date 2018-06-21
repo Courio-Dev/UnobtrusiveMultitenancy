@@ -17,7 +17,7 @@
         private readonly ILog<TenantPipelineMiddleware<TTenant>> logger;
         private readonly RequestDelegate next;
         private readonly IApplicationBuilder rootApp;
-        private readonly IOptionsMonitor<MultitenancyOptions> optionsMonitor;
+        private readonly IOptionsMonitor<MultitenancyOptions<TTenant>> optionsMonitor;
 
         private readonly IServiceFactoryForMultitenancy<TTenant> serviceFactoryForMultitenancy;
 
@@ -33,7 +33,7 @@
             RequestDelegate next,
             IApplicationBuilder rootApp,
             Action<TenantPipelineBuilderContext<TTenant>,
-            IApplicationBuilder> configuration, IOptionsMonitor<MultitenancyOptions> optionsMonitor,
+            IApplicationBuilder> configuration, IOptionsMonitor<MultitenancyOptions<TTenant>> optionsMonitor,
             ILog<TenantPipelineMiddleware<TTenant>> logger,
             IServiceFactoryForMultitenancy<TTenant> serviceFactoryForMultitenancy)
         {

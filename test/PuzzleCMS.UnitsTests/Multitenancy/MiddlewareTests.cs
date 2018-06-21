@@ -1,17 +1,11 @@
 ﻿namespace PuzzleCMS.UnitsTests.Multitenancy
 {
     using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Net.Http;
-    using System.Text;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.TestHost;
-    using Microsoft.Extensions.Configuration;
     using Puzzle.Core.Multitenancy.Extensions;
-    using Puzzle.Core.Multitenancy.Internal.Middlewares;
     using PuzzleCMS.UnitsTests.Base;
     using Xunit;
 
@@ -48,7 +42,7 @@
             // Arrange
             IWebHostBuilder builder = new WebHostBuilder().Configure(app =>
             {
-                    UsePerTenantApplicationBuilderExtensions.UsePerTenant<TestTenant>(null, null);
+                UsePerTenantApplicationBuilderExtensions.UsePerTenant<TestTenant>(null, null);
             });
 
             // Act
@@ -149,9 +143,6 @@
                   //  app.ApplicationServices.GetService(typeof(TenantResolutionMiddleware<TestTenant>));
                 });
 
-
-
-
             // Act
             using (TestServer server = new TestServer(builder))
             using (System.Net.Http.HttpClient client = server.CreateClient())
@@ -168,7 +159,6 @@
                     "The ConfigurePerTenantServices method must take only two parameter one of type IServiceCollection and one of type TTenant.",
                            ex.Message);
             }
-
         }
         */
     }

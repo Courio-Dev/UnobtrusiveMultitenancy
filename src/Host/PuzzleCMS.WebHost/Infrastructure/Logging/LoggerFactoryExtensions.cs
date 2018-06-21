@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace PuzzleCMS.WebHost.Infrastructure.Logging
+﻿namespace PuzzleCMS.WebHost.Infrastructure.Logging
 {
     using System;
-    using System.Collections.Generic;
-    using System.Text;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
-    using Puzzle.Core.Multitenancy.Internal.Logging;
 
     internal static class LoggerFactoryExtensions
     {

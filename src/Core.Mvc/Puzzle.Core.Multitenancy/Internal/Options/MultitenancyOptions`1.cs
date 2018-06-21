@@ -6,10 +6,11 @@
     /// <summary>
     /// Options for multitenancy.
     /// </summary>
-    public class MultitenancyOptions
+    /// <typeparam name="TTenant">Tenant object.</typeparam>
+    public class MultitenancyOptions<TTenant>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="MultitenancyOptions"/> class.
+        /// Initializes a new instance of the <see cref="MultitenancyOptions{TTenant}"/> class.
         /// </summary>
         public MultitenancyOptions()
         {
@@ -29,6 +30,6 @@
         /// <summary>
         /// Gets or sets list of tenant.
         /// </summary>
-        public Collection<AppTenant> Tenants { get; set; }
+        public virtual Collection<TTenant> Tenants { get; set; }
     }
 }

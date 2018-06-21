@@ -204,7 +204,7 @@
             {
             }
 
-            public void ConfigurePerTenantServices(IServiceCollection services, TestTenant tenant, MultiTenancyConfig config)
+            public void ConfigurePerTenantServices(IServiceCollection services, TestTenant tenant, MultiTenancyConfig<TestTenant> config)
             {
             }
 
@@ -223,7 +223,7 @@
             {
             }
 
-            public void ConfigurePerTenantServices(IServiceCollection services, MultiTenancyConfig config)
+            public void ConfigurePerTenantServices(IServiceCollection services, MultiTenancyConfig<TestTenant> config)
             {
             }
 

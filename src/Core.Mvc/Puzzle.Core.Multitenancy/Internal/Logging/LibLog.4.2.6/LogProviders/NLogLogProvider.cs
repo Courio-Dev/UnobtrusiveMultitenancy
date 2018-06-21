@@ -42,7 +42,6 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using System.Text;
 
     /// <summary>
     /// NLogLogProvider.
@@ -276,6 +275,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                         }
 
                         break;
+
                     case LogLevel.Info:
                         if (logger.IsInfoEnabled)
                         {
@@ -284,6 +284,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                         }
 
                         break;
+
                     case LogLevel.Warn:
                         if (logger.IsWarnEnabled)
                         {
@@ -292,6 +293,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                         }
 
                         break;
+
                     case LogLevel.Error:
                         if (logger.IsErrorEnabled)
                         {
@@ -300,6 +302,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                         }
 
                         break;
+
                     case LogLevel.Fatal:
                         if (logger.IsFatalEnabled)
                         {
@@ -308,6 +311,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                         }
 
                         break;
+
                     default:
                         if (logger.IsTraceEnabled)
                         {
@@ -349,6 +353,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                         }
 
                         break;
+
                     case LogLevel.Info:
                         if (logger.IsInfoEnabled)
                         {
@@ -357,6 +362,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                         }
 
                         break;
+
                     case LogLevel.Warn:
                         if (logger.IsWarnEnabled)
                         {
@@ -365,6 +371,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                         }
 
                         break;
+
                     case LogLevel.Error:
                         if (logger.IsErrorEnabled)
                         {
@@ -373,6 +380,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                         }
 
                         break;
+
                     case LogLevel.Fatal:
                         if (logger.IsFatalEnabled)
                         {
@@ -381,6 +389,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                         }
 
                         break;
+
                     default:
                         if (logger.IsTraceEnabled)
                         {
@@ -400,14 +409,19 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                 {
                     case LogLevel.Debug:
                         return logger.IsDebugEnabled;
+
                     case LogLevel.Info:
                         return logger.IsInfoEnabled;
+
                     case LogLevel.Warn:
                         return logger.IsWarnEnabled;
+
                     case LogLevel.Error:
                         return logger.IsErrorEnabled;
+
                     case LogLevel.Fatal:
                         return logger.IsFatalEnabled;
+
                     default:
                         return logger.IsTraceEnabled;
                 }
@@ -419,16 +433,22 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                 {
                     case LogLevel.Trace:
                         return LevelTrace;
+
                     case LogLevel.Debug:
                         return LevelDebug;
+
                     case LogLevel.Info:
                         return LevelInfo;
+
                     case LogLevel.Warn:
                         return LevelWarn;
+
                     case LogLevel.Error:
                         return LevelError;
+
                     case LogLevel.Fatal:
                         return LevelFatal;
+
                     default:
                         throw new ArgumentOutOfRangeException("logLevel", logLevel, null);
                 }

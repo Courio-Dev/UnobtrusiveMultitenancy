@@ -9,7 +9,6 @@
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
-    using Puzzle.Core.Multitenancy;
     using Puzzle.Core.Multitenancy.Internal;
 
     /// <summary>
@@ -55,7 +54,7 @@
         /// <param name="tenant">The tenant object.</param>
         public void ConfigurePerTenantServices(IServiceCollection services, AppTenant tenant)
         {
-            if (tenant.Id.ToUpperInvariant() == "Tenant-1".ToUpperInvariant())
+            if (tenant.Id.ToUpperInvariant().StartsWith("Tenant-1".ToUpperInvariant()))
             {
                 services.AddMvc();
             }
@@ -79,7 +78,7 @@
 
             application.UsePerTenant<AppTenant>((tenantContext, builder) =>
             {
-                if (tenantContext.Tenant.Id.ToUpperInvariant() == "Tenant-1".ToUpperInvariant())
+                if (tenantContext.Tenant.Id.ToUpperInvariant().StartsWith("Tenant-1".ToUpperInvariant()))
                 {
                     builder.UseMvcWithDefaultRoute();
                 }

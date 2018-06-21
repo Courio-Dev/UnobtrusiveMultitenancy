@@ -15,5 +15,10 @@
         /// <param name="context">httpcontext.</param>
         /// <returns>Tenant's context.</returns>
         Task<TenantContext<TTenant>> ResolveAsync(HttpContext context);
+
+        /// <summary>
+        /// Clear data.
+        /// </summary>
+        void Reset();
     }
 }

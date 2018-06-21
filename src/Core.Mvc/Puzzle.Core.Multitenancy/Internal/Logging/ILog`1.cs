@@ -1,8 +1,5 @@
 ﻿namespace Puzzle.Core.Multitenancy.Internal.Logging
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
     using Puzzle.Core.Multitenancy.Internal.Logging.LibLog;
 
     /// <summary>

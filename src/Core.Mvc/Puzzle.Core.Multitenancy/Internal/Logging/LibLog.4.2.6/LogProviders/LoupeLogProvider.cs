@@ -37,9 +37,7 @@
 namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
 {
     using System;
-    using System.Collections.Generic;
     using System.Reflection;
-    using System.Text;
 
     /// <summary>
     /// LoupeLogProvider.
@@ -188,16 +186,22 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                 {
                     case LogLevel.Trace:
                         return TraceEventTypeValues.Verbose;
+
                     case LogLevel.Debug:
                         return TraceEventTypeValues.Verbose;
+
                     case LogLevel.Info:
                         return TraceEventTypeValues.Information;
+
                     case LogLevel.Warn:
                         return TraceEventTypeValues.Warning;
+
                     case LogLevel.Error:
                         return TraceEventTypeValues.Error;
+
                     case LogLevel.Fatal:
                         return TraceEventTypeValues.Critical;
+
                     default:
                         throw new ArgumentOutOfRangeException("logLevel");
                 }

@@ -85,7 +85,7 @@ public class BuildPaths
                                     toClean);
     }
 
-    public static BuildPaths GetPaths(ICakeContext context, BuildParameters parameters)
+    public static BuildPaths GetPaths(ICakeContext context)
     {
 
         string allProjectsPatternFiles="./src/**/*.csproj";
@@ -98,9 +98,7 @@ public class BuildPaths
         FilePathCollection allProjectsToPack =
         context.GetFiles(allProjectsPatternFiles) - context.GetFiles(allTestProjectsPatternFiles);
 
-        //https://github.com/cake-build/cake/issues/1037
-
-        var configuration =  parameters.Configuration;
+        // https://github.com/cake-build/cake/issues/1037
         var buildDirectories = GetBuildDirectories(context);
         var testProjects =(new[]{unitTestProjects,integrationTestProjects}).SelectMany(p => p).ToList();
 

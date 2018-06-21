@@ -3,12 +3,10 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Caching.Memory;
-    using Microsoft.Extensions.Logging;
     using Puzzle.Core.Multitenancy;
     using Puzzle.Core.Multitenancy.Internal;
     using Puzzle.Core.Multitenancy.Internal.Logging;
@@ -31,12 +29,11 @@
 
         [Theory]
         [ClassData(typeof(CacheTenantResolverTestData))]
-        public async Task CannotResolveMemoryCaheAppTenantResolver_IfParamsIsnNull(
-            IMemoryCache cache, ILog log, MemoryCacheTenantResolverOptions options)
+        public async Task CannotResolveMemoryCaheAppTenantResolver_IfParamsIsnNull(IMemoryCache cache, ILog log, MemoryCacheTenantResolverOptions options)
         {
             Task Res() => Task.Run(() =>
             {
-                TestTenantMemoryCacheResolver resolver = new TestTenantMemoryCacheResolver(cache, log, options, cacheExpirationInSeconds: 1);
+                TestTenantMemoryCacheResolver resolver = new TestTenantMemoryCacheResolver(null,cache, log, options, cacheExpirationInSeconds: 1);
             });
 
             Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(Res).ConfigureAwait(false);
@@ -54,7 +51,7 @@
             // Act
             Task Res() => Task.Run(async () =>
             {
-                TenantContext<TestTenant> tenantContext = await harness.Resolver.ResolveAsync(null);
+                TenantContext<TestTenant> tenantContext = await harness.TestTenantResolver.ResolveAsync(null);
             });
 
             // Assert
@@ -73,7 +70,7 @@
             // Act
             Task Res() => Task.Run(async () =>
             {
-                TenantContext<AppTenant> tenantContext = await harness.CachingAppTenantResolver.ResolveAsync(null);
+                TenantContext<AppTenant> tenantContext = await harness.AppTenantResolver.ResolveAsync(null);
             });
 
             // Assert
@@ -92,7 +89,7 @@
             context.Request.Host = new HostString("/test-tenant-notfound");
 
             // Act
-            TenantContext<TestTenant> tenantContext = await harness.Resolver.ResolveAsync(context);
+            TenantContext<TestTenant> tenantContext = await harness.TestTenantResolver.ResolveAsync(context);
 
             // Assert
             Assert.Null(tenantContext);
@@ -106,7 +103,7 @@
             HttpContext context = CreateContext("/test-tenant-notfound");
 
             // Act
-            TenantContext<AppTenant> tenantContext = await harness.CachingAppTenantResolver.ResolveAsync(context);
+            TenantContext<AppTenant> tenantContext = await harness.AppTenantResolver.ResolveAsync(context);
 
             // Assert
             Assert.Null(tenantContext);
@@ -118,7 +115,7 @@
             TestHarness harness = new TestHarness();
             HttpContext context = CreateContext(Fixture.UrlTenant1);
 
-            TenantContext<TestTenant> tenantContext = await harness.Resolver.ResolveAsync(context);
+            TenantContext<TestTenant> tenantContext = await harness.TestTenantResolver.ResolveAsync(context);
 
             Assert.NotNull(tenantContext);
             Assert.Equal("Tenant 1", tenantContext.Tenant.Name);
@@ -130,7 +127,7 @@
             TestHarness harness = new TestHarness();
             HttpContext context = CreateContext(Fixture.UrlTenant1);
 
-            TenantContext<AppTenant> tenantContext = await harness.CachingAppTenantResolver.ResolveAsync(context);
+            TenantContext<AppTenant> tenantContext = await harness.AppTenantResolver.ResolveAsync(context);
 
             Assert.NotNull(tenantContext);
             Assert.Equal("Tenant 1", tenantContext.Tenant.Name);
@@ -141,17 +138,27 @@
         {
             // Arrange
             TestHarness harness = new TestHarness();
+            Exception exLogger = await Assert.ThrowsAsync<ArgumentNullException>(() => Task.Run(() =>
+            {
+                return new AppTenantResolver(harness.AppTenantMultitenancyOptionsProvider,harness.Cache,null);
+            })).ConfigureAwait(false);
+            Assert.Contains("log", exLogger.Message);
+
+            Exception exCache = await Assert.ThrowsAsync<ArgumentNullException>(() => Task.Run(() =>
+            {
+                return new AppTenantResolver(harness.AppTenantMultitenancyOptionsProvider,null,new Log<AppTenantResolver>());
+            })).ConfigureAwait(false);
+            Assert.Contains("cache", exCache.Message);
 
             Task Res() => Task.Run(() =>
             {
-                CachingAppTenantResolver cachingAppTenantResolver = new CachingAppTenantResolver(
-               harness.Cache,
-               new Log<CachingAppTenantResolver>(),
-               null);
+                AppTenantResolver cachingAppTenantResolver = new AppTenantResolver(
+                 null,
+                 harness.Cache,
+                 new Log<AppTenantResolver>());
             });
-
-            Exception ex = await Assert.ThrowsAsync<ArgumentNullException>(Res).ConfigureAwait(false);
-            Assert.Contains("optionsMonitor", ex.Message);
+            Exception exOptionsProvider = await Assert.ThrowsAsync<ArgumentNullException>(Res).ConfigureAwait(false);
+            Assert.Contains("multitenancyOptionsProvider", exOptionsProvider.Message);
         }
 
         [Fact]
@@ -160,7 +167,7 @@
             TestHarness harness = new TestHarness();
             HttpContext context = CreateContext(RequestPathTenant11);
 
-            TenantContext<AppTenant> tenantContext = await harness.CachingAppTenantResolver.ResolveAsync(context);
+            TenantContext<AppTenant> tenantContext = await harness.AppTenantResolver.ResolveAsync(context);
 
             Assert.True(harness.Cache.TryGetValue(RequestPathTenant12, out TenantContext<AppTenant> cachedTenant));
 
@@ -173,7 +180,7 @@
             TestHarness harness = new TestHarness();
             HttpContext context = CreateContext(RequestPathTenant11);
 
-            TenantContext<TestTenant> tenantContext = await harness.Resolver.ResolveAsync(context);
+            TenantContext<TestTenant> tenantContext = await harness.TestTenantResolver.ResolveAsync(context);
 
             Assert.True(harness.Cache.TryGetValue(RequestPathTenant12, out TenantContext<TestTenant> cachedTenant));
 
@@ -186,7 +193,7 @@
             TestHarness harness = new TestHarness();
             HttpContext context = CreateContext(RequestPathTenant11);
 
-            TenantContext<TestTenant> tenantContext = await harness.Resolver.ResolveAsync(context);
+            TenantContext<TestTenant> tenantContext = await harness.TestTenantResolver.ResolveAsync(context);
 
             Assert.True(harness.Cache.TryGetValue(RequestPathTenant12, out TenantContext<TestTenant> cachedTenant));
 
@@ -199,7 +206,7 @@
             TestHarness harness = new TestHarness(cacheExpirationInSeconds: 1);
             HttpContext context = CreateContext(RequestPathTenant11);
 
-            TenantContext<TestTenant> tenantContext = await harness.Resolver.ResolveAsync(context);
+            TenantContext<TestTenant> tenantContext = await harness.TestTenantResolver.ResolveAsync(context);
 
             Thread.Sleep(1000);
 
@@ -221,7 +228,7 @@
             TestHarness harness = new TestHarness(cacheExpirationInSeconds: 10);
 
             // first request
-            TenantContext<TestTenant> tenantContext = await harness.Resolver.ResolveAsync(CreateContext(RequestPathTenant11));
+            TenantContext<TestTenant> tenantContext = await harness.TestTenantResolver.ResolveAsync(CreateContext(RequestPathTenant11));
 
             // cache should have all 3 entries
             Assert.NotNull(harness.Cache.Get(RequestPathTenant11));
@@ -252,13 +259,13 @@
             HttpContext context = CreateContext(RequestPathTenant11);
 
             // first request for tenant 1
-            await harness.Resolver.ResolveAsync(CreateContext(RequestPathTenant11));
+            await harness.TestTenantResolver.ResolveAsync(CreateContext(RequestPathTenant11));
 
             // wait 1 second
             Thread.Sleep(1000);
 
             // second request
-            await harness.Resolver.ResolveAsync(CreateContext(RequestPathTenant12));
+            await harness.TestTenantResolver.ResolveAsync(CreateContext(RequestPathTenant12));
 
             // wait 1 second
             Thread.Sleep(1000);
@@ -276,7 +283,7 @@
             TestHarness harness = new TestHarness(cacheExpirationInSeconds: 1, disposeOnEviction: true);
             HttpContext context = CreateContext(RequestPathTenant11);
 
-            TenantContext<TestTenant> tenantContext = await harness.Resolver.ResolveAsync(context);
+            TenantContext<TestTenant> tenantContext = await harness.TestTenantResolver.ResolveAsync(context);
 
             Thread.Sleep(2 * 1000);
 
@@ -295,7 +302,7 @@
             TestHarness harness = new TestHarness(cacheExpirationInSeconds: 1, disposeOnEviction: false);
             HttpContext context = CreateContext(RequestPathTenant11);
 
-            TenantContext<TestTenant> tenantContext = await harness.Resolver.ResolveAsync(context);
+            TenantContext<TestTenant> tenantContext = await harness.TestTenantResolver.ResolveAsync(context);
 
             Thread.Sleep(1 * 1000);
 

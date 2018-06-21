@@ -36,10 +36,6 @@
 // LibLog providers internally to provide built in support for popular logging frameworks.
 namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
-
     /// <summary>
     /// The log level.
     /// </summary>
