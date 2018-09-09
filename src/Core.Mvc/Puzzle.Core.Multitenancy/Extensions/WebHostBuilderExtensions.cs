@@ -10,10 +10,12 @@
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
+    using Microsoft.Extensions.Options;
     using Puzzle.Core.Multitenancy.Constants;
     using Puzzle.Core.Multitenancy.Internal;
     using Puzzle.Core.Multitenancy.Internal.Configurations;
     using Puzzle.Core.Multitenancy.Internal.Logging;
+    using Puzzle.Core.Multitenancy.Internal.Logging.LibLog;
     using Puzzle.Core.Multitenancy.Internal.Options;
     using Puzzle.Core.Multitenancy.Internal.Resolvers;
     using Puzzle.Core.Multitenancy.Internal.StartupFilters;
@@ -33,9 +35,9 @@
         /// <param name="actionConfiguration">Additionnal config.</param>
         /// <returns>IWebHostBuilder.</returns>
         public static IWebHostBuilder UseUnobtrusiveMulitenancyStartup<TStartup>(
-            this IWebHostBuilder hostBuilder, 
-            IConfigurationRoot multitenancyConfiguration, 
-            bool throwErrorIfOptionsNotFound=true,
+            this IWebHostBuilder hostBuilder,
+            IConfigurationRoot multitenancyConfiguration,
+            bool throwErrorIfOptionsNotFound = true,
             Action<MultiTenancyConfig<AppTenant>> actionConfiguration = null)
             where TStartup : class
         {
@@ -46,7 +48,7 @@
 
             return hostBuilder.
                 UseUnobtrusiveMulitenancyStartup<TStartup, AppTenant, AppTenantResolver>(
-                typeof(TStartup), 
+                typeof(TStartup),
                 multitenancyConfiguration,
                 throwErrorIfOptionsNotFound,
                 actionConfiguration: actionConfiguration);
@@ -64,8 +66,8 @@
         /// <param name="actionConfiguration">Additionnal config.</param>
         /// <returns>IWebHostBuilder.</returns>
         public static IWebHostBuilder UseUnobtrusiveMulitenancyStartup<TStartup, TTenant, TResolver>(
-            this IWebHostBuilder hostBuilder, 
-            IConfigurationRoot multitenancyConfiguration = null, 
+            this IWebHostBuilder hostBuilder,
+            IConfigurationRoot multitenancyConfiguration = null,
             bool throwErrorIfOptionsNotFound = true,
             Action<MultiTenancyConfig<TTenant>> actionConfiguration = null)
                 where TStartup : class
@@ -94,9 +96,9 @@
         /// <param name="actionConfiguration">Additionnal config.</param>
         /// <returns>IWebHostBuilder.</returns>
         public static IWebHostBuilder UseUnobtrusiveMulitenancyStartupWithDefaultConvention<TStartup>(
-            this IWebHostBuilder hostBuilder, 
+            this IWebHostBuilder hostBuilder,
             bool throwErrorIfOptionsNotFound = true,
-            Action<MultiTenancyConfig<AppTenant>> actionConfiguration=null)
+            Action<MultiTenancyConfig<AppTenant>> actionConfiguration = null)
         where TStartup : class
         {
             if (hostBuilder == null)
@@ -105,7 +107,7 @@
             }
 
             return hostBuilder.UseUnobtrusiveMulitenancyStartup<TStartup, AppTenant, AppTenantResolver>(
-                typeof(TStartup), 
+                typeof(TStartup),
                 multitenancyConfiguration: null,
                 throwErrorIfOptionsNotFound: throwErrorIfOptionsNotFound,
                 actionConfiguration: actionConfiguration);
@@ -138,13 +140,17 @@
                 throw new ArgumentNullException(nameof(hostBuilder));
             }
 
+            string env = hostBuilder.GetSetting("environment");
+            IPostConfigureOptions<MultitenancyOptions<TTenant>>[] postConfigures = new[] {
+                new MultitenancyPostConfigureOptions<TTenant>()
+            };
             MultiTenancyConfig<TTenant> multitenancyConfig = new MultiTenancyConfig<TTenant>(
-                hostBuilder.GetSetting("environment"), 
-                multitenancyConfiguration);
-
+                env,
+                multitenancyConfiguration,
+                postConfigures: postConfigures);
             MultitenancyOptions<TTenant> buildedOptions = multitenancyConfig.CurrentMultiTenacyOptionsValue;
 
-            if(throwErrorIfOptionsNotFound && (buildedOptions == null ||!(buildedOptions?.Tenants?.Any() ?? false)))
+            if (throwErrorIfOptionsNotFound && (buildedOptions == null || !(buildedOptions?.Tenants?.Any() ?? false)))
             {
                 throw new Exception("MultitenancyOptions not found in configuration.");
             }
@@ -167,58 +173,49 @@
                 })
                 .ConfigureServices((WebHostBuilderContext ctx, IServiceCollection services) =>
                 {
-                    {
-                        // Add logging
-                        services.TryAdd(ServiceDescriptor.Singleton(typeof(ILog<>), typeof(Log<>)));
-                        multitenancyConfig.UseColoredConsoleLogProvider();
+                    services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+                    services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
-                        services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-                        services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
+                    // Register multitenancy options.
+                    services.AddMultitenancyOptions<TTenant>(multitenancyConfig);
+                    services.AddMultitenancy<TTenant, TResolver>();
 
-                        // Register multitenancy options.
-                        services.AddMultitenancyOptions<TTenant>(multitenancyConfig);
+                    // manage IStartup
+                    services.RemoveAll<IStartup>();
 
-                        services.AddMultitenancy<TTenant, TResolver>();
+                    // Override config.
+                    // Add logging
+                    multitenancyConfig.UseColoredConsoleLogProvider();
+                    actionConfiguration?.Invoke(multitenancyConfig);                 
+                    services.TryAdd(ServiceDescriptor.Singleton<ILogProvider>(LogProvider.CurrentLogProvider));
+                    services.TryAdd(ServiceDescriptor.Singleton(typeof(ILog<>), typeof(Log<>)));
+                    services.AddSingleton<MultiTenancyConfig<TTenant>>(serviceProvider => multitenancyConfig);
 
-                        // manage IStartup
-                        services.RemoveAll<IStartup>();
+                    ServiceDescriptor descriptor = BuildMultitenantRequestStartupFilter<TStartup, TTenant>();
+                    services.Insert(0, descriptor);
 
-
-                        ServiceDescriptor descriptor = new ServiceDescriptor(
-                            typeof(IStartupFilter),
-                            sp => new MultitenantRequestStartupFilter<TStartup, TTenant>(),
-                            ServiceLifetime.Transient);
-                        services.Insert(0, descriptor);
-
-
-                        ServiceDescriptor staruptDescriptor = new ServiceDescriptor(
-                        typeof(IStartup),
-                        (IServiceProvider provider) =>
-                        {
-                            IHostingEnvironment hostingEnvironment = provider.GetRequiredService<IHostingEnvironment>();
-                            StartupMethodsMultitenant<TTenant> methods = StartupLoaderMultitenant.LoadMethods<TTenant>(provider, startupType, hostingEnvironment.EnvironmentName);
-                            return new ConventionMultitenantBasedStartup<TTenant>(methods);
-                        }, lifetime: ServiceLifetime.Singleton);
-
-                        // services.Add(staruptDescriptor);
-                        services.Insert(1, staruptDescriptor);
-
-
-                        services.AddSingleton<MultiTenancyConfig<TTenant>>(serviceProvider =>
-                        {
-                            /*// LogProvider logProvider = serviceProvider.GetService<LogProvider>();
-                            if (logProvider != null)
-                            {
-                                // multitenancyConfig.UseLogProvider(new AspNetCoreMultiTenantLogProvider(loggerFactory));
-                            }*/
-                            actionConfiguration?.Invoke(multitenancyConfig);
-
-                            return multitenancyConfig;
-                        });
-                    }
+                    ServiceDescriptor startuptDescriptor = BuildConventionMultitenantBasedStartup(startupType, multitenancyConfig);
+                    services.Insert(1, startuptDescriptor);
                 })
                 ;
             }
         }
+
+        private static ServiceDescriptor BuildConventionMultitenantBasedStartup<TTenant>(Type startupType, MultiTenancyConfig<TTenant> multitenancyConfig)
+            where TTenant : class => new ServiceDescriptor(
+                                typeof(IStartup),
+                                (IServiceProvider provider) =>
+                                {
+                                    IHostingEnvironment hostingEnvironment = provider.GetRequiredService<IHostingEnvironment>();
+                                    StartupMethodsMultitenant<TTenant> methods = StartupLoaderMultitenant.LoadMethods<TTenant>(provider, startupType, hostingEnvironment.EnvironmentName);
+                                    return new ConventionMultitenantBasedStartup<TTenant>(methods, multitenancyConfig.BuildTenantLogProvider());
+                                }, lifetime: ServiceLifetime.Singleton);
+
+        private static ServiceDescriptor BuildMultitenantRequestStartupFilter<TStartup, TTenant>()
+            where TStartup : class
+            where TTenant : class => new ServiceDescriptor(
+                                    typeof(IStartupFilter),
+                                    sp => new MultitenantRequestStartupFilter<TStartup, TTenant>(),
+                                    ServiceLifetime.Transient);
     }
 }

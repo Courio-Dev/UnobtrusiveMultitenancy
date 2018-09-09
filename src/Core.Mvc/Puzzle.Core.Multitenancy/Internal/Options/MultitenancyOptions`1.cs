@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using Microsoft.Extensions.Configuration;
 
     /// <summary>
     /// Options for multitenancy.
@@ -14,22 +15,27 @@
         /// </summary>
         public MultitenancyOptions()
         {
-            OtherTokens = new Dictionary<string, string>();
+            Tokens = new Dictionary<string, string>();
         }
 
         /// <summary>
         /// Gets or sets tenant's folder.
         /// </summary>
-        public string AppTenantFolder { get; set; }
+        public string TenantFolder { get; set; }
 
         /// <summary>
         /// Gets or sets tokens replacement.
         /// </summary>
-        public IDictionary<string, string> OtherTokens { get; set; }
+        public IDictionary<string, string> Tokens { get; set; }
 
         /// <summary>
         /// Gets or sets list of tenant.
         /// </summary>
         public virtual Collection<TTenant> Tenants { get; set; }
+
+        /// <summary>
+        /// Configuration of each tenant.
+        /// </summary>
+        public virtual IEnumerable<IConfigurationSection> TenantsConfigurations { get; set; } 
     }
 }

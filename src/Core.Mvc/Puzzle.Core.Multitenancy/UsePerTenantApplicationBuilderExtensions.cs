@@ -33,6 +33,7 @@
                 throw new ArgumentNullException($"Argument {nameof(configuration)} must not be null");
             }
 
+            
             IOptionsMonitor<MultitenancyOptions<TTenant>> optionsMonitor = app.ApplicationServices.GetRequiredService<IOptionsMonitor<MultitenancyOptions<TTenant>>>();
             ILog<TenantPipelineMiddleware<TTenant>> logger = app.ApplicationServices.GetRequiredService<ILog<TenantPipelineMiddleware<TTenant>>>();
             IServiceFactoryForMultitenancy<TTenant> serviceFactoryForMultitenancy = app.ApplicationServices.GetRequiredService<IServiceFactoryForMultitenancy<TTenant>>();

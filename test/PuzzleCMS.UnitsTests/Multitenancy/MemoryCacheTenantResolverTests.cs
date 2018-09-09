@@ -146,7 +146,7 @@
 
             Exception exCache = await Assert.ThrowsAsync<ArgumentNullException>(() => Task.Run(() =>
             {
-                return new AppTenantResolver(harness.AppTenantMultitenancyOptionsProvider,null,new Log<AppTenantResolver>());
+                return new AppTenantResolver(harness.AppTenantMultitenancyOptionsProvider,null,new Log<AppTenantResolver>(LogProvider.CurrentLogProvider));
             })).ConfigureAwait(false);
             Assert.Contains("cache", exCache.Message);
 
@@ -155,7 +155,7 @@
                 AppTenantResolver cachingAppTenantResolver = new AppTenantResolver(
                  null,
                  harness.Cache,
-                 new Log<AppTenantResolver>());
+                 new Log<AppTenantResolver>(LogProvider.CurrentLogProvider));
             });
             Exception exOptionsProvider = await Assert.ThrowsAsync<ArgumentNullException>(Res).ConfigureAwait(false);
             Assert.Contains("multitenancyOptionsProvider", exOptionsProvider.Message);

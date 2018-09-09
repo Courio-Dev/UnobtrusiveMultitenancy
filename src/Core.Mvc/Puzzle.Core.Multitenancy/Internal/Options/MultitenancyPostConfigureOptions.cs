@@ -4,7 +4,9 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.IO;
+    using System.Linq;
     using System.Text;
+    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Options;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
@@ -60,7 +62,7 @@
         private void AddAdditionnalKeys(MultitenancyOptions<TTenant> options, IDictionary<string, string> tokenList)
         {
             // Add other tokens.
-            foreach (KeyValuePair<string, string> item in options.OtherTokens)
+            foreach (KeyValuePair<string, string> item in options.Tokens)
             {
                 tokenList[string.Format(FormatReplacement, item.Key)] = item.Value;
             }
@@ -68,12 +70,13 @@
 
         private MultitenancyOptions<TTenant> ReplaceTokenString(MultitenancyOptions<TTenant> options, IDictionary<string, string> tokenList)
         {
-            string tmpString = DumpToJsonString(options.Tenants);
-            string tenantListAsString = ReplaceWithStringBuilder(tmpString, tokenList);
-
-            options.Tenants = JsonConvert.DeserializeObject<Collection<TTenant>>(tenantListAsString);
+            options.TenantFolder = ReplaceWithStringBuilder(options.TenantFolder, tokenList);
+            options.Tenants = FormattedTenantsList(options, tokenList);
+            options.TenantsConfigurations = FormattedTenantsConfigurations(options, tokenList);
             return options;
         }
+
+
 
         private string ReplaceWithStringBuilder(string value, IDictionary<string, string> tokenList)
         {
@@ -94,6 +97,57 @@
         private string DumpToJsonString(object obj)
         {
             return JsonConvert.SerializeObject(obj, settings);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private Collection<TTenant> FormattedTenantsList(MultitenancyOptions<TTenant> options, IDictionary<string, string> tokenList)
+        {
+            string tmpString = DumpToJsonString(options.Tenants);
+            string tenantListAsString = ReplaceWithStringBuilder(tmpString, tokenList);
+
+            return JsonConvert.DeserializeObject<Collection<TTenant>>(tenantListAsString);
+        }
+
+        /// <summary>
+        /// TODO :doesn't work very well.
+        /// </summary>
+        private IEnumerable<IConfigurationSection> FormattedTenantsConfigurations(MultitenancyOptions<TTenant> options, IDictionary<string, string> tokenList)
+        {
+            IConfigurationSection[] result = options.TenantsConfigurations?.ToArray() ?? Array.Empty<IConfigurationSection>();
+
+            /*
+            for (int i = 0; i < result.Length; ++i)
+            {
+                IConfigurationSection config = result?[i];
+
+                if (config != null)
+                {
+                    FormattedTenantsConfigurations(config, tokenList);
+                }
+            }*/
+
+            return result;
+        }
+
+        private void FormattedTenantsConfigurations(IConfigurationSection section, IDictionary<string, string> tokenList)
+        {
+            if (!(section?.GetChildren().Any() ?? false))
+            {
+                if (section != null)
+                {
+                    section[section.Key] = ReplaceWithStringBuilder(section.Value, tokenList);
+                }
+            }
+            else
+            {
+                IConfigurationSection[] children = section?.GetChildren()?.ToArray();
+                for (int i = 0; i < children.Length; ++i)
+                {
+                    FormattedTenantsConfigurations(children?[i], tokenList);
+                }
+            }
         }
     }
 }

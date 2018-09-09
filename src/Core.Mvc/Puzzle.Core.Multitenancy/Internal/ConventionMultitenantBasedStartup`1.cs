@@ -12,16 +12,53 @@
     using Microsoft.Extensions.Options;
     using Microsoft.Extensions.Primitives;
     using Puzzle.Core.Multitenancy.Internal.Configurations;
+    using Puzzle.Core.Multitenancy.Internal.Logging.LibLog;
     using Puzzle.Core.Multitenancy.Internal.Options;
     using Puzzle.Core.Multitenancy.Internal.Resolvers;
 
     internal class ConventionMultitenantBasedStartup<TTenant> : IStartup
     {
         private readonly StartupMethodsMultitenant<TTenant> methods;
+        private readonly Func<IServiceCollection, TTenant, IConfiguration, ILogProvider> additionnalServicesTenant;
 
-        public ConventionMultitenantBasedStartup(StartupMethodsMultitenant<TTenant> methods)
+        public ConventionMultitenantBasedStartup(
+            StartupMethodsMultitenant<TTenant> methods, 
+            Func<IServiceCollection, TTenant, IConfiguration, ILogProvider> additionnalServicesTenant)
         {
             this.methods = methods ?? throw new ArgumentNullException($"Argument {nameof(methods)} must not be null");
+            this.additionnalServicesTenant = additionnalServicesTenant ?? throw new ArgumentNullException($"Argument {nameof(additionnalServicesTenant)} must not be null");
+        }
+
+        public IServiceProvider ConfigureServices(IServiceCollection services)
+        {
+            try
+            {
+                using (ServiceProvider provider = methods.ConfigureServicesDelegate(services) as ServiceProvider)
+                {
+                    IOptionsMonitor<MultitenancyOptions<TTenant>> optionsMonitor = provider.GetRequiredService<IOptionsMonitor<MultitenancyOptions<TTenant>>>();
+                    IMultitenancyOptionsProvider<TTenant> multitenancyProvider = provider.GetRequiredService<IMultitenancyOptionsProvider<TTenant>>();
+                    services.AddScoped<IServiceFactoryForMultitenancy<TTenant>>(_ =>
+                    {
+                        return new ServiceFactoryForMultitenancy<TTenant>(services.Clone(), 
+                            methods.ConfigurePerTenantServicesDelegate,
+                            additionnalServicesTenant,
+                            multitenancyProvider,
+                            optionsMonitor);
+                    });
+                }
+
+                IServiceProvider serviceProvider = methods.ConfigureServicesDelegate(services);
+                return serviceProvider;
+            }
+            catch (Exception ex)
+            {
+                if (ex is TargetInvocationException)
+                {
+                    ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                }
+
+                throw;
+            }
         }
 
         public void Configure(IApplicationBuilder app)
@@ -42,31 +79,5 @@
             }
         }
 
-        public IServiceProvider ConfigureServices(IServiceCollection services)
-        {
-            try
-            {
-                using (ServiceProvider provider = methods.ConfigureServicesDelegate(services) as ServiceProvider)
-                {
-                    IOptionsMonitor<MultitenancyOptions<TTenant>> optionsMonitor = provider.GetRequiredService<IOptionsMonitor<MultitenancyOptions<TTenant>>>();
-                    services.AddScoped<IServiceFactoryForMultitenancy<TTenant>>(_ =>
-                    {
-                        return new ServiceFactoryForMultitenancy<TTenant>(services.Clone(), methods.ConfigurePerTenantServicesDelegate, optionsMonitor);
-                    });
-                }
-
-                IServiceProvider serviceProvider = methods.ConfigureServicesDelegate(services);
-                return serviceProvider;
-            }
-            catch (Exception ex)
-            {
-                if (ex is TargetInvocationException)
-                {
-                    ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
-                }
-
-                throw;
-            }
-        }
     }
 }

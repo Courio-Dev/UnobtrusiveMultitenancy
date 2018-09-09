@@ -29,17 +29,22 @@
 
         /// <inheritdoc />
         protected override IEnumerable<string> GetTenantIdentifiers(TenantContext<AppTenant> context)=> context.Tenant.Hostnames;
+
+        /// <inheritdoc />
+        protected override Func<HttpContext,AppTenant, bool> PredicateResolver() => (c,t) => t.Hostnames.Any(h => h.Equals(GetContextIdentifier(c)));
+
         
 
+        /// <inheritdoc />
         protected override Task<TenantContext<AppTenant>> ResolveAsync(HttpContext context)
         {
             TenantContext<AppTenant> tenantContext = null;
-
-            AppTenant tenant = Tenants.FirstOrDefault(t => t.Hostnames.Any(h => h.Equals(GetContextIdentifier(context))));
+            AppTenant tenant = Tenants.FirstOrDefault(t => PredicateResolver().Invoke(context,t));
 
             if (tenant != null)
             {
-                tenantContext = new TenantContext<AppTenant>(tenant);
+                int postion = GetTenantPositionWithPredicateResolver(context);
+                tenantContext = new TenantContext<AppTenant>(tenant, postion);
             }
 
             return Task.FromResult(tenantContext);
@@ -49,5 +54,6 @@
         {
             return base.CreateCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5));
         }
+
     }
 }

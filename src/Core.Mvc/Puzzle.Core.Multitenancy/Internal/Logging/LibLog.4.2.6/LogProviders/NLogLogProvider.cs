@@ -230,9 +230,9 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                         Type knownType1 = typeof(LogExtensions);
                         //Maybe inline, so we may can't found any LibLog classes in stack
                         s_callerStackBoundaryType = null;
-                        for (var i = 0; i < stack.FrameCount; i++)
+                        for (int i = 0; i < stack.FrameCount; i++)
                         {
-                            var declaringType = stack.GetFrame(i).GetMethod().DeclaringType;
+                            Type declaringType = stack.GetFrame(i).GetMethod().DeclaringType;
                             if (!IsInTypeHierarchy(thisType, declaringType) &&
                                 !IsInTypeHierarchy(knownType0, declaringType) &&
                                 !IsInTypeHierarchy(knownType1, declaringType))

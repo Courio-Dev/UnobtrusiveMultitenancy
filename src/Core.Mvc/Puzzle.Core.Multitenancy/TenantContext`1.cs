@@ -15,13 +15,19 @@
         /// Initializes a new instance of the <see cref="TenantContext{TTenant}"/> class.
         /// </summary>
         /// <param name="tenant">Tenant object.</param>
-        public TenantContext(TTenant tenant)
+        /// <param name="position">position</param>
+        public TenantContext(TTenant tenant,int position)
         {
             if (tenant == null)
             {
-                throw new ArgumentNullException($"Argument {nameof(tenant)} must not be null");
+                 throw new ArgumentNullException($"Argument {nameof(tenant)} must not be null");
+            }
+            if (position < 0)
+            {
+                throw new ArgumentException($"Argument {nameof(position)} cannot be negative.");
             }
 
+            Position = position;
             Tenant = tenant;
             Properties = new Dictionary<string, object>();
         }
@@ -30,6 +36,11 @@
         /// Gets uniqueId that identify the tenant.
         /// </summary>
         public string Id { get; } = Guid.NewGuid().ToString();
+
+        /// <summary>
+        /// Gets uniqueId that identify the tenant.
+        /// </summary>
+        public int Position { get; private set; }
 
         /// <summary>
         /// Gets tenant object.

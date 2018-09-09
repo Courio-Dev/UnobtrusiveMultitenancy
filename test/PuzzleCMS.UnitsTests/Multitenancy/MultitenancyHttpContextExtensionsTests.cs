@@ -12,7 +12,7 @@
         public void CannotSetTenantContext_WhenHttpContextIsNull()
         {
             HttpContext httpContext = null;
-            TenantContext<AppTenantTest> tenantContext = new TenantContext<AppTenantTest>(new AppTenantTest());
+            TenantContext<AppTenantTest> tenantContext = new TenantContext<AppTenantTest>(new AppTenantTest(),0);
 
             Exception ex = Assert.Throws<ArgumentNullException>(() => httpContext.SetTenantContext(tenantContext));
             Assert.Contains($"Argument context must not be null", ex.Message);
@@ -69,7 +69,7 @@
         [Fact]
         public void WhenConstrucTenantContextWithNullTeanntWith__ThenThrowArgumentNullException()
         {
-            Exception ex = Assert.Throws<ArgumentNullException>(() => new TenantContext<AppTenantTest>(null));
+            Exception ex = Assert.Throws<ArgumentNullException>(() => new TenantContext<AppTenantTest>(null,0));
             Assert.NotNull(ex);
         }
 
@@ -78,7 +78,7 @@
         {
             HttpContext httpContext = new DefaultHttpContext();
 
-            TenantContext<AppTenantTest> tenantContext = new TenantContext<AppTenantTest>(new AppTenantTest());
+            TenantContext<AppTenantTest> tenantContext = new TenantContext<AppTenantTest>(new AppTenantTest(),0);
             httpContext.SetTenantContext(tenantContext);
 
             Assert.Same(tenantContext, httpContext.GetTenantContext<AppTenantTest>());
@@ -90,7 +90,7 @@
             HttpContext httpContext = new DefaultHttpContext();
 
             AppTenantTest tenant = new AppTenantTest { Name = "Name" };
-            httpContext.SetTenantContext(new TenantContext<AppTenantTest>(tenant));
+            httpContext.SetTenantContext(new TenantContext<AppTenantTest>(tenant,0));
 
             Assert.Same(tenant, httpContext.GetTenant<AppTenantTest>());
         }

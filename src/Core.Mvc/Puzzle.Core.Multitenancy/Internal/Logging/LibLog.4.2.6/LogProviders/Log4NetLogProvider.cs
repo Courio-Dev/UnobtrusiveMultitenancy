@@ -38,6 +38,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
@@ -243,7 +244,7 @@ namespace Puzzle.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                         StackTrace stack = new StackTrace();
                         Type thisType = GetType();
                         s_callerStackBoundaryType = Type.GetType("LoggerExecutionWrapper");
-                        for (var i = 1; i < stack.FrameCount; i++)
+                        for (int i = 1; i < stack.FrameCount; i++)
                         {
                             if (!IsInTypeHierarchy(thisType, stack.GetFrame(i).GetMethod().DeclaringType))
                             {

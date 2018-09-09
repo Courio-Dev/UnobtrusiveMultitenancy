@@ -7,33 +7,39 @@
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using Puzzle.Core.Multitenancy.Extensions;
+    using Puzzle.Core.Multitenancy.Internal;
+    using PuzzleCMS.WebHost.Infrastructure.Logging;
     using Serilog;
+    using Serilog.Extensions.Logging;
 
     /// <summary>
     /// Program class.
     /// </summary>
-    public sealed class Program
+    public class Program
     {
         private const string BasePathName = "Configs";
         private const string HostingJsonFileName = "hosting.json";
+
+        protected static IConfigurationRoot Configuration => new ConfigurationBuilder()
+                    .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), BasePathName))
+                    .AddJsonFile("config.json", optional: false, reloadOnChange: true)
+                    .Build();
+
+        protected static Serilog.ILogger SeriLogger => new LoggerConfiguration()
+                .ReadFrom.Configuration(Configuration)
+                .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Error)
+                .CreateLogger();
+
+
+        protected static SerilogLoggerProvider SerilogLoggerProvider => new SerilogLoggerProvider(SeriLogger, dispose: true);
 
         /// <summary>
         /// The entry point.
         /// </summary>
         public static int Main(string[] args)
         {
-            IConfigurationRoot configuration = new ConfigurationBuilder()
-                    .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), BasePathName))
-                    .AddJsonFile("config.json", optional: false, reloadOnChange: true)
-                    .AddEnvironmentVariables()
-                    .AddCommandLine(args)
-                    .Build();
 
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(configuration)
-                .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Fatal)
-                .CreateLogger();
-
+            Log.Logger = SeriLogger;
             try
             {
                 Log.Information("Starting web host");
@@ -70,20 +76,32 @@
             return Microsoft.AspNetCore.WebHost
                   .CreateDefaultBuilder()
                   .UseConfiguration(config)
-                  .UseSerilog()
-                  .ConfigureAppConfiguration((context, configBuilder) =>
-                   {
-                       ConfigureConfigurationBuilder(context, configBuilder, args);
-                   })
-                  .ConfigureLogging((context, logging) =>
-                  {
-                      // clear all previously registered providers
-                      logging.ClearProviders();
-                  })
+                  .ConfigureAppConfiguration((context, configBuilder) => ConfigureConfigurationBuilder(context, configBuilder, args))
+                  .ConfigureLogging((context, logging) => logging.ClearProviders())
                   .UseIISIntegration()
-                  .UseUnobtrusiveMulitenancyStartupWithDefaultConvention<Startup>()
-                  .UseDefaultServiceProvider(options =>options.ValidateScopes = false)
-                  ;
+                  .UseUnobtrusiveMulitenancyStartupWithDefaultConvention<Startup>(actionConfiguration:(action)=> {
+                      action.UseLogProvider(new SeriLogProvider(SerilogLoggerProvider));
+                      action.UseConfigureServicesTenant((sc, tenant) => { });
+                      action.UseCustomServicesTenant((IServiceCollection sc,AppTenant tenant,IConfiguration tentantConfiguration) =>
+                      {
+                          try
+                          {
+                              Serilog.ILogger tenantLogger = new LoggerConfiguration().ReadFrom.Configuration(tentantConfiguration)
+                                                                   .CreateLogger();
+                              return new SeriLogProvider(new SerilogLoggerProvider(tenantLogger, dispose: true));
+                          }
+                          catch
+                          {
+                              string fileName =$"App_Tenants/{tenant.Name}/Logs/log.txt";
+                              Serilog.Core.Logger serilogger = new LoggerConfiguration()
+                               .Enrich.FromLogContext()
+                               .MinimumLevel.Verbose()
+                               .WriteTo.File(fileName, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{SourceContext}] [{Level}] {Message}{NewLine}{Exception}", flushToDiskInterval: TimeSpan.FromSeconds(1), shared: true)
+                               .CreateLogger();
+                              return new SeriLogProvider(new SerilogLoggerProvider(serilogger, dispose: true));
+                          }
+                      });
+                  });
         }
 
         private static void ConfigureConfigurationBuilder(WebHostBuilderContext ctx, IConfigurationBuilder config, string[] args)
@@ -92,21 +110,15 @@
 
             config
                 .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "Configs"))
-                .AddEnvironmentVariables()
-                .AddCommandLine(args)
+                
                 .AddJsonFile(HostingJsonFileName, optional: false, reloadOnChange: true)
                 .AddJsonFile("config.json", optional: false, reloadOnChange: true)
                 .AddXmlFile("settings.xml", optional: true, reloadOnChange: true)
                 .AddJsonFile($"config.{env.EnvironmentName}.json", optional: true)
-
                 .AddJsonFile("MultitenancyOptions.json", optional: false, reloadOnChange: true)
-
-                // This reads the configuration keys from the secret store. This allows you to store connection strings
-                // and other sensitive settings, so you don't have to check them into your source control provider.
-                // Only use this in Development, it is not intended for Production use. See
-                // http://docs.asp.net/en/latest/security/app-secrets.html
                 .AddUserSecrets<Startup>()
-                .AddApplicationInsightsSettings(developerMode: env.IsProduction())
+                .AddEnvironmentVariables()
+                .AddCommandLine(args)
                 .Build();
         }
 

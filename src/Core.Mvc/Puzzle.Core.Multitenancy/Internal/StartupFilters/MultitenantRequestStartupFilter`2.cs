@@ -10,6 +10,7 @@
     using Puzzle.Core.Multitenancy.Internal.Options;
     using Puzzle.Core.Multitenancy.Internal.Resolvers;
     using Microsoft.Extensions.DependencyInjection;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// The StartupFilter for multitenant.
@@ -28,17 +29,22 @@
         {
             return builder =>
             {
-                IOptionsMonitor<MultitenancyOptions<TTenant>> t = builder.ApplicationServices.GetService<IOptionsMonitor<MultitenancyOptions<TTenant>>>();
-                if (t != null)
+                IOptionsMonitor<MultitenancyOptions<TTenant>> monitor = builder.ApplicationServices.GetService<IOptionsMonitor<MultitenancyOptions<TTenant>>>();
+                if (monitor != null)
                 {
-                    t.OnChangeDelayed(x => {
+                    monitor.OnChangeDelayed(x =>
+                    {
+                        Task.Delay(1000).ContinueWith((continuationAction) =>
+                        {
+                            GetService<ITenantResolver<TTenant>>()?.Reset();
+                            GetService<IServiceFactoryForMultitenancy<TTenant>>()?.RemoveAll();
+                            Console.WriteLine($" Configuration changed. ");
+                        });
 
-                        Thread.Sleep(200);
-
-                        GetService<ITenantResolver<TTenant>>()?.Reset();
-                        GetService<IServiceFactoryForMultitenancy<TTenant>>()?.RemoveAll();
-
-                        Console.WriteLine($" Configuration changed. ");
+                        //Thread.Sleep(200);
+                        //GetService<ITenantResolver<TTenant>>()?.Reset();
+                        //GetService<IServiceFactoryForMultitenancy<TTenant>>()?.RemoveAll();
+                        //Console.WriteLine($" Configuration changed. ");
                     });
 
                     T GetService<T>()
@@ -49,37 +55,11 @@
 
 
                 builder.UseMultitenancy<TTenant>();
-
-                // builder.UseMiddleware<TenantUnresolvedRedirectMiddleware<AppTenant>>("", false);
                 builder.UseMiddleware<MultitenancyRequestServicesContainerMiddleware<TTenant>>();
-
-                // builder.UsePerTenant<TStartup, TTenant>((ctx, innerBuilder) => { });
+                //builder.UsePerTenant<TStartup>((ctx, innerBuilder) => { });
 
                 next(builder);
             };
         }
-
-        /*
-    public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> nextFilter)
-    {
-        return builder =>
-        {
-            ConfigureRequestScoping(builder);
-
-            nextFilter(builder);
-        };
-    }
-
-    private void ConfigureRequestScoping(IApplicationBuilder builder)
-    {
-        builder.Use(async (context, next) =>
-        {
-            using (var scope = this.requestScopeProvider())
-            {
-                await next();
-            }
-        });
-    }
-    */
     }
 }

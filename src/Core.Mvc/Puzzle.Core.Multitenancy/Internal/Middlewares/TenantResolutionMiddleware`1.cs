@@ -22,27 +22,27 @@
         }
 
         public async Task Invoke(
-            HttpContext httpContext,ILog<TenantResolutionMiddleware<TTenant>> logger, ITenantResolver<TTenant> tenantResolver)
+            HttpContext httpContext, 
+            ILog<TenantResolutionMiddleware<TTenant>> logger, 
+            ITenantResolver<TTenant> tenantResolver)
         {
-           // using (IServiceScope scope = rootApp.ApplicationServices.CreateScope())
-            {
-                // ITenantResolver<TTenant> tenantResolver = scope.ServiceProvider.GetRequiredService<ITenantResolver<TTenant>>();
-                // you have access to ScopedService here but don't let it leak to any middleware
-                logger?.Debug($"Resolving TenantContext using {tenantResolver.GetType().Name}.");
-                TenantContext<TTenant> tenantContext = await tenantResolver.ResolveAsync(httpContext).ConfigureAwait(false);
+            logger?.Debug($"Resolving TenantContext using {tenantResolver.GetType().Name}.");
+            TenantContext<TTenant> tenantContext = await tenantResolver.ResolveAsync(httpContext).ConfigureAwait(false);
 
-                if (tenantContext != null)
-                {
-                    logger?.Debug("TenantContext Resolved. Adding to HttpContext.");
-                    httpContext?.SetTenantContext(tenantContext);
-                }
-                else
-                {
-                    logger?.Debug("TenantContext Not Resolved.");
-                }
+            if (tenantContext != null)
+            {
+                logger?.Debug("TenantContext Resolved. Adding to HttpContext.");
+                httpContext?.SetTenantContext(tenantContext);
+            }
+            else
+            {
+                logger?.Warn("TenantContext Not Resolved.");
             }
 
-            await next.Invoke(httpContext).ConfigureAwait(false);
+            //using (logger.Info($"Tenant:{httpContext.GetTenant<TTenant>()}"))
+            {
+                await next.Invoke(httpContext).ConfigureAwait(false);
+            }
         }
     }
 }

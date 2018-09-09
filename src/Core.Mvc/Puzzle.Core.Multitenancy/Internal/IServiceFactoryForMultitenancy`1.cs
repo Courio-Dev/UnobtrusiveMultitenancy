@@ -6,9 +6,14 @@
     using System.IO;
     using System.Linq;
     using System.Threading;
+    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.DependencyInjection.Extensions;
     using Microsoft.Extensions.FileProviders;
     using Microsoft.Extensions.Options;
+    using Puzzle.Core.Multitenancy.Internal.Configurations;
+    using Puzzle.Core.Multitenancy.Internal.Logging;
+    using Puzzle.Core.Multitenancy.Internal.Logging.LibLog;
     using Puzzle.Core.Multitenancy.Internal.Options;
     using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
@@ -21,24 +26,33 @@
 
     internal class ServiceFactoryForMultitenancy<TTenant> : IServiceFactoryForMultitenancy<TTenant>
     {
-        private readonly IOptionsMonitor<MultitenancyOptions<TTenant>> optionsMonitor;
-
         public ServiceFactoryForMultitenancy(
-            IServiceCollection services, Action<IServiceCollection, TTenant> configurePerTenantServicesDelegate, IOptionsMonitor<MultitenancyOptions<TTenant>> optionsMonitor)
+            IServiceCollection services, 
+            Action<IServiceCollection, TTenant> configurePerTenantServicesDelegate,
+            Func<IServiceCollection, TTenant, IConfiguration, ILogProvider> additionnalServicesTenant,
+            IMultitenancyOptionsProvider<TTenant> multitenancyProvider,
+            IOptionsMonitor<MultitenancyOptions<TTenant>> optionsMonitor)
             : this()
         {
-            this.optionsMonitor = optionsMonitor ?? throw new ArgumentNullException($"Argument {nameof(optionsMonitor)} must not be null");
-            Services = services;
-            ConfigurePerTenantServicesDelegate = configurePerTenantServicesDelegate;
+
+            OptionsMonitor = optionsMonitor ?? throw new ArgumentNullException($"Argument {nameof(optionsMonitor)} must not be null");
+            Services = services ?? throw new ArgumentNullException($"Argument {nameof(services)} must not be null");
+            MultitenancyOptionsProvider = multitenancyProvider ?? throw new ArgumentNullException($"Argument {nameof(multitenancyProvider)} must not be null");
+            ConfigurePerTenantServicesDelegate = configurePerTenantServicesDelegate ?? throw new ArgumentNullException($"Argument {nameof(configurePerTenantServicesDelegate)} must not be null");
+            AdditionnalServicesTenant = additionnalServicesTenant ?? throw new ArgumentNullException($"Argument {nameof(additionnalServicesTenant)} must not be null");
         }
 
-        private ServiceFactoryForMultitenancy()
-        {
-        }
+        private ServiceFactoryForMultitenancy() {}
 
         public IServiceCollection Services { get; }
 
+        public IOptionsMonitor<MultitenancyOptions<TTenant>> OptionsMonitor { get; }
+
+        public IMultitenancyOptionsProvider<TTenant> MultitenancyOptionsProvider { get; }
+
         public Action<IServiceCollection, TTenant> ConfigurePerTenantServicesDelegate { get; }
+
+        public Func<IServiceCollection, TTenant, IConfiguration, ILogProvider> AdditionnalServicesTenant { get; }
 
         private static LazyConcurrentDictionary<string, IServiceProvider> Cache { get; } = new LazyConcurrentDictionary<string, IServiceProvider>();
 
@@ -48,13 +62,23 @@
 
             IServiceProvider value = Cache.GetOrAdd(key, (k) =>
             {
-                IServiceCollection serviceCollection = Services.Clone();
+                int position = tenantContext.Position;
+                IConfiguration tenantConfiguration = MultitenancyOptionsProvider
+                                                     ?.MultitenancyOptions
+                                                     ?.TenantsConfigurations
+                                                     ?.FirstOrDefault(x => string.Equals(x.Key, position.ToString(), StringComparison.OrdinalIgnoreCase));
 
-                // Add plugin tenant services to servicecollection.
-                BuildAddTenantServiceCollection(serviceCollection, tenantContext.Tenant);
+                IServiceCollection serviceCollection = Services.Clone();    
 
                 // Add specific tenant services to servicecollection.
                 ConfigurePerTenantServicesDelegate(serviceCollection, tenantContext.Tenant);
+
+                // Add tenant services to servicecollection.
+                if (tenantConfiguration != null)
+                {
+                    BuildAddTenantServiceCollection(serviceCollection, tenantContext.Tenant, tenantConfiguration);
+                }
+
                 return GetProviderFromFactory(serviceCollection, tenantContext);
             });
 
@@ -72,12 +96,12 @@
             }
         }
 
-        private void BuildAddTenantServiceCollection(IServiceCollection collectionClone, TTenant tenant)
+        private void BuildAddTenantServiceCollection(IServiceCollection collectionClone, TTenant tenant, IConfiguration tenantConfiguration)
         {
             using (ServiceProvider provider = collectionClone.BuildServiceProvider())
             {
                 OverrideHostingEnvironnementForTenant(collectionClone, provider);
-                OverrideLoggerFactoryForTenant(collectionClone, provider, tenant);
+                OverrideLoggerFactoryForTenant(collectionClone, provider, tenant, tenantConfiguration);
             }
         }
 
@@ -100,11 +124,23 @@
             return env;
         }
 
-        private void OverrideLoggerFactoryForTenant(IServiceCollection collectionClone, ServiceProvider provider, TTenant tenant)
+        private ILogProvider OverrideLoggerFactoryForTenant(
+            IServiceCollection collectionClone, 
+            ServiceProvider provider, 
+            TTenant tenant, 
+            IConfiguration tenantConfiguration)
         {
-            /*ILoggerFactory loggerFactory = new LoggerFactory();
-            loggerFactory.AddTenantLogger(tenant, provider, LogLevel.Trace);
-            collectionClone.AddSingleton(loggerFactory);*/
+            ILogProvider logProvider = AdditionnalServicesTenant?.Invoke(collectionClone, tenant, tenantConfiguration);
+            if (logProvider != null)
+            {
+                collectionClone.RemoveAll(typeof(ILogProvider));
+                collectionClone.RemoveAll(typeof(ILog<>));
+
+                collectionClone.TryAdd(ServiceDescriptor.Singleton<ILogProvider>(logProvider));             
+                collectionClone.TryAdd(ServiceDescriptor.Singleton(typeof(ILog<>), typeof(Log<>)));
+            }
+
+            return logProvider;
         }
 
         private IServiceProvider GetProviderFromFactory(IServiceCollection collectionClone, TenantContext<TTenant> tenantContext)

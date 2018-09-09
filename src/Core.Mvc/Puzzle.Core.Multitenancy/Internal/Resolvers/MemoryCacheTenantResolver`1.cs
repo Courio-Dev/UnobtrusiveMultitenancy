@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Http;
@@ -115,6 +116,19 @@
 
         protected abstract IEnumerable<string> GetTenantIdentifiers(TenantContext<TTenant> context);
 
+        protected abstract Func<HttpContext,TTenant, bool> PredicateResolver();
+
+        /// <inheritdoc />
+        protected int GetTenantPositionWithPredicateResolver(HttpContext context)
+        {
+            int? index = Tenants.Select((x, p) => new { Item = x, Position = p })
+                                    .Where(x => PredicateResolver().Invoke(context, (x.Item)))
+                                    .FirstOrDefault()?.Position
+                                    ;
+
+            return index.GetValueOrDefault(-1);
+        }
+
         protected abstract Task<TenantContext<TTenant>> ResolveAsync(HttpContext context);
 
         private MemoryCacheEntryOptions GetCacheEntryOptions()
@@ -125,23 +139,19 @@
             {
                 CancellationTokenSource tokenSource = new CancellationTokenSource();
 
-                cacheEntryOptions
-                    .RegisterPostEvictionCallback(
-                        (key, value, reason, state) =>
-                        {
-                            tokenSource.Cancel();
-                        })
-                    .AddExpirationToken(new CancellationChangeToken(tokenSource.Token));
+                cacheEntryOptions.RegisterPostEvictionCallback((key, value, reason, state) =>
+                {
+                    tokenSource.Cancel();
+                })
+                .AddExpirationToken(new CancellationChangeToken(tokenSource.Token));
             }
 
             if (options.DisposeOnEviction)
             {
-                cacheEntryOptions
-                    .RegisterPostEvictionCallback(
-                        (key, value, reason, state) =>
-                        {
-                            DisposeTenantContext(key, value as TenantContext<TTenant>);
-                        });
+                cacheEntryOptions.RegisterPostEvictionCallback((key, value, reason, state) =>
+                {
+                     DisposeTenantContext(key, value as TenantContext<TTenant>);
+                });
             }
 
             return cacheEntryOptions;

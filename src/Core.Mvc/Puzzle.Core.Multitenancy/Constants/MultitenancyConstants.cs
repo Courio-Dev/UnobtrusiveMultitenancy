@@ -7,6 +7,9 @@
         public const string MultiTenantContextKey = nameof(MultiTenantContextKey);
 
         public const string MultitenancyOptions = nameof(MultitenancyOptions);
+
+        public const string Tenants = nameof(Tenants);
         
+
     }
 }

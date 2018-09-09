@@ -64,7 +64,7 @@
             this.cacheExpirationInSeconds = cacheExpirationInSeconds;
         }
 
-        protected override IEnumerable<TestTenant> Tenants => throw new NotImplementedException();
+        protected override IEnumerable<TestTenant> Tenants => tenants;
 
         protected override MemoryCacheEntryOptions CreateCacheEntryOptions()
         {
@@ -84,16 +84,18 @@
         protected override Task<TenantContext<TestTenant>> ResolveAsync(HttpContext context)
         {
             TestTenant tenant = tenants.FirstOrDefault(testTenant => testTenant.Hostnames.ToList().Contains(context.Request.Path));
-
             TenantContext<TestTenant> tenantContext = null;
             if (tenant != null)
             {
-                tenantContext = new TenantContext<TestTenant>(tenant);
+                int postion = GetTenantPositionWithPredicateResolver(context);
+                tenantContext = new TenantContext<TestTenant>(tenant, postion);
 
                 tenantContext.Properties.Add("Created", DateTime.UtcNow);
             }
 
             return Task.FromResult(tenantContext);
         }
+
+        protected override Func<HttpContext, TestTenant, bool> PredicateResolver() => (c, t) => t.Hostnames.ToList().Contains(c.Request.Path);
     }
 }

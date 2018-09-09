@@ -1,8 +1,9 @@
 ﻿{
   "MultitenancyOptions": {
-    "OtherTokens": {
-      "TenantFolder": "App_Tenants_Override"
+    "Tokens": {
+      "TenantFolder_2": "App_Tenants"
     },
+    "TenantFolder": "{TenantFolder}",
     "Tenants": [
       {
         "Name": "Tenant 1",
@@ -12,7 +13,34 @@
           "localhost:60000"
         ],
         "Theme": "{DS}",
-        "ConnectionString": "{TenantFolder}"
+        "ConnectionString": "{TenantFolder}",
+        "Serilog": {
+          "Using": [ "Serilog.Sinks.Literate", "Serilog.Sinks.Console", "Serilog.Sinks.File" ],
+          "MinimumLevel": {
+            "Default": "Verbose",
+            "Override": {
+              "Microsoft": "Verbose"
+            }
+          },
+          "WriteTo": [
+            {
+              "Name": "LiterateConsole"
+            },
+            {
+              "Name": "File",
+              "Args": {
+                "path": "App_Tenants/tenant-1/Logs/log.txt",
+                "rollingInterval": "Day",
+                "formatter": "Serilog.Formatting.Compact.CompactJsonFormatter, Serilog.Formatting.Compact",
+                "fileSizeLimitBytes": 5000000,
+                "retainedFileCountLimit": null
+              }
+            }
+          ],
+          "Enrich": [ "FromLogContext", "WithMachineName", "WithThreadId" ],
+          "Properties": {
+          }
+        }
       },
       {
         "Name": "Tenant 2",

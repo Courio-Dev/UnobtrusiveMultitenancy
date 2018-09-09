@@ -4,48 +4,43 @@
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Logging.Internal;
     using Puzzle.Core.Multitenancy.Internal.Logging.LibLog;
+    using Serilog;
+    using Serilog.Context;
+    using Serilog.Extensions.Logging;
     using Logging = Puzzle.Core.Multitenancy.Internal.Logging;
 
-    internal class AspNetCoreMultiTenantLogProvider : Logging.LibLog.ILogProvider
+    internal class SeriLogProvider : Logging.LibLog.ILogProvider
     {
-        private readonly ILoggerFactory loggerFactory;
+        private readonly SerilogLoggerProvider loggerProvider;
 
-        public AspNetCoreMultiTenantLogProvider(ILoggerFactory loggerFactory)
+        public SeriLogProvider(SerilogLoggerProvider loggerProvider)
         {
-            this.loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
+            this.loggerProvider = loggerProvider ?? throw new ArgumentNullException(nameof(loggerProvider));
         }
 
-        public Logging.LibLog.ILog GetLogger(string name)
-        {
-            return new AspNetCoreMultiTenantLog(loggerFactory.CreateLogger(name));
-        }
+        public Logging.LibLog.ILog GetLogger(string name) => new SeriLogCoreMultiTenantLog( loggerProvider.CreateLogger(name));
+        Logger ILogProvider.GetLogger(string name) => new SeriLogCoreMultiTenantLog(loggerProvider.CreateLogger(name)).Log;
 
-        public IDisposable OpenMappedContext(string key, string value)
-        {
-            return null;
-        }
 
-        public IDisposable OpenNestedContext(string message)
-        {
-            return null;
-        }
+        public IDisposable OpenMappedContext(string key, string value) => LogContext.PushProperty(key, value);
+        public IDisposable OpenNestedContext(string message) => LogContext.PushProperty("NDC", message);
 
-        Logger ILogProvider.GetLogger(string name) => throw new NotImplementedException();
 
-        internal class AspNetCoreMultiTenantLog : ILog
+        internal class SeriLogCoreMultiTenantLog : ILog
         {
             private static readonly Func<object, Exception, string> MessageFormatterFunc = MessageFormatter;
             private static readonly object[] EmptyArgs = new object[0];
 
-            private readonly ILogger targetLogger;
+            private readonly Microsoft.Extensions.Logging.ILogger targetLogger;
 
-            public AspNetCoreMultiTenantLog(ILogger targetLogger)
+            public SeriLogCoreMultiTenantLog(Microsoft.Extensions.Logging.ILogger targetLogger)
             {
                 this.targetLogger = targetLogger ?? throw new ArgumentNullException(nameof(targetLogger));
             }
 
             public bool Log(Logging.LibLog.LogLevel logLevel, Func<string> messageFunc, Exception exception = null)
             {
+                
                 Microsoft.Extensions.Logging.LogLevel targetLogLevel = ToTargetLogLevel(logLevel);
 
                 // When messageFunc is null

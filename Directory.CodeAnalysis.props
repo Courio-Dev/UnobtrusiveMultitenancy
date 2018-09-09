@@ -12,16 +12,22 @@
     <Features>IOperation</Features>
     <NoWarn>$(NoWarn);1701;1702;1705;1101;1633</NoWarn>
     <!--<NoWarn>$(NoWarn),1573,1591,1712</NoWarn>-->
-    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <RunCodeAnalysis>False</RunCodeAnalysis>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
     <WarningsAsErrors />
     <TreatSpecificWarningsAsErrors />
   </PropertyGroup>
    
   <ItemGroup>
-    <AdditionalFiles Include="$(SolutionDir)\CodeAnalysis.ruleset" Link="CodeAnalysis.ruleset" />
+    <!--<AdditionalFiles Include="$(SolutionDir)\CodeAnalysis.ruleset" Link="CodeAnalysis.ruleset" />
     <AdditionalFiles Include="$(SolutionDir)\Stylecop.json" Link="Stylecop.json" />
-    <AdditionalFiles Include="$(SolutionDir)\GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
+    <AdditionalFiles Include="$(SolutionDir)\GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />-->
+
+    <AdditionalFiles Include="$(ProjectDir)\CodeAnalysis.ruleset" Link="CodeAnalysis.ruleset" />
+    <AdditionalFiles Include="$(ProjectDir)\Stylecop.json" Link="Stylecop.json" />
+    <AdditionalFiles Include="$(ProjectDir)\GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
   </ItemGroup>
+
+
 
 </Project>

@@ -18,7 +18,7 @@
         /// <summary>
         /// Gets the id of tenant, thid must be unique.
         /// </summary>
-        public string Id => GenerateSlug(Name).ToLowerInvariant();
+        public string Id => GenerateId(Name).ToLowerInvariant();
 
         /// <summary>
         /// Gets or sets list of hostname hosted by tenant.
@@ -40,7 +40,7 @@
         /// </summary>
         /// <param name="value">value.</param>
         /// <returns>string.</returns>
-        private static string GenerateSlug(string value)
+        private static string GenerateId(string value)
         {
             // prepare string, remove accents, lower case and convert hyphens to whitespace
             string result = RemoveDiacritics(value).Replace("-", " ").ToLowerInvariant();
@@ -73,34 +73,4 @@
             return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
         }
     }
-
-    /*
-    public class AppTenant : IEquatable<AppTenant>
-    {
-        public string Name { get; set; }
-        public string[] Hostnames { get; set; }
-
-        public string Id { get => Name.Replace(" ", "").ToLower(); }
-
-        public bool Equals(AppTenant other)
-        {
-            if (other == null)
-            {
-                return false;
-            }
-
-            return other.Name.Equals(Name);
-        }
-
-        public override bool Equals(object obj)
-        {
-            return Equals(obj as AppTenant);
-        }
-
-        public override int GetHashCode()
-        {
-            return Name.GetHashCode();
-        }
-    }
-    */
 }

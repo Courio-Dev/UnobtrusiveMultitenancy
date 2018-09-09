@@ -155,14 +155,12 @@ Task("Test-OpenCover")
     .WithFilter("+[*]* -[*.UnitsTests]*")
     .WithFilter("-[xunit.*]*")
     .WithFilter("-[*.*Tests]*")
-    //.AdditionalArguments("-hideskipped:All")
     ;
  
     foreach(var project in paths.Files.TestProjects)
     {
         try 
         {
-
              Information("Testing project " + MakeAbsolute(project).ToString());
             var projectFile = MakeAbsolute(project).ToString();
             var dotNetTestSettings = new DotNetCoreTestSettings
@@ -262,7 +260,8 @@ Task("Copy-Files")
         // .NET Core
         DotNetCorePublish(csprojFile.FullPath, new DotNetCorePublishSettings
         {
-            Framework = "netcoreapp2.1",
+            //Framework = "netcoreapp2.1",
+            //Framework = "netstandard2.0",
             NoRestore = true,
             Configuration = configuration,
             OutputDirectory = outputDirectory21,

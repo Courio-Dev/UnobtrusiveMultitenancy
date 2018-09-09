@@ -55,22 +55,20 @@
 
         public async Task Invoke(HttpContext httpContext)
         {
-            // if (httpContext == null)
-            // {
-            //    throw new ArgumentNullException($"Argument {nameof(httpContext)} must not be null");
-            // }
+            ILog<TenantPipelineMiddleware<TTenant>> log = httpContext.RequestServices.GetService<ILog<TenantPipelineMiddleware<TTenant>>>() ?? logger;
             TenantContext<TTenant> tenantContext = httpContext.GetTenantContext<TTenant>();
             if (tenantContext != null)
             {
                 Lazy<RequestDelegate> tenantPipeline = pipelines.GetOrAdd(
                     tenantContext.Tenant,
-                    new Lazy<RequestDelegate>(() => BuildTenantPipeline(httpContext, tenantContext)));
+                    new Lazy<RequestDelegate>(() => BuildTenantPipeline(httpContext, tenantContext, log)));
                 await tenantPipeline.Value(httpContext).ConfigureAwait(false);
             }
         }
 
-        private RequestDelegate BuildTenantPipeline(HttpContext httpContext, TenantContext<TTenant> tenantContext)
+        private RequestDelegate BuildTenantPipeline(HttpContext httpContext, TenantContext<TTenant> tenantContext, ILog<TenantPipelineMiddleware<TTenant>> loggerPipeline)
         {
+            loggerPipeline.Info($" Building TenantPipeline for Tenant: {tenantContext.Id}");
             IApplicationBuilder branchBuilder = rootApp.New();
             TenantPipelineBuilderContext<TTenant> builderContext = new TenantPipelineBuilderContext<TTenant>(tenantContext);
 
@@ -92,6 +90,7 @@
             branchBuilder.Run(next);
 
             RequestDelegate branchDelegate = branchBuilder.Build();
+            loggerPipeline.Info($" Builded TenantPipeline for Tenant: {tenantContext.Id}");
             return branchDelegate;
         }
     }

@@ -12,6 +12,7 @@
     using Puzzle.Core.Multitenancy.Internal;
     using Puzzle.Core.Multitenancy.Internal.Configurations;
     using Puzzle.Core.Multitenancy.Internal.Logging;
+    using Puzzle.Core.Multitenancy.Internal.Logging.LibLog;
     using Puzzle.Core.Multitenancy.Internal.Options;
     using Puzzle.Core.Multitenancy.Internal.Resolvers;
 
@@ -135,8 +136,8 @@
                 TestMultitenancyOptionsProvider = new MultitenancyOptionsProvider<TestTenant>(new MultiTenancyConfig<TestTenant>(environmentTest, Config));
                 AppTenantMultitenancyOptionsProvider = new MultitenancyOptionsProvider<AppTenant>(new MultiTenancyConfig<AppTenant>(environmentTest, Config));
 
-                TestTenantResolver = new TestTenantMemoryCacheResolver(TestMultitenancyOptionsProvider, Cache, new Log<TestTenantMemoryCacheResolver>(), options, cacheExpirationInSeconds);
-                AppTenantResolver = new AppTenantResolver(AppTenantMultitenancyOptionsProvider, Cache, new Log<AppTenantResolver>());
+                TestTenantResolver = new TestTenantMemoryCacheResolver(TestMultitenancyOptionsProvider, Cache, new Log<TestTenantMemoryCacheResolver>(LogProvider.CurrentLogProvider), options, cacheExpirationInSeconds);
+                AppTenantResolver = new AppTenantResolver(AppTenantMultitenancyOptionsProvider, Cache, new Log<AppTenantResolver>(LogProvider.CurrentLogProvider));
             }
 
             public IMemoryCache Cache { get; } = new MemoryCache(new MemoryCacheOptions()
@@ -154,7 +155,7 @@
 
             public ITenantResolver<AppTenant> AppTenantResolver { get; }
 
-            protected static ILog<MultitenancyBaseFixture> Logger { get; } = new Log<MultitenancyBaseFixture>();
+            protected static ILog<MultitenancyBaseFixture> Logger { get; } = new Log<MultitenancyBaseFixture>(LogProvider.CurrentLogProvider);
         }
     }
 }

@@ -14,15 +14,38 @@
     {
         private readonly ILog log;
 
-        public Log()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="logProvider"></param>
+        public Log(ILogProvider logProvider)
         {
-            // this.logProvider = logProvider ?? throw new ArgumentNullException(nameof(logProvider));
-            log = LogProvider.For<T>();
+            //if (logProvider == null) throw new ArgumentNullException(nameof(logProvider));
+            //log =GetLogger(logProvider, typeof(T));
+            log =(logProvider!=null)? GetLogger(logProvider,typeof(T)) : LogProvider.For<T>();
         }
 
         bool ILog.Log(LogLevel logLevel, Func<string> messageFunc, Exception exception, params object[] formatParameters)
         {
             return log.Log(logLevel, messageFunc, exception, formatParameters);
+        }
+
+        private static ILog GetLogger(ILogProvider logProvider,Type type, string fallbackTypeName = "System.Object")
+        {
+            // If the type passed in is null then fallback to the type name specified
+            return GetLogger(logProvider,type != null ? type.FullName : fallbackTypeName);
+        }
+
+        /// <summary>
+        /// Gets a logger with the specified name.
+        /// </summary>
+        /// <param name="logProvider">the provided log provider</param>
+        /// <param name="name">The name.</param>
+        /// <returns>An instance of. <see cref="ILog"/></returns>
+        private static ILog GetLogger(ILogProvider logProvider,string name)
+        {
+            bool isDisabled = false;
+            return  (ILog)new LoggerExecutionWrapper(logProvider.GetLogger(name), () => isDisabled);
         }
     }
 }
