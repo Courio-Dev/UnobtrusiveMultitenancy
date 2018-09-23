@@ -252,6 +252,7 @@ Task("Remove-Packages").Does(() =>CleanDirectory(paths.Directories.ArtifactNuget
 Task("Copy-Files")
     .DoesForEach(paths.Files.AllNuspecsProjects,projectNuSpecToPack => 
     {
+        /*
         var nuspecFile = projectNuSpecToPack.FullPath;
         var csprojFile = projectNuSpecToPack.ChangeExtension(".csproj");
 
@@ -270,6 +271,7 @@ Task("Copy-Files")
 
         // Copy license
         //CopyFileToDirectory("./LICENSE", outputDirectory21); 
+        */
 
     });
 
@@ -285,15 +287,18 @@ Task("Package-NuGet")
     {
         // .NET Core
         var nuspecFile=projectNuSpecToPack.FullPath;
+        var csprojFile = projectNuSpecToPack.ChangeExtension(".csproj");
         var fullBasePath = GetOutputArtifactFromProjectFile(paths.Directories.ArtifactsBinNetCoreapp21,nuspecFile);
-        // normal
-        NuGetPack(nuspecFile, new NuGetPackSettings {
-            Version = buildVersion.Version,
-            BasePath = fullBasePath,
-            OutputDirectory = paths.Directories.ArtifactNugetsDirectory,
-            Symbols = false,
-            NoPackageAnalysis = true
+
+        DotNetCorePack(csprojFile.FullPath,new DotNetCorePackSettings()
+        {
+            Configuration = configuration,
+            OutputDirectory =  paths.Directories.ArtifactNugetsDirectory,
+            VersionSuffix = buildVersion.VersionSuffix,
+            NoRestore=true,
+            NoBuild=true
         });
+
     });
 
 //////////////////////////////////////////////////////////////////////

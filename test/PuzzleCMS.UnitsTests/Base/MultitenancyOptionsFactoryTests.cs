@@ -3,8 +3,8 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using Microsoft.Extensions.Options;
-    using Puzzle.Core.Multitenancy.Internal;
-    using Puzzle.Core.Multitenancy.Internal.Options;
+    using PuzzleCMS.Core.Multitenancy.Internal;
+    using PuzzleCMS.Core.Multitenancy.Internal.Options;
 
     /// <summary>
     /// Factory for MultitenancyOptions test.

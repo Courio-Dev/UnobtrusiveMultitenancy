@@ -2,8 +2,8 @@
 {
     using System;
     using Microsoft.AspNetCore.Http;
-    using Puzzle.Core.Multitenancy;
-    using Puzzle.Core.Multitenancy.Extensions;
+    using PuzzleCMS.Core.Multitenancy;
+    using PuzzleCMS.Core.Multitenancy.Extensions;
     using Xunit;
 
     public class MultitenancyHttpContextExtensionsTests

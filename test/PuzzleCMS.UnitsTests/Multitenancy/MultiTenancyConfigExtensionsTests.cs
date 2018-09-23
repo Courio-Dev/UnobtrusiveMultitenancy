@@ -18,7 +18,7 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
             // Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() => Task.Run(() =>
             {
-                Puzzle.
+                PuzzleCMS.
                 Core.
                 Multitenancy.Extensions.
                 MultiTenancyConfigExtensions.

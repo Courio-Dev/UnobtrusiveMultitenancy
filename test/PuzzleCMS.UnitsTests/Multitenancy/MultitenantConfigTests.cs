@@ -2,7 +2,7 @@
 {
     using System;
     using Microsoft.AspNetCore.Hosting;
-    using Puzzle.Core.Multitenancy.Internal.Configurations;
+    using PuzzleCMS.Core.Multitenancy.Internal.Configurations;
     using PuzzleCMS.UnitsTests.Base;
     using Xunit;
 

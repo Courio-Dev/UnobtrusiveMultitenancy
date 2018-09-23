@@ -39,7 +39,7 @@ public class BuildPaths
     public BuildDirectories Directories { get; private set; }
 
     private static FilePath SolutionFile => "./PuzzleCMS.sln";
-    private static FilePath VersionFile => "./version.props";
+    private static FilePath VersionFile => "./directory.build/version.props";
 
     public static FilePath ArtifactCodeCoverageResultFile => "coverage.xml";
     public static DirectoryPath ArtifactCodeCoverageReportDirectory => "coverage";

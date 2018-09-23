@@ -21,12 +21,12 @@
 
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Core.Mvc\Puzzle.Core.Multitenancy\Puzzle.Core.Multitenancy.csproj" />
+    <Folder Include="LibLog\" />
   </ItemGroup>
 
 
   <ItemGroup>
-    <Folder Include="LibLog\" />
+    <ProjectReference Include="..\..\src\PuzzleCMS.Core\PuzzleCMS.Core.Multitenancy\PuzzleCMS.Core.Multitenancy.csproj" />
   </ItemGroup>
 
 

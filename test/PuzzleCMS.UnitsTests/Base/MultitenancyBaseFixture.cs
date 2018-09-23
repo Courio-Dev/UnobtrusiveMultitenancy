@@ -8,13 +8,13 @@
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Options;
-    using Puzzle.Core.Multitenancy.Extensions;
-    using Puzzle.Core.Multitenancy.Internal;
-    using Puzzle.Core.Multitenancy.Internal.Configurations;
-    using Puzzle.Core.Multitenancy.Internal.Logging;
-    using Puzzle.Core.Multitenancy.Internal.Logging.LibLog;
-    using Puzzle.Core.Multitenancy.Internal.Options;
-    using Puzzle.Core.Multitenancy.Internal.Resolvers;
+    using PuzzleCMS.Core.Multitenancy.Extensions;
+    using PuzzleCMS.Core.Multitenancy.Internal;
+    using PuzzleCMS.Core.Multitenancy.Internal.Configurations;
+    using PuzzleCMS.Core.Multitenancy.Internal.Logging;
+    using PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog;
+    using PuzzleCMS.Core.Multitenancy.Internal.Options;
+    using PuzzleCMS.Core.Multitenancy.Internal.Resolvers;
 
     /// <summary>
     /// The common fixture for multitenancy test.

@@ -6,11 +6,11 @@
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Caching.Memory;
-    using Puzzle.Core.Multitenancy;
-    using Puzzle.Core.Multitenancy.Internal.Configurations;
-    using Puzzle.Core.Multitenancy.Internal.Logging;
-    using Puzzle.Core.Multitenancy.Internal.Logging.LibLog;
-    using Puzzle.Core.Multitenancy.Internal.Resolvers;
+    using PuzzleCMS.Core.Multitenancy;
+    using PuzzleCMS.Core.Multitenancy.Internal.Configurations;
+    using PuzzleCMS.Core.Multitenancy.Internal.Logging;
+    using PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog;
+    using PuzzleCMS.Core.Multitenancy.Internal.Resolvers;
 
     internal class TestTenantMemoryCacheResolver : MemoryCacheTenantResolver<TestTenant>
     {

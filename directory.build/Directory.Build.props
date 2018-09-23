@@ -1,0 +1,111 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netcoreapp2.1' ">
+    <DefineConstants>LIBLOG_PORTABLE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <SolutionDir>$([System.IO.Path]::GetDirectoryName($(MSBuildProjectDirectory)))\</SolutionDir>
+  </PropertyGroup>
+
+  <Import Project="Directory.Version.props" />
+  <Import Project="Directory.Dependencies.Commons.props" />
+  <Import Project="Directory.CodeAnalysis.props" />
+
+  <ItemGroup>
+   <Content Include="README.md"><Pack>true</Pack><PackagePath>..\</PackagePath></Content>
+   <Content Include="LICENSE"><Pack>true</Pack><PackagePath>LICENSE</PackagePath></Content>
+  </ItemGroup>
+
+  <PropertyGroup Label="Common Package">
+    <Copyright>Copyright (c) Courio-Dev and contributors. All rights reserved.</Copyright>
+    <Description>Description</Description>
+    <Authors>Courio-Dev</Authors>
+    <Company>Courio-Dev</Company>
+    <PackageProjectUrl>https://github.com/Courio-Dev/UnobtrusiveMultitenancy</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/Courio-Dev/UnobtrusiveMultitenancy/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageIconUrl>https://github.com/Courio-Dev/UnobtrusiveMultitenancy</PackageIconUrl>
+    <RepositoryUrl>https://github.com/Courio-Dev/UnobtrusiveMultitenancy</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>
+    multitenancy 
+    multitenant 
+    multitenant-applications 
+    tenant 
+    dependency-injection 
+    aspnet-core-2 
+    aspnet-core-mvc 
+    net-core-2
+    </PackageTags>
+  </PropertyGroup>
+  
+  <!-- Use for debug -->
+  <!-- https://chimpiq.com/msbuild-part-3/ -->
+  <!-- https://stackoverflow.com/questions/2111256/how-can-i-get-current-directory-in-msbuild-script -->
+  <!-- https://www.newventuresoftware.com/blog/code-bites-copying-output-files-after-build-using-msbuild -->
+  <!-- http://sedodream.com/2008/06/09/MSBuildReservedProperties.aspx -->
+  <!-- http://sedodream.com/2007/11/21/MSBuildHowToGetAllGeneratedOutputs.aspx -->
+  <!-- https://blogs.msdn.microsoft.com/visualstudio/2010/07/06/debugging-msbuild-script-with-visual-studio/ -->
+  <!-- https://natemcmaster.com/blog/2017/07/05/msbuild-task-in-nuget/ -->
+ <Target Name="Display SetPackageProperties" BeforeTargets="SetPackageProperties">
+    <Message Text="$(PackageId)" Importance="high"/>
+    <Message Text="$(PackageVersion)" Importance="high"/>
+    <Message Text="$(Configuration)" Importance="high"/>
+    <Message Text="$(PackageTags.Replace(';',' '))" Importance="high"/>
+    <Message Text="$(PackageProjectUrl)" Importance="high"/>
+    <Message Text="$(PackageLicenseUrl)" Importance="high"/>
+    <Message Text="$(PackageIconUrl)" Importance="high"/>
+    <Message Text="$(RepositoryUrl)" Importance="high"/>
+    <Message Text="$(RepositoryType)" Importance="high"/>
+    <Message Text="$(Authors)" Importance="high"/>
+    <Message Text="$(Copyright)" Importance="high"/>
+    <Message Text="$(Description)" Importance="high"/>
+    <Message Text="OutputPath: $(OutputPath)" Importance="high"/>
+    <Message Text="MSBuildProjectDirectory: $(MSBuildProjectDirectory)" Importance="high"/>
+
+    <Message Text="PublishDir: $(PublishDir)" Importance="high"/>
+    <Message Text="SolutionDir: $(SolutionDir)" Importance="high"/>
+    <Message Text="OutputShims: $(IntermediateOutputPath)shims\$(TargetFramework)" Importance="high"/>
+    <Message Text="OutputBinary: $(MSBuildProjectDirectory)\$(OutputPath)" Importance="high"/>
+    <Message Text="OutputRuntimeConfig: $(MSBuildProjectDirectory)\netcoreapp2.0\$(PackageId).runtimeconfig.json" Importance="high"/>
+    <Message Text="OutputSymbol: $(MSBuildProjectDirectory)\netcoreapp2.0\$(PackageId).pdb" Importance="high"/>
+  </Target>
+
+  <Target Name="SetPackageProperties" BeforeTargets="GenerateNuspec">
+    <PropertyGroup>
+      <IncludeSymbols>true</IncludeSymbols>
+      <NuspecProperties>
+        id=$(PackageId);
+        version=$(PackageVersion);
+        configuration=$(Configuration);
+        tags=$(PackageTags.Replace("&amp;", "&amp;amp;"));
+        projectUrl=$(PackageProjectUrl);
+        licenseUrl=$(PackageLicenseUrl);
+        iconUrl=$(PackageIconUrl);
+        repositoryUrl=$(RepositoryUrl);
+        repositoryType=$(RepositoryType);
+        author=$(Authors);
+        copyright=$(Copyright);
+        description=$(Description);
+
+        OutputBaseBinary=$(MSBuildProjectDirectory)\$(OutputPath);
+      </NuspecProperties>
+    </PropertyGroup>
+  </Target>
+
+  <PropertyGroup Label="Source Link">
+    <!-- Optional: Declare that the Repository URL can be published to NuSpec -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <!-- Optional: Embed source files that are not tracked by the source control manager to the PDB -->
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <!-- Optional: Include PDB in the built .nupkg -->
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Package Versions">
+    <AspNetCoreVersion>2.1.1</AspNetCoreVersion>
+    <XunitVersion>2.3.1</XunitVersion>
+    <XunitAnalyzersVersion>0.8.0</XunitAnalyzersVersion>
+  </PropertyGroup>
+
+</Project>

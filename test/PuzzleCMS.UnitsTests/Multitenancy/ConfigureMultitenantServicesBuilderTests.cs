@@ -7,8 +7,8 @@
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.TestHost;
     using Microsoft.Extensions.DependencyInjection;
-    using Puzzle.Core.Multitenancy.Internal;
-    using Puzzle.Core.Multitenancy.Internal.Configurations;
+    using PuzzleCMS.Core.Multitenancy.Internal;
+    using PuzzleCMS.Core.Multitenancy.Internal.Configurations;
     using PuzzleCMS.UnitsTests.Base;
     using Xunit;
 
@@ -35,14 +35,14 @@
             using (TestServer server = new TestServer(builder))
             using (System.Net.Http.HttpClient client = server.CreateClient())
             {
-                Task Res() => Task.Run(async () =>
+                Task res() => Task.Run(async () =>
                 {
                     System.Net.Http.HttpResponseMessage response = await client.GetAsync("/tenant-1-1").ConfigureAwait(false);
                     response.EnsureSuccessStatusCode();
                     string result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 });
 
-                Exception ex = await Assert.ThrowsAsync<InvalidOperationException>(Res).ConfigureAwait(false);
+                Exception ex = await Assert.ThrowsAsync<InvalidOperationException>(res).ConfigureAwait(false);
                 Assert.Equal(
                     "The ConfigurePerTenantServices method must take only two parameter one of type IServiceCollection and one of type TTenant.",
                     ex.Message);
@@ -59,14 +59,14 @@
             using (TestServer server = new TestServer(builder))
             using (System.Net.Http.HttpClient client = server.CreateClient())
             {
-                Task Res() => Task.Run(async () =>
+                Task res() => Task.Run(async () =>
                 {
                     System.Net.Http.HttpResponseMessage response = await client.GetAsync("/tenant-1-1").ConfigureAwait(false);
                     response.EnsureSuccessStatusCode();
                     string result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 });
 
-                Exception ex = await Assert.ThrowsAsync<InvalidOperationException>(Res).ConfigureAwait(false);
+                Exception ex = await Assert.ThrowsAsync<InvalidOperationException>(res).ConfigureAwait(false);
                 Assert.Equal(
                     "The ConfigurePerTenantServices method must take only two parameter one of type IServiceCollection and one of type TTenant.",
                     ex.Message);
@@ -141,12 +141,12 @@
             WebHostBuilder builder = CreateWebHostBuilder<TestStartupConfigureServicesInvalidOperationException, TestTenant, TestTenantMemoryCacheResolver>();
 
             // Act
-            Task Res() => Task.Run(() =>
+            Task res() => Task.Run(() =>
             {
                 TestServer server = new TestServer(builder);
             });
 
-            Exception ex = await Assert.ThrowsAsync<InvalidOperationException>(Res).ConfigureAwait(false);
+            Exception ex = await Assert.ThrowsAsync<InvalidOperationException>(res).ConfigureAwait(false);
             Assert.Equal("TestStartupInvalidOperationException", ex.Message);
         }
 
@@ -157,12 +157,12 @@
             WebHostBuilder builder = CreateWebHostBuilder<TestStartupConfigureServicesException, TestTenant, TestTenantMemoryCacheResolver>();
 
             // Act
-            Task Res() => Task.Run(() =>
+            Task res() => Task.Run(() =>
             {
                 TestServer server = new TestServer(builder);
             });
 
-            Exception ex = await Assert.ThrowsAsync<Exception>(Res).ConfigureAwait(false);
+            Exception ex = await Assert.ThrowsAsync<Exception>(res).ConfigureAwait(false);
             Assert.Equal("TestStartupInvalidOperationException", ex.Message);
         }
 
@@ -173,12 +173,12 @@
             WebHostBuilder builder = CreateWebHostBuilder<TestStartupConfigureInvalidOperationException, TestTenant, TestTenantMemoryCacheResolver>();
 
             // Act
-            Task Res() => Task.Run(() =>
+            Task res() => Task.Run(() =>
             {
                 TestServer server = new TestServer(builder);
             });
 
-            Exception ex = await Assert.ThrowsAsync<InvalidOperationException>(Res).ConfigureAwait(false);
+            Exception ex = await Assert.ThrowsAsync<InvalidOperationException>(res).ConfigureAwait(false);
             Assert.Equal("TestStartupInvalidOperationException", ex.Message);
         }
 
@@ -189,12 +189,12 @@
             WebHostBuilder builder = CreateWebHostBuilder<TestStartupConfigureException, TestTenant, TestTenantMemoryCacheResolver>();
 
             // Act
-            Task Res() => Task.Run(() =>
+            Task res() => Task.Run(() =>
             {
                 TestServer server = new TestServer(builder);
             });
 
-            Exception ex = await Assert.ThrowsAsync<Exception>(Res).ConfigureAwait(false);
+            Exception ex = await Assert.ThrowsAsync<Exception>(res).ConfigureAwait(false);
             Assert.Equal("TestStartupInvalidOperationException", ex.Message);
         }
 

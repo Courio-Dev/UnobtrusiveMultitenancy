@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Puzzle.Core.Multitenancy.Extensions;
-using Puzzle.Core.Multitenancy.Internal;
-using Puzzle.Core.Multitenancy.Internal.Configurations;
+using PuzzleCMS.Core.Multitenancy.Extensions;
+using PuzzleCMS.Core.Multitenancy.Internal;
+using PuzzleCMS.Core.Multitenancy.Internal.Configurations;
 using PuzzleCMS.UnitsTests.Base;
 using Xunit;
 

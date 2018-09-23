@@ -1,7 +1,7 @@
 ﻿namespace PuzzleCMS.UnitsTests.Base
 {
     using Microsoft.AspNetCore.Hosting;
-    using Puzzle.Core.Multitenancy.Internal.Resolvers;
+    using PuzzleCMS.Core.Multitenancy.Internal.Resolvers;
     using Xunit;
     using static PuzzleCMS.UnitsTests.Base.MultitenancyBaseFixture;
 

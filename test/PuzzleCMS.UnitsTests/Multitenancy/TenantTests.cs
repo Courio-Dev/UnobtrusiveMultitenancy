@@ -1,7 +1,7 @@
 ﻿namespace PuzzleCMS.UnitsTests.Multitenancy
 {
     using System;
-    using Puzzle.Core.Multitenancy.Internal;
+    using PuzzleCMS.Core.Multitenancy.Internal;
     using Xunit;
 
     public class TenantTests

@@ -12,9 +12,9 @@
     using Microsoft.AspNetCore.TestHost;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Options;
-    using Puzzle.Core.Multitenancy.Constants;
-    using Puzzle.Core.Multitenancy.Extensions;
-    using Puzzle.Core.Multitenancy.Internal.Options;
+    using PuzzleCMS.Core.Multitenancy.Constants;
+    using PuzzleCMS.Core.Multitenancy.Extensions;
+    using PuzzleCMS.Core.Multitenancy.Internal.Options;
     using PuzzleCMS.UnitsTests.Base;
     using Xunit;
 

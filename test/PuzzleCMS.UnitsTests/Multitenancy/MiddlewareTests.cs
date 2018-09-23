@@ -5,7 +5,7 @@
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.TestHost;
-    using Puzzle.Core.Multitenancy.Extensions;
+    using PuzzleCMS.Core.Multitenancy.Extensions;
     using PuzzleCMS.UnitsTests.Base;
     using Xunit;
 
@@ -83,7 +83,7 @@
             // Act
             Task Res() => Task.Run(() =>
             {
-                Puzzle.Core.Multitenancy.Extensions.WebHostBuilderExtensions.UseUnobtrusiveMulitenancyStartupWithDefaultConvention<TestStartup>(null);
+                PuzzleCMS.Core.Multitenancy.Extensions.WebHostBuilderExtensions.UseUnobtrusiveMulitenancyStartupWithDefaultConvention<TestStartup>(null);
             });
 
             // Assert
@@ -98,7 +98,7 @@
             // Act
             Task Res() => Task.Run(() =>
             {
-                Puzzle.Core.Multitenancy.Extensions.WebHostBuilderExtensions.
+                PuzzleCMS.Core.Multitenancy.Extensions.WebHostBuilderExtensions.
                 UseUnobtrusiveMulitenancyStartup<TestStartup, TestTenant, TestTenantMemoryCacheResolver>(null);
             });
 

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata minClientVersion="4.0">
+    <id>$id$</id>
+    <version>$version$</version>
+    <authors>$author$</authors>
+    <copyright>$copyright$</copyright>
+    <licenseUrl>$licenseUrl$</licenseUrl>
+    <iconUrl>$iconUrl$</iconUrl>
+    <projectUrl>$projectUrl$</projectUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <developmentDependency>true</developmentDependency>
+    <description>$description$</description>
+    <tags>$tags$</tags>
+    <serviceable>true</serviceable>
+    <repository type="$repositoryType$" url="$repositoryUrl$" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+      <file src="$OutputBaseBinary$" target="lib/" />
+      <file src="../../../LICENSE.txt" target="/" />
+      <file src="../../../README.md" target="/" />
+      <!--<file src="**" exclude="**\bin\**\*;**\obj\**\*;**\*.user;**\*.lock.json" />-->    
+  </files>
+</package>

@@ -7,9 +7,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{938F61AB-A71
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Host", "Host", "{09455435-891C-4583-BD89-247FCF26C3E1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PuzzleCMS.WebHost", "src\Host\PuzzleCMS.WebHost\PuzzleCMS.WebHost.csproj", "{1F6A83DC-65CA-435B-93DF-69E5295668B1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PuzzleCMS.Web.Hosting", "src\PuzzleCMS.Web.Hosting\PuzzleCMS.Web.Hosting.csproj", "{1F6A83DC-65CA-435B-93DF-69E5295668B1}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core.Mvc", "Core.Mvc", "{4C1D4A63-1206-4948-BC79-FEE4BB87C27F}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PuzzleCMS.Core", "PuzzleCMS.Core", "{4C1D4A63-1206-4948-BC79-FEE4BB87C27F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solutions Items", "Solutions Items", "{81CBA0A8-63C5-47E1-A9D8-741F81C6ED78}"
 	ProjectSection(SolutionItems) = preProject
@@ -19,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solutions Items", "Solution
 		testsandcoverage.bat = testsandcoverage.bat
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Puzzle.Core.Multitenancy", "src\Core.Mvc\Puzzle.Core.Multitenancy\Puzzle.Core.Multitenancy.csproj", "{93C0E47A-8F09-476E-B279-8522CD3A0109}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PuzzleCMS.Core.Multitenancy", "src\PuzzleCMS.Core\PuzzleCMS.Core.Multitenancy\PuzzleCMS.Core.Multitenancy.csproj", "{93C0E47A-8F09-476E-B279-8522CD3A0109}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{C46235CA-CF95-4644-BC9C-3F5339321DA3}"
 EndProject
