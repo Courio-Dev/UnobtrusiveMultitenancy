@@ -7,6 +7,7 @@ assembly_info:
 
 # Build script
 version: '{build}'
+
 image: Previous Visual Studio 2017
 os: Previous Visual Studio 2017
 
@@ -75,27 +76,48 @@ test: off
 #---------------------------------#
 
 artifacts:
-  - path: 'artifacts\Nugets\**\*.nupkg'
-  - path: 'build\**\*.zip'
+# Store NuGet packages
+- path: .\Artifacts\**\*.nupkg
+  name: NuGet
+# Store xUnit Test Results
+- path: .\Artifacts\**\*.trx
+  name: xUnit Test Results
+
 
 #---------------------------------#
 #      deployment configuration   #
 #---------------------------------#
 
 deploy:
-  - provider: GitHub
+- provider: GitHub
     auth_token:
       secure: xxx
     artifact: /.*\.zip/
     draft: true
     on:
       appveyor_repo_tag: true
-
-  - provider: NuGet
-    api_key: 
-      secure: xxx
-    on:
-      appveyor_repo_tag: true
+# Publish MyGet packages
+- provider: NuGet
+  name: development
+  server: https://www.myget.org/F/courio-dev/api/v2/package
+  api_key:
+    secure: 9uzkCroixqPrC9das6F7wx42qI+xXhfz+L0Bu4XPwxmIh8f+UrZGUEBwvsOrKzeg
+  skip_symbols: true
+  on:
+    # Only publish from the master branch
+    branch: master
+# Publish NuGet packages
+- provider: NuGet
+  name: production
+  api_key:
+    secure: hd7kH5D5DJr+IpC+9zAklVm9r5Pm0Ku0RbMaA7DmReouBhExmFBPTVe+rWtl9zRa
+  on:
+    # Only publish from the master branch
+    branch: master
+    # Only publish if the trigger was a Git tag
+    # git tag v0.1.0-beta
+    # git push origin --tags
+    appveyor_repo_tag: true
 
 #---------------------------------#
 #      cache configuration        #
