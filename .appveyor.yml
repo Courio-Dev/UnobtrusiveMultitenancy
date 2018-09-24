@@ -89,13 +89,13 @@ artifacts:
 #---------------------------------#
 
 deploy:
-- provider: GitHub
-    auth_token:
-      secure: xxx
-    artifact: /.*\.zip/
-    draft: true
-    on:
-      appveyor_repo_tag: true
+#- provider: GitHub
+#    auth_token:
+#      secure: xxx
+#    artifact: /.*\.zip/
+#    draft: true
+#    on:
+#      appveyor_repo_tag: true
 # Publish MyGet packages
 - provider: NuGet
   name: development
