@@ -19,9 +19,10 @@ branches:
     - dev
 
 clone_depth: 1
+
 init:
-- ps: >-
-  if ($env:APPVEYOR_REPO_TAG_NAME) {
+- ps: |
+      if ($env:APPVEYOR_REPO_TAG_NAME) {
         $headers = @{
           "Authorization" = "Bearer $env:GITHUB_TOKEN"
           "Content-type" = "application/json"
@@ -33,9 +34,16 @@ init:
         } else {
             $env:isPrerelease = "false"
         }
-        echo ("isPrerelease: " + $env:isPrerelease)
-        echo ("description: " + $env:releaseDescription)
-  }
+        
+    }
+
+- ps: |
+          If ($Env:APPVEYOR_REPO_TAG_NAME -match "-"){
+            Set-AppveyorBuildVariable -Name "IsPreRelease" -Value True
+          }
+          Else{
+            Set-AppveyorBuildVariable -Name "IsPreRelease" -Value False
+          }
 
 environment:
   global:
@@ -104,6 +112,8 @@ artifacts:
 # Store NuGet packages
 - path: .\Artifacts\**\*.nupkg
   name: NuGet
+- path: .\Artifacts\**\*.zip
+  name: Zip
 # Store xUnit Test Results
 - path: .\Artifacts\**\*.trx
   name: xUnit Test Results
@@ -115,12 +125,15 @@ artifacts:
 
 deploy:
 - provider: GitHub
+  release: 'Release $(APPVEYOR_REPO_TAG_NAME) build $(APPVEYOR_BUILD_VERSION)'
+  tag: $(APPVEYOR_REPO_TAG_NAME)
+  description: '[**CHANGE LOG**](https://github.com/courio-dev/$(APPVEYOR_REPO_TAG_NAME)/blob/master/HISTORY.md)'
+  prerelease: $(IsPreRelease)
+  artifact: Zip, NuGet
   auth_token: $(GITHUB_TOKEN)
   artifact: /.*\.nupkg/
   draft: true
   force_update: true
-  prerelease: true
-  description: "e"
   on:
     appveyor_repo_tag: false
   # Deploying to MyGet feed
