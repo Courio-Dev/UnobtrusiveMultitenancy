@@ -31,9 +31,10 @@ Inspired by [saaskit](https://github.com/saaskit/saaskit) and [Explanation of  m
 - Per Tenant Middleware
 - Per Tenant DI
 - Per Tenant Services
-- Per Tenant HostingEnvironment (Coming soon)
-- Per Tenant Configuration (Coming soon)
-- Per Tenant LoggerFactory (Coming soon)
+- Per Tenant HostingEnvironment
+- Per Tenant Configuration
+- Per Tenant Logging
+- Add/Update/Delete on fly without restart
 
 ## Installation
 
@@ -185,5 +186,4 @@ In example project if you try to UseMvc work for ```Tenant 2``` you will get thi
 
 ## Version History
 
-**1.0.0**
-* Initial release
+[**CHANGE LOG**](https://github.com/courio-dev/UnobtrusiveMultitenancy/blob/master/HISTORY.md)
