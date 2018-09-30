@@ -12,16 +12,17 @@
   <Import Project="Directory.Dependencies.Commons.props" />
   <Import Project="Directory.CodeAnalysis.props" />
 
-  <ItemGroup>
+  <!--<ItemGroup>
    <Content Include="README.md"><Pack>true</Pack><PackagePath>..\</PackagePath></Content>
    <Content Include="LICENSE"><Pack>true</Pack><PackagePath>LICENSE</PackagePath></Content>
-  </ItemGroup>
+  </ItemGroup>-->
 
   <PropertyGroup Label="Common Package">
-    <Copyright>Copyright (c) Courio-Dev and contributors. All rights reserved.</Copyright>
-    <Description>Description</Description>
     <Authors>Courio-Dev</Authors>
     <Company>Courio-Dev</Company>
+    <Copyright>Copyright (c) Courio-Dev and contributors. All rights reserved.</Copyright>
+    <Description>Description</Description>
+    <ReleaseNotes></ReleaseNotes>
     <PackageProjectUrl>https://github.com/Courio-Dev/UnobtrusiveMultitenancy</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/Courio-Dev/UnobtrusiveMultitenancy/blob/master/LICENSE</PackageLicenseUrl>
     <PackageIconUrl>https://github.com/Courio-Dev/UnobtrusiveMultitenancy</PackageIconUrl>
@@ -87,6 +88,7 @@
         author=$(Authors);
         copyright=$(Copyright);
         description=$(Description);
+        releaseNotes=$(ReleaseNotes)
 
         OutputBaseBinary=$(MSBuildProjectDirectory)\$(OutputPath);
       </NuspecProperties>

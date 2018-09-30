@@ -182,3 +182,8 @@ In example project if you try to UseMvc work for ```Tenant 2``` you will get thi
 
 - [Saaskit](https://github.com/saaskit/saaskit) 
 - [Explanation of  multitenancy with autofac in ASP.NET Core](https://stackoverflow.com/questions/38940241/autofac-multitenant-in-an-aspnet-core-application-does-not-seem-to-resolve-tenan/38960122#38960122)
+
+## Version History
+
+**1.0.0**
+* Initial release
