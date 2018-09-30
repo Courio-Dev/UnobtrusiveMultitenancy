@@ -19,6 +19,24 @@ branches:
     - dev
 
 clone_depth: 1
+init:
+- ps: >-
+  if ($env:APPVEYOR_REPO_TAG_NAME) {
+        $headers = @{
+          "Authorization" = "Bearer $env:GITHUB_TOKEN"
+          "Content-type" = "application/json"
+        }
+        $releases = Invoke-RestMethod -Uri "https://api.github.com/repos/$env:APPVEYOR_REPO_NAME/releases" -Headers $headers  -Method GET
+        $env:releaseDescription = ($releases | Where-Object {$_.name -eq "$env:APPVEYOR_REPO_TAG_NAME"}).body
+        if ($env:APPVEYOR_REPO_TAG_NAME -like "-") {
+            $env:isPrerelease = "true"
+        } else {
+            $env:isPrerelease = "false"
+        }
+        echo ("isPrerelease: " + $env:isPrerelease)
+        echo ("description: " + $env:releaseDescription)
+  }
+
 environment:
   global:
     # Set the DOTNET_SKIP_FIRST_TIME_EXPERIENCE environment variable to stop wasting time caching packages
