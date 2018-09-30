@@ -25,7 +25,12 @@ environment:
     DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
     # Disable sending usage data to Microsoft
     DOTNET_CLI_TELEMETRY_OPTOUT: true
-  gh_token:
+  BUILD: $(APPVEYOR_BUILD_NUMBER)
+  COVERITY_EMAIL:
+    secure: xxx
+  COVERITY_TOKEN:
+    secure: xxx
+  GITHUB_TOKEN:
     secure: tlnq8XIYBO8uf9X6Umt0ei09ldGB7E9hhxT8gLxsfm4fnt2ymz8M2uMVtA0jplPj
     
 pull_requests:
@@ -91,6 +96,16 @@ artifacts:
 #---------------------------------#
 
 deploy:
+  - provider: GitHub
+    auth_token: $(GITHUB_TOKEN)
+    artifact: /.*\.nupkg/
+    draft: true
+    force_update: true
+    prerelease: true
+    description: "e"
+    on:
+      appveyor_repo_tag: false
+  # Deploying to MyGet feed
 - provider: NuGet
   name: development
   server: https://www.myget.org/F/courio-dev/api/v2/package
@@ -100,6 +115,8 @@ deploy:
   on:
     # Only publish from the master branch
     branch: master
+
+  # Deploying to NuGet feed
 - provider: NuGet
   name: production
   api_key:
@@ -111,6 +128,31 @@ deploy:
     # git tag v0.1.0-beta
     # git push origin --tags
     appveyor_repo_tag: true
+
+# scripts to run before deployment
+before_deploy:
+
+# scripts to run after deployment
+after_deploy:
+- ps: .\upload-test.ps1
+
+# to run your custom scripts instead of provider deployments
+deploy_script:
+
+# to disable deployment
+#deploy: off
+
+#---------------------------------#
+#        global handlers          #
+#---------------------------------#
+
+# on build failure
+on_failure:
+  - do something
+
+#---------------------------------#
+#         notifications           #
+#---------------------------------#
 
 #---------------------------------#
 #      cache configuration        #
