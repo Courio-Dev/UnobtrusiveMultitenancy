@@ -22,28 +22,18 @@ clone_depth: 1
 
 init:
 - ps: |
-      if ($env:APPVEYOR_REPO_TAG_NAME) {
-        $headers = @{
+    If ($Env:APPVEYOR_REPO_TAG_NAME -match "-"){
+      $headers = @{
           "Authorization" = "Bearer $env:GITHUB_TOKEN"
           "Content-type" = "application/json"
         }
         $releases = Invoke-RestMethod -Uri "https://api.github.com/repos/$env:APPVEYOR_REPO_NAME/releases" -Headers $headers  -Method GET
         $env:releaseDescription = ($releases | Where-Object {$_.name -eq "$env:APPVEYOR_REPO_TAG_NAME"}).body
-        if ($env:APPVEYOR_REPO_TAG_NAME -like "-") {
-            $env:isPrerelease = "true"
-        } else {
-            $env:isPrerelease = "false"
-        }
-        
+      Set-AppveyorBuildVariable -Name "IsPreRelease" -Value True
     }
-
-- ps: |
-          If ($Env:APPVEYOR_REPO_TAG_NAME -match "-"){
-            Set-AppveyorBuildVariable -Name "IsPreRelease" -Value True
-          }
-          Else{
-            Set-AppveyorBuildVariable -Name "IsPreRelease" -Value False
-          }
+    Else{
+      Set-AppveyorBuildVariable -Name "IsPreRelease" -Value False
+    }
 
 environment:
   global:
@@ -131,7 +121,6 @@ deploy:
   prerelease: $(IsPreRelease)
   artifact: Zip, NuGet
   auth_token: $(GITHUB_TOKEN)
-  artifact: /.*\.nupkg/
   draft: true
   force_update: true
   on:
