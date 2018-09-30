@@ -92,7 +92,7 @@ artifacts:
 
 deploy:
 # Publish Github
--provider: GitHub
+  provider: GitHub
   auth_token:
     secure: $env:gh_token # your encrypted token from GitHub
   artifact: .\Artifacts\**\*.nupkg # upload all NuGet packages to release assets
