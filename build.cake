@@ -249,40 +249,10 @@ Task("BuildAndTest")
 Task("Version").Does(() =>{});
 Task("Remove-Packages").Does(() =>CleanDirectory(paths.Directories.ArtifactNugetsDirectory));
 
-Task("Copy-Files")
-    .DoesForEach(paths.Files.AllNuspecsProjects,projectNuSpecToPack => 
-    {
-        /*
-        var nuspecFile = projectNuSpecToPack.FullPath;
-        var csprojFile = projectNuSpecToPack.ChangeExtension(".csproj");
-
-        var outputDirectory21 = GetOutputArtifactFromProjectFile(paths.Directories.ArtifactsBinNetCoreapp21,csprojFile);
-
-        // .NET Core
-        DotNetCorePublish(csprojFile.FullPath, new DotNetCorePublishSettings
-        {
-            //Framework = "netcoreapp2.1",
-            //Framework = "netstandard2.0",
-            NoRestore = true,
-            Configuration = configuration,
-            OutputDirectory = outputDirectory21,
-            MSBuildSettings = msBuildSettings
-        });
-
-        // Copy license
-        //CopyFileToDirectory("./LICENSE", outputDirectory21); 
-        */
-
-    });
-
-// Run dotnet pack to produce NuGet packages from our projects. Versions the package
-// using the build number argument on the script which is used as the revision number 
-// (Last number in 1.0.0.0). The packages are dropped in the Artifacts directory.
 Task("Package-NuGet")
     .IsDependentOn("BuildAndTest")
     .IsDependentOn("Remove-Packages")
     .IsDependentOn("Version")
-    .IsDependentOn("Copy-Files")
     .DoesForEach(paths.Files.AllNuspecsProjects,projectNuSpecToPack => 
     {
         // .NET Core
@@ -296,7 +266,11 @@ Task("Package-NuGet")
             OutputDirectory =  paths.Directories.ArtifactNugetsDirectory,
             VersionSuffix = buildVersion.VersionSuffix,
             NoRestore=true,
-            NoBuild=true
+            NoBuild=true,
+            ArgumentCustomization = args => args
+                        .Append("--no-restore")
+                        .Append("--no-build")
+                        .AppendSwitch("/p:PackageVersion","=",buildVersion.Version) 
         });
 
     });
