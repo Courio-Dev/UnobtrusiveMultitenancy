@@ -152,8 +152,8 @@ deploy:
 before_deploy:
 
 # scripts to run after deployment
-after_deploy:
-- ps: .\upload-test.ps1
+#after_deploy:
+#- ps: .\upload-test.ps1
 
 # to run your custom scripts instead of provider deployments
 deploy_script:
