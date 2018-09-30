@@ -20,21 +20,6 @@ branches:
 
 clone_depth: 1
 
-init:
-- ps: |
-    If ($Env:APPVEYOR_REPO_TAG_NAME -match "-"){
-      $headers = @{
-          "Authorization" = "Bearer $env:GITHUB_TOKEN"
-          "Content-type" = "application/json"
-        }
-        $releases = Invoke-RestMethod -Uri "https://api.github.com/repos/$env:APPVEYOR_REPO_NAME/releases" -Headers $headers  -Method GET
-        $env:releaseDescription = ($releases | Where-Object {$_.name -eq "$env:APPVEYOR_REPO_TAG_NAME"}).body
-      Set-AppveyorBuildVariable -Name "IsPreRelease" -Value True
-    }
-    Else{
-      Set-AppveyorBuildVariable -Name "IsPreRelease" -Value False
-    }
-
 environment:
   global:
     # Set the DOTNET_SKIP_FIRST_TIME_EXPERIENCE environment variable to stop wasting time caching packages
@@ -57,9 +42,23 @@ nuget:
   # Do not publish NuGet packages for pull requests
   disable_publish_on_pr: true
 
+
 init:
-  # Good practise, because Windows line endings are different from Unix/Linux ones
-  - cmd: git config --global core.autocrlf true
+- ps: |
+    If ($Env:APPVEYOR_REPO_TAG_NAME -match "-"){
+      $headers = @{
+          "Authorization" = "Bearer $env:GITHUB_TOKEN"
+          "Content-type" = "application/json"
+        }
+        $releases = Invoke-RestMethod -Uri "https://api.github.com/repos/$env:APPVEYOR_REPO_NAME/releases" -Headers $headers  -Method GET
+        $env:releaseDescription = ($releases | Where-Object {$_.name -eq "$env:APPVEYOR_REPO_TAG_NAME"}).body
+      Set-AppveyorBuildVariable -Name "IsPreRelease" -Value True
+    }
+    Else{
+      Set-AppveyorBuildVariable -Name "IsPreRelease" -Value False
+    }
+# Good practise, because Windows line endings are different from Unix/Linux ones
+- cmd: git config --global core.autocrlf true
 
 install:
   # .NET Core SDK binaries
