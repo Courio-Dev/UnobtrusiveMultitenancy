@@ -91,17 +91,6 @@ artifacts:
 #---------------------------------#
 
 deploy:
-# Publish Github
-  provider: GitHub
-  auth_token:
-    secure: $env:gh_token # your encrypted token from GitHub
-  artifact: .\Artifacts\**\*.nupkg # upload all NuGet packages to release assets
-  draft: false
-  prerelease: true
-  on:
-    branch: master                 # release from master branch only
-    appveyor_repo_tag: false        # deploy on tag push only
-# Publish MyGet packages
 - provider: NuGet
   name: development
   server: https://www.myget.org/F/courio-dev/api/v2/package
@@ -111,7 +100,6 @@ deploy:
   on:
     # Only publish from the master branch
     branch: master
-# Publish NuGet packages
 - provider: NuGet
   name: production
   api_key:
