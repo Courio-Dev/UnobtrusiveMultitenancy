@@ -15,12 +15,8 @@ os: Previous Visual Studio 2017
 branches:
   # whitelist
   only:
-<<<<<<< HEAD
-    - master
-=======
     - /^release\/v\d+\.\d+(\.\d+)?(-\S*)?$/
     - /^master$/
->>>>>>> develop
 
 clone_depth: 1
 
