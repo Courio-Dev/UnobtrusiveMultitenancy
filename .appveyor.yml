@@ -15,7 +15,12 @@ os: Previous Visual Studio 2017
 branches:
   # whitelist
   only:
+<<<<<<< HEAD
     - master
+=======
+    - /^release\/v\d+\.\d+(\.\d+)?(-\S*)?$/
+    - /^master$/
+>>>>>>> develop
 
 clone_depth: 1
 
@@ -139,13 +144,13 @@ deploy:
   name: production
   api_key:
     secure: hd7kH5D5DJr+IpC+9zAklVm9r5Pm0Ku0RbMaA7DmReouBhExmFBPTVe+rWtl9zRa
+  skip_symbols: true
   on:
-    # Only publish from the master branch
-    branch: master
     # Only publish if the trigger was a Git tag
     # git tag v0.1.0-beta
     # git push origin --tags
-    appveyor_repo_tag: true
+    branch: /master|v\d+\.\d+\.\d+[.*]/
+    APPVEYOR_REPO_TAG: true
 
 # scripts to run before deployment
 before_deploy:
