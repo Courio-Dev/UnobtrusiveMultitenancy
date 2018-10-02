@@ -106,7 +106,7 @@ artifacts:
 - path: .\Artifacts\**\*.zip
   name: Zip
 # Store xUnit Test Results
-- path: .\Artifacts\**\*.trx
+- path: .\Artifacts\**\*.coverage.xml
   name: xUnit Test Results
 
 
@@ -117,7 +117,7 @@ artifacts:
 deploy:
 - provider: GitHub
   release: 'Release $(APPVEYOR_REPO_TAG_NAME) build $(APPVEYOR_BUILD_VERSION)'
-  description: '[**CHANGE LOG**](https://github.com/courio-dev/$(APPVEYOR_REPO_TAG_NAME)/blob/master/HISTORY.md)'
+  description: '[**CHANGE LOG**](https://github.com/courio-dev/$(APPVEYOR_PROJECT_SLUG)/blob/master/HISTORY.md)'
   artifact: Zip, NuGet
   draft: false
   prerelease: $(IsPreRelease)
@@ -127,7 +127,7 @@ deploy:
   on:
     appveyor_repo_tag: true
   # Deploying to MyGet feed
-- provider: NuGet
+- provider: MyGet
   name: development
   server: https://www.myget.org/F/courio-dev/api/v2/package
   api_key:

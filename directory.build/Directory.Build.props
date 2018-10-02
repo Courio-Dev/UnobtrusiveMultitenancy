@@ -12,31 +12,37 @@
   <Import Project="Directory.Dependencies.Commons.props" />
   <Import Project="Directory.CodeAnalysis.props" />
 
-  <!--<ItemGroup>
-   <Content Include="README.md"><Pack>true</Pack><PackagePath>..\</PackagePath></Content>
-   <Content Include="LICENSE"><Pack>true</Pack><PackagePath>LICENSE</PackagePath></Content>
-  </ItemGroup>-->
-
   <PropertyGroup Label="Common Package">
+    <Title>An Unobtrusive Multitenancy helper for (new or existing) Asp.Net Core project</Title>
     <Authors>Courio-Dev</Authors>
     <Company>Courio-Dev</Company>
     <Copyright>Copyright (c) Courio-Dev and contributors. All rights reserved.</Copyright>
-    <Description>Description</Description>
-    <ReleaseNotes></ReleaseNotes>
+    <Description>
+    An Unobtrusive Multitenancy helper for (new or existing) Asp.Net Core project
+
+    The goal of this project is to add the multitenancy functionality to an ASP.NET Core application (existing or new) without modification (or very little) of code.
+
+    It's support multitenant DI ,sandbox services, etc.
+    </Description>
+    <ReleaseNotes>https://github.com/courio-dev/UnobtrusiveMultitenancy/blob/master/HISTORY.md</ReleaseNotes>
     <PackageProjectUrl>https://github.com/Courio-Dev/UnobtrusiveMultitenancy</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/Courio-Dev/UnobtrusiveMultitenancy/blob/master/LICENSE</PackageLicenseUrl>
     <PackageIconUrl>https://github.com/Courio-Dev/UnobtrusiveMultitenancy</PackageIconUrl>
     <RepositoryUrl>https://github.com/Courio-Dev/UnobtrusiveMultitenancy</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>
-    multitenancy 
-    multitenant 
-    multitenant-applications 
-    tenant 
-    dependency-injection 
-    aspnet-core-2 
-    aspnet-core-mvc 
-    net-core-2
+      multitenancy 
+      multitenant
+      multi-tenant  
+      multitenant-applications 
+      tenant
+      ASP.NET Core 2.1 
+      aspnet-core-2
+      aspnet-core-mvc
+      .NET Core 2.1
+      dependency-injection
+      tenant-resolution
+      dotnet core 2.1
     </PackageTags>
   </PropertyGroup>
   
@@ -77,6 +83,7 @@
       <IncludeSymbols>true</IncludeSymbols>
       <NuspecProperties>
         id=$(PackageId);
+        title=$(Title);
         version=$(PackageVersion);
         configuration=$(Configuration);
         tags=$(PackageTags.Replace("&amp;", "&amp;amp;"));
@@ -88,8 +95,7 @@
         author=$(Authors);
         copyright=$(Copyright);
         description=$(Description);
-        releaseNotes=$(ReleaseNotes)
-
+        releaseNotes=$(ReleaseNotes);
         OutputBaseBinary=$(MSBuildProjectDirectory)\$(OutputPath);
       </NuspecProperties>
     </PropertyGroup>
