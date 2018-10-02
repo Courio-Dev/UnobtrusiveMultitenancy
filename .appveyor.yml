@@ -15,8 +15,10 @@ os: Previous Visual Studio 2017
 branches:
   # whitelist
   only:
-    - /^release\/v\d+\.\d+(\.\d+)?(-\S*)?$/
-    - /^master$/
+    - /v\d+\.\d+\.\d+/
+  except:
+    - master
+    - develop
 
 clone_depth: 1
 
@@ -115,13 +117,13 @@ artifacts:
 deploy:
 - provider: GitHub
   release: 'Release $(APPVEYOR_REPO_TAG_NAME) build $(APPVEYOR_BUILD_VERSION)'
-  tag: $(APPVEYOR_REPO_TAG_NAME)
   description: '[**CHANGE LOG**](https://github.com/courio-dev/$(APPVEYOR_REPO_TAG_NAME)/blob/master/HISTORY.md)'
-  prerelease: $(IsPreRelease)
   artifact: Zip, NuGet
-  auth_token: $(GITHUB_TOKEN)
   draft: false
+  prerelease: $(IsPreRelease)
   force_update: true
+  tag: $(APPVEYOR_REPO_TAG_NAME)
+  auth_token: $(GITHUB_TOKEN)
   on:
     appveyor_repo_tag: true
   # Deploying to MyGet feed
@@ -140,12 +142,16 @@ deploy:
   name: production
   api_key:
     secure: hd7kH5D5DJr+IpC+9zAklVm9r5Pm0Ku0RbMaA7DmReouBhExmFBPTVe+rWtl9zRa
+  artifact: NuGet
   skip_symbols: true
+  draft: false
+  prerelease: $(IsPreRelease)
+  force_update: true
+  tag: $(APPVEYOR_REPO_TAG_NAME)
   on:
     # Only publish if the trigger was a Git tag
     # git tag v0.1.0-beta
     # git push origin --tags
-    branch: /master|v\d+\.\d+\.\d+[.*]/
     APPVEYOR_REPO_TAG: true
 
 # scripts to run before deployment
