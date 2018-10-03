@@ -16,8 +16,8 @@ branches:
   # whitelist
   only:
     - /v\d+\.\d+\.\d+/
-  except:
     - master
+  except:
     - develop
 
 clone_depth: 1
