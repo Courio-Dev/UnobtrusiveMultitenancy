@@ -127,7 +127,7 @@ deploy:
   on:
     appveyor_repo_tag: true
   # Deploying to MyGet feed
-- provider: MyGet
+- provider: NuGet
   name: development
   server: https://www.myget.org/F/courio-dev/api/v2/package
   api_key:
