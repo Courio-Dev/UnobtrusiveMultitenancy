@@ -106,7 +106,7 @@ artifacts:
 - path: .\Artifacts\**\*.zip
   name: Zip
 # Store xUnit Test Results
-- path: .\Artifacts\**\*.coverage.xml
+- path: .\Artifacts\**\coverage.xml
   name: xUnit Test Results
 
 

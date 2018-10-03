@@ -34,7 +34,7 @@
             services.AddSingleton<ITenantResolver<TTenant>, TResolver>();
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
+            //services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
             // Make Tenant and TenantContext injectable
             services.AddScoped(prov => prov.GetService<IHttpContextAccessor>()?.HttpContext?.GetTenantContext<TTenant>());

@@ -18,6 +18,19 @@
     <repository type="$repositoryType$" url="$repositoryUrl$" />
     <dependencies>
       <group targetFramework=".NETStandard2.0">
+        <dependency id="Microsoft.AspNetCore.Hosting" version="[2.1.0,)" />
+        <dependency id="Microsoft.AspNetCore.JsonPatch" version="[2.1.0,)" />
+        <dependency id="Microsoft.AspNetCore.Http" version="[2.1.0,)" />
+        <dependency id="Microsoft.AspNetCore.Mvc" version="[2.1.0,)" />
+        <dependency id="Microsoft.Extensions.Configuration" version="[2.1.0,)" />
+        <dependency id="Microsoft.Extensions.Configuration.EnvironmentVariables" version="[2.1.0,)" />
+        <dependency id="Microsoft.Extensions.Configuration.FileExtensions" version="[2.1.0,)" />
+        <dependency id="Microsoft.Extensions.Configuration.Json" version="[2.1.0,)" />
+        <dependency id="Microsoft.Extensions.Configuration.Ini" version="[2.1.0,)" />
+        <dependency id="Microsoft.Extensions.DependencyInjection" version="[2.1.0,)" />
+        <dependency id="Microsoft.Extensions.FileProviders.Physical" version="[2.1.0,)" />
+        <dependency id="Microsoft.Extensions.Options" version="[2.1.0,)" />
+        <dependency id="Microsoft.Extensions.Options.ConfigurationExtensions" version="[2.1.0,)" />
       </group>
     </dependencies>
   </metadata>

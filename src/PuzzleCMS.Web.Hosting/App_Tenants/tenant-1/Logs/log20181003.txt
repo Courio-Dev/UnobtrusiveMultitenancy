@@ -1,0 +1,1 @@
+{"@t":"2018-10-03T20:33:29.1697747Z","@mt":"IServiceProvider is successfully set for tenant e4a4d9b2-5c96-4665-b6a6-fd36a9edf82c","SourceContext":"PuzzleCMS.Core.Multitenancy.Internal.Middlewares.MultitenancyRequestServicesContainerMiddleware`1[[PuzzleCMS.Core.Multitenancy.Internal.AppTenant, PuzzleCMS.Core.Multitenancy, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"}

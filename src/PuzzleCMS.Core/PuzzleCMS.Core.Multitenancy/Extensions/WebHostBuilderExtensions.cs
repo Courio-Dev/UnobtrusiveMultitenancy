@@ -174,7 +174,7 @@
                 .ConfigureServices((WebHostBuilderContext ctx, IServiceCollection services) =>
                 {
                     services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-                    services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
+                    //services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
                     // Register multitenancy options.
                     services.AddMultitenancyOptions<TTenant>(multitenancyConfig);

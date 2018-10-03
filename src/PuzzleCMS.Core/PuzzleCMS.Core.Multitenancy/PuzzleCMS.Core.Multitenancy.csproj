@@ -13,20 +13,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+  
     <PackageReference Include="Microsoft.Packaging.Tools.Trimming" Version="1.1.0-preview1-25818-01" />
-    <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="$(AspNetCoreVersion)" />
-    <PackageReference Include="Microsoft.AspNetCore.Http" Version="$(AspNetCoreVersion)" />
-    <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="$(AspNetCoreVersion)" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="$(AspNetCoreVersion)" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="$(AspNetCoreVersion)" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="$(AspNetCoreVersion)" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="$(AspNetCoreVersion)" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="$(AspNetCoreVersion)" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Ini" Version="$(AspNetCoreVersion)" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(AspNetCoreVersion)" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="$(AspNetCoreVersion)" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="$(AspNetCoreVersion)" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="$(AspNetCoreVersion)" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="[2.1.0,)" />
+    <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="[2.1.0,)" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="[2.1.0,)" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="[2.1.0,)" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="[2.1.0,)" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="[2.1.0,)" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="[2.1.0,)" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="[2.1.0,)" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Ini" Version="[2.1.0,)" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="[2.1.0,)" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="[2.1.0,)" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="[2.1.0,)" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="[2.1.0,)" />
   </ItemGroup>
 
 </Project>
