@@ -33,17 +33,13 @@
         {
             try
             {
-                using (ServiceProvider provider = methods.ConfigureServicesDelegate(services) as ServiceProvider)
+                ServiceProvider hostServiceprovider = methods.ConfigureServicesDelegate(services) as ServiceProvider;
                 {
-                    IOptionsMonitor<MultitenancyOptions<TTenant>> optionsMonitor = provider.GetRequiredService<IOptionsMonitor<MultitenancyOptions<TTenant>>>();
-                    IMultitenancyOptionsProvider<TTenant> multitenancyProvider = provider.GetRequiredService<IMultitenancyOptionsProvider<TTenant>>();
                     services.AddScoped<IServiceFactoryForMultitenancy<TTenant>>(_ =>
                     {
-                        return new ServiceFactoryForMultitenancy<TTenant>(services.Clone(), 
+                        return new ServiceFactoryForMultitenancy<TTenant>(hostServiceprovider,services.Clone(), 
                             methods.ConfigurePerTenantServicesDelegate,
-                            additionnalServicesTenant,
-                            multitenancyProvider,
-                            optionsMonitor);
+                            additionnalServicesTenant);
                     });
                 }
 

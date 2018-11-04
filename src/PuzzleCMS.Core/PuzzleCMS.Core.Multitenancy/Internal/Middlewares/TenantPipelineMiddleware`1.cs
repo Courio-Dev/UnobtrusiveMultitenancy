@@ -17,7 +17,6 @@
         private readonly ILog<TenantPipelineMiddleware<TTenant>> logger;
         private readonly RequestDelegate next;
         private readonly IApplicationBuilder rootApp;
-        private readonly IOptionsMonitor<MultitenancyOptions<TTenant>> optionsMonitor;
 
         private readonly IServiceFactoryForMultitenancy<TTenant> serviceFactoryForMultitenancy;
 
@@ -43,8 +42,8 @@
             this.serviceFactoryForMultitenancy = serviceFactoryForMultitenancy ?? throw new ArgumentNullException(nameof(serviceFactoryForMultitenancy));
 
             this.configuration = configuration ?? throw new ArgumentNullException($"Argument {nameof(configuration)} must not be null");
-            this.optionsMonitor = optionsMonitor ?? throw new ArgumentNullException($"Argument {nameof(optionsMonitor)} must not be null");
-            this.optionsMonitor.OnChange(vals =>
+            IOptionsMonitor<MultitenancyOptions<TTenant>> opt = optionsMonitor ?? throw new ArgumentNullException($"Argument {nameof(optionsMonitor)} must not be null");
+            opt.OnChange(vals =>
             {
                 pipelinesBranchBuilder.Clear();
 
@@ -68,6 +67,11 @@
 
         private RequestDelegate BuildTenantPipeline(HttpContext httpContext, TenantContext<TTenant> tenantContext, ILog<TenantPipelineMiddleware<TTenant>> loggerPipeline)
         {
+            if (httpContext == null)
+            {
+                throw new ArgumentNullException(nameof(httpContext));
+            }
+
             loggerPipeline.Info($" Building TenantPipeline for Tenant: {tenantContext.Id}");
             IApplicationBuilder branchBuilder = rootApp.New();
             TenantPipelineBuilderContext<TTenant> builderContext = new TenantPipelineBuilderContext<TTenant>(tenantContext);

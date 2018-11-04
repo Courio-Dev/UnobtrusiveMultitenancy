@@ -16,6 +16,8 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Configurations
         /// </summary>
         MultitenancyOptions<TTenant> MultitenancyOptions { get; }
 
+        bool HasTenants { get; }
+
         void Reload();
     }
 }

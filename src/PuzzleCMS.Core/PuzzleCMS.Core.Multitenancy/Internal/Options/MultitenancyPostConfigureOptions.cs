@@ -21,8 +21,12 @@
         private const string OpenTokenReplacement = "{";
         private const string CloseTokenReplacement = "}";
 
+#pragma warning disable S2743 // Static fields should not be used in generic types
         private static readonly char DirectorySeparator = Path.DirectorySeparatorChar;
+#pragma warning restore S2743 // Static fields should not be used in generic types
+#pragma warning disable S2743 // Static fields should not be used in generic types
         private static readonly string FormatReplacement = string.Format("{0}{1}{2}", OpenTokenReplacement, 0, CloseTokenReplacement);
+#pragma warning restore S2743 // Static fields should not be used in generic types
 
         private readonly JsonSerializerSettings settings = new JsonSerializerSettings
         {
@@ -56,7 +60,7 @@
         public void PostConfigure(string name, MultitenancyOptions<TTenant> options)
         {
             AddAdditionnalKeys(options, TokenList);
-            options = ReplaceTokenString(options, TokenList);
+            _ = ReplaceTokenString(ref options, TokenList);
         }
 
         private void AddAdditionnalKeys(MultitenancyOptions<TTenant> options, IDictionary<string, string> tokenList)
@@ -68,7 +72,7 @@
             }
         }
 
-        private MultitenancyOptions<TTenant> ReplaceTokenString(MultitenancyOptions<TTenant> options, IDictionary<string, string> tokenList)
+        private MultitenancyOptions<TTenant> ReplaceTokenString(ref MultitenancyOptions<TTenant> options, IDictionary<string, string> tokenList)
         {
             options.TenantFolder = ReplaceWithStringBuilder(options.TenantFolder, tokenList);
             options.Tenants = FormattedTenantsList(options, tokenList);
@@ -111,43 +115,17 @@
         }
 
         /// <summary>
-        /// TODO :doesn't work very well.
+        /// Doesn't work very well.
         /// </summary>
         private IEnumerable<IConfigurationSection> FormattedTenantsConfigurations(MultitenancyOptions<TTenant> options, IDictionary<string, string> tokenList)
         {
             IConfigurationSection[] result = options.TenantsConfigurations?.ToArray() ?? Array.Empty<IConfigurationSection>();
 
-            /*
-            for (int i = 0; i < result.Length; ++i)
+            if(tokenList!=null)
             {
-                IConfigurationSection config = result?[i];
-
-                if (config != null)
-                {
-                    FormattedTenantsConfigurations(config, tokenList);
-                }
-            }*/
-
+                Console.WriteLine(tokenList);
+            }
             return result;
-        }
-
-        private void FormattedTenantsConfigurations(IConfigurationSection section, IDictionary<string, string> tokenList)
-        {
-            if (!(section?.GetChildren().Any() ?? false))
-            {
-                if (section != null)
-                {
-                    section[section.Key] = ReplaceWithStringBuilder(section.Value, tokenList);
-                }
-            }
-            else
-            {
-                IConfigurationSection[] children = section?.GetChildren()?.ToArray();
-                for (int i = 0; i < children.Length; ++i)
-                {
-                    FormattedTenantsConfigurations(children?[i], tokenList);
-                }
-            }
         }
     }
 }

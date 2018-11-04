@@ -139,23 +139,11 @@
             {
                 throw new ArgumentNullException(nameof(hostBuilder));
             }
+            const string environment= nameof(environment);
+            string env = hostBuilder.GetSetting(environment);
 
-            string env = hostBuilder.GetSetting("environment");
-            IPostConfigureOptions<MultitenancyOptions<TTenant>>[] postConfigures = new[] {
-                new MultitenancyPostConfigureOptions<TTenant>()
-            };
-            MultiTenancyConfig<TTenant> multitenancyConfig = new MultiTenancyConfig<TTenant>(
-                env,
-                multitenancyConfiguration,
-                postConfigures: postConfigures);
-            MultitenancyOptions<TTenant> buildedOptions = multitenancyConfig.CurrentMultiTenacyOptionsValue;
-
-            if (throwErrorIfOptionsNotFound && (buildedOptions == null || !(buildedOptions?.Tenants?.Any() ?? false)))
-            {
-                throw new Exception("MultitenancyOptions not found in configuration.");
-            }
-
-            if (!(buildedOptions?.Tenants?.Any() ?? false))
+            hostBuilder.BuildTemporaryMulitenancyProviderAndValidate<TTenant>(env, throwErrorIfOptionsNotFound, out bool hasTenants, multitenancyConfiguration);
+            if (!hasTenants && !throwErrorIfOptionsNotFound)
             {
                 return hostBuilder.UseStartup<TStartup>();
             }
@@ -173,41 +161,33 @@
                 })
                 .ConfigureServices((WebHostBuilderContext ctx, IServiceCollection services) =>
                 {
-                    services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-                    //services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
+                    // Register feault services for multitenancy.
+                    services.AddPuzzleCMSMulitenancyCore<TTenant>(env, multitenancyConfiguration);
 
-                    // Register multitenancy options.
-                    services.AddMultitenancyOptions<TTenant>(multitenancyConfig);
-                    services.AddMultitenancy<TTenant, TResolver>();
+                    services.AddMultitenancy<TTenant, TResolver>();           
 
-                    // manage IStartup
+                    // Manage IStartup.
                     services.RemoveAll<IStartup>();
 
-                    // Override config.
-                    // Add logging
-                    multitenancyConfig.UseColoredConsoleLogProvider();
-                    actionConfiguration?.Invoke(multitenancyConfig);                 
-                    services.TryAdd(ServiceDescriptor.Singleton<ILogProvider>(LogProvider.CurrentLogProvider));
-                    services.TryAdd(ServiceDescriptor.Singleton(typeof(ILog<>), typeof(Log<>)));
-                    services.AddSingleton<MultiTenancyConfig<TTenant>>(serviceProvider => multitenancyConfig);
-
+                    //
                     ServiceDescriptor descriptor = BuildMultitenantRequestStartupFilter<TStartup, TTenant>();
                     services.Insert(0, descriptor);
 
-                    ServiceDescriptor startuptDescriptor = BuildConventionMultitenantBasedStartup(startupType, multitenancyConfig);
+                    //
+                    ServiceDescriptor startuptDescriptor = BuildConventionMultitenantBasedStartup<TTenant>(startupType);
                     services.Insert(1, startuptDescriptor);
-                })
-                ;
+                });
             }
         }
 
-        private static ServiceDescriptor BuildConventionMultitenantBasedStartup<TTenant>(Type startupType, MultiTenancyConfig<TTenant> multitenancyConfig)
+        private static ServiceDescriptor BuildConventionMultitenantBasedStartup<TTenant>(Type startupType)
             where TTenant : class => new ServiceDescriptor(
                                 typeof(IStartup),
                                 (IServiceProvider provider) =>
                                 {
                                     IHostingEnvironment hostingEnvironment = provider.GetRequiredService<IHostingEnvironment>();
                                     StartupMethodsMultitenant<TTenant> methods = StartupLoaderMultitenant.LoadMethods<TTenant>(provider, startupType, hostingEnvironment.EnvironmentName);
+                                    MultiTenancyConfig<TTenant> multitenancyConfig= provider.GetRequiredService<MultiTenancyConfig<TTenant>>();
                                     return new ConventionMultitenantBasedStartup<TTenant>(methods, multitenancyConfig.BuildTenantLogProvider());
                                 }, lifetime: ServiceLifetime.Singleton);
 

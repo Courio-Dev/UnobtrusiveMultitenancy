@@ -70,7 +70,6 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                     return true; // All log levels are enabled
                 }
 
-                // ConsoleColor consoleColor;
                 if (Colors.TryGetValue(logLevel, out ConsoleColor consoleColor))
                 {
                     ConsoleColor originalForground = Console.ForegroundColor;
@@ -130,12 +129,13 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
             Console.WriteLine("{0} | {1} | {2} | {3}", DateTime.UtcNow, logLevel, name, message);
         }
 
-        private class NullDisposable : IDisposable
+        private sealed class NullDisposable : IDisposable
         {
             internal static readonly IDisposable Instance = new NullDisposable();
 
             public void Dispose()
             {
+                Console.Write(nameof(NullDisposable));
             }
         }
     }

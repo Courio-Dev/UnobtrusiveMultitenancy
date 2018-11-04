@@ -21,6 +21,8 @@
             this.scopeFactory = scopeFactory ?? throw new ArgumentNullException($"Argument {nameof(scopeFactory)} must not be null");
         }
 
+        public IServiceScopeFactory ScopeFactory => scopeFactory;
+
         public async Task Invoke(
             HttpContext httpContext, 
             ILog<TenantResolutionMiddleware<TTenant>> logger, 

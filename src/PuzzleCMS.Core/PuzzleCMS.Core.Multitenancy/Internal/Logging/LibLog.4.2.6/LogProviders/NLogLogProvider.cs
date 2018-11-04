@@ -49,7 +49,6 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
     [Multitenancy.ExcludeFromCodeCoverage]
     internal class NLogLogProvider : LogProviderBase
     {
-        private static bool providerIsAvailableOverride = true;
         private readonly Func<string, object> getLoggerByNameDelegate;
 
         [SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "LogManager", Justification = "Pending")]
@@ -64,11 +63,7 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
             getLoggerByNameDelegate = GetGetLoggerMethodCall();
         }
 
-        public static bool ProviderIsAvailableOverride
-        {
-            get { return providerIsAvailableOverride; }
-            set { providerIsAvailableOverride = value; }
-        }
+        public static bool ProviderIsAvailableOverride { get; set; } = true;
 
         public static bool IsLoggerAvailable()
         {
@@ -142,6 +137,7 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
 
             private readonly dynamic logger;
 
+#pragma warning disable S3963 // "static" fields should be initialized inline
             static NLogLogger()
             {
                 try
@@ -149,7 +145,9 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                     Type logEventLevelType = Type.GetType("NLog.LogLevel, NLog");
                     if (logEventLevelType == null)
                     {
+#pragma warning disable S3877 
                         throw new InvalidOperationException("Type NLog.LogLevel was not found.");
+#pragma warning restore S3877
                     }
 
                     List<FieldInfo> levelFields = logEventLevelType.GetFieldsPortable().ToList();
@@ -197,10 +195,12 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                         messageParam,
                         exceptionParam).Compile();
                 }
-                catch
+                catch(Exception ex)
                 {
+                    Console.Write(ex);
                 }
             }
+#pragma warning restore S3963 // "static" fields should be initialized inline
 
             internal NLogLogger(dynamic logger)
             {
@@ -245,7 +245,9 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
 #else
                         s_callerStackBoundaryType = null;
 #endif
+#pragma warning disable S2583 // Conditionally executed blocks should be reachable
                         if (s_callerStackBoundaryType != null)
+#pragma warning restore S2583 // Conditionally executed blocks should be reachable
                         {
                             logger.Log(s_callerStackBoundaryType, LogEventInfoFact(logger.Name, nlogLevel, messageFunc(), exception));
                         }
@@ -325,6 +327,7 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                 return false;
             }
 
+#pragma warning disable S1144 // Unused private types or members should be removed
             private static bool IsInTypeHierarchy(Type currentType, Type checkType)
             {
                 while (currentType != null && currentType != typeof(object))
@@ -339,6 +342,7 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
 
                 return false;
             }
+#pragma warning restore S1144 // Unused private types or members should be removed
 
             [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Pending")]
             private bool LogException(LogLevel logLevel, Func<string> messageFunc, Exception exception)

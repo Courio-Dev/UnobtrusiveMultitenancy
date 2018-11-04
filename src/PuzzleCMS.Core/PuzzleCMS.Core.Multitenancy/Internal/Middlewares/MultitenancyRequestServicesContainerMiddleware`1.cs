@@ -28,6 +28,7 @@
 
         /// <summary>
         /// Invokes the middleware using the specified context.
+        /// https://www.codesd.com/item/autofac-multitenant-in-a-main-application-aspnet-does-not-seem-to-resolve-tenant-dependencies-correctly.html
         /// </summary>
         /// <param name="httpContext">
         /// The request context to process through the middleware.
@@ -39,23 +40,34 @@
         {
             Debug.Assert(httpContext != null, nameof(httpContext));
 
+            if (contextAccessor.HttpContext == null)
+            {
+                contextAccessor.HttpContext = httpContext;
+            }
+
             TenantContext<TTenant> tenantContext = httpContext.GetTenantContext<TTenant>();
             if (tenantContext != null)
             {
-                IServiceProvidersFeature existingRequestServices = httpContext.Features.Get<IServiceProvidersFeature>();
+                IServiceProvidersFeature existingRequestServicesFeature = httpContext.Features.Get<IServiceProvidersFeature>();
 
                 using (RequestServicesFeature feature = 
                        new RequestServicesFeature(httpContext, serviceFactoryForMultitenancy.Build(tenantContext).GetRequiredService<IServiceScopeFactory>()))
                 {
-                    // Replace the request IServiceProvider created by IServiceScopeFactory
-                    httpContext.RequestServices = feature.RequestServices;
+                    try
+                    {
+                        // Replace the request IServiceProvider created by IServiceScopeFactory
+                        httpContext.RequestServices = feature.RequestServices;
 
-                    ILog<MultitenancyRequestServicesContainerMiddleware<TTenant>> log = 
-                        httpContext.RequestServices.GetRequiredService<ILog<MultitenancyRequestServicesContainerMiddleware<TTenant>>>();
-                    log.Log(Logging.LibLog.LogLevel.Info, () => $"IServiceProvider is successfully set for tenant {tenantContext.Id}");
+                        ILog<MultitenancyRequestServicesContainerMiddleware<TTenant>> log =
+                            httpContext.RequestServices.GetRequiredService<ILog<MultitenancyRequestServicesContainerMiddleware<TTenant>>>();
+                        log.Log(Logging.LibLog.LogLevel.Info, () => $"IServiceProvider is successfully set for tenant {tenantContext.Id}");
 
-                   await next.Invoke(httpContext).ConfigureAwait(false);
-
+                        await next.Invoke(httpContext).ConfigureAwait(false);
+                    }
+                    finally
+                    {
+                        httpContext.Features.Set(existingRequestServicesFeature);
+                    }
                 }
             }
         }

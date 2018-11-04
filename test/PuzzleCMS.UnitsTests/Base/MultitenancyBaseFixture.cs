@@ -8,6 +8,7 @@
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Options;
+    using PuzzleCMS.Core.Multitenancy.Constants;
     using PuzzleCMS.Core.Multitenancy.Extensions;
     using PuzzleCMS.Core.Multitenancy.Internal;
     using PuzzleCMS.Core.Multitenancy.Internal.Configurations;
@@ -21,7 +22,7 @@
     /// </summary>
     public class MultitenancyBaseFixture
     {
-        internal const string environmentTest= "IntegrationTest";
+        internal const string environmentTest = "IntegrationTest";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MultitenancyBaseFixture"/> class.
@@ -122,19 +123,39 @@
         {
             public TestHarness(bool disposeOnEviction = true, int cacheExpirationInSeconds = 10, bool evictAllOnExpiry = true)
             {
-                MemoryCacheTenantResolverOptions options = new MemoryCacheTenantResolverOptions {
+                MemoryCacheTenantResolverOptions options = new MemoryCacheTenantResolverOptions
+                {
                     DisposeOnEviction = disposeOnEviction,
                     EvictAllEntriesOnExpiry = evictAllOnExpiry
                 };
 
+
+
                 ServiceProvider services = new ServiceCollection()
-                        .AddSingleton<IOptionsFactory<MultitenancyOptions<TestTenant>>, MultitenancyOptionsTestTenantFactoryTests>()
-                        .AddSingleton<IOptionsFactory<MultitenancyOptions<AppTenant>>, MultitenancyOptionsAppTenantFactoryTests>()
-                        //.Configure<MultitenancyOptions>(o => { })
+                        .AddOptions()
+                        .Configure<MultitenancyOptions<TestTenant>>(Config.GetSection(nameof(MultitenancyConstants.MultitenancyOptions)))
+                        .Configure<MultitenancyOptions<AppTenant>>(Config.GetSection(nameof(MultitenancyConstants.MultitenancyOptions)))
+                        .AddSingleton<MultiTenancyConfig<TestTenant>>(sp => new MultiTenancyConfig<TestTenant>(environmentTest, Config))
+                        .AddSingleton<MultiTenancyConfig<AppTenant>>(sp => new MultiTenancyConfig<AppTenant>(environmentTest, Config))
+
+
+                        .AddSingleton(sp => sp.GetService<IOptionsMonitor<MultitenancyOptions<TestTenant>>>().CurrentValue)
+                        .AddSingleton(sp => sp.GetService<IOptionsMonitor<MultitenancyOptions<AppTenant>>>().CurrentValue)
+                        //.AddSingleton<IOptionsFactory<MultitenancyOptions<TestTenant>>, MultitenancyOptionsTestTenantFactoryTests>()
+                        //.AddSingleton<IOptionsFactory<MultitenancyOptions<AppTenant>>, MultitenancyOptionsAppTenantFactoryTests>()
+                        .AddSingleton<IMultitenancyOptionsProvider<TestTenant>>(sp =>
+                        {
+                            return new MultitenancyOptionsProvider<TestTenant>(sp, new MultiTenancyConfig<TestTenant>(environmentTest, Config));
+                        })
+                        .AddSingleton<IMultitenancyOptionsProvider<AppTenant>>(sp =>
+                        {
+                            return new MultitenancyOptionsProvider<AppTenant>(sp, new MultiTenancyConfig<AppTenant>(environmentTest, Config));
+                        })
                         .BuildServiceProvider();
 
-                TestMultitenancyOptionsProvider = new MultitenancyOptionsProvider<TestTenant>(new MultiTenancyConfig<TestTenant>(environmentTest, Config));
-                AppTenantMultitenancyOptionsProvider = new MultitenancyOptionsProvider<AppTenant>(new MultiTenancyConfig<AppTenant>(environmentTest, Config));
+                TestMultitenancyOptionsProvider = services.GetRequiredService<IMultitenancyOptionsProvider<TestTenant>>();
+                AppTenantMultitenancyOptionsProvider = services.GetRequiredService<IMultitenancyOptionsProvider<AppTenant>>();
+
 
                 TestTenantResolver = new TestTenantMemoryCacheResolver(TestMultitenancyOptionsProvider, Cache, new Log<TestTenantMemoryCacheResolver>(LogProvider.CurrentLogProvider), options, cacheExpirationInSeconds);
                 AppTenantResolver = new AppTenantResolver(AppTenantMultitenancyOptionsProvider, Cache, new Log<AppTenantResolver>(LogProvider.CurrentLogProvider));

@@ -12,7 +12,7 @@
     /// </summary>
     public class HomeController : Controller
     {
-        private readonly IOptions<AppSettings> appSettings;
+        public IOptions<AppSettings> AppSettings { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HomeController"/> class.
@@ -20,7 +20,7 @@
         /// </summary>
         public HomeController(IOptions<AppSettings> appSettings)
         {
-            this.appSettings = appSettings;
+            AppSettings = appSettings;
         }
 
         /// <summary>
@@ -80,12 +80,7 @@
             await Task.Delay(1000).ConfigureAwait(false);
             string content = "application / xml";
 
-            if (content == null)
-            {
-                return BadRequest("Sitemap index is out of range.");
-            }
-
-            return Content(content, "application/xml", Encoding.UTF8);
+            return (IActionResult)Content(content, "application/xml", Encoding.UTF8);
         }
 
         /// <summary>

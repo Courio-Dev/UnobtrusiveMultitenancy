@@ -50,8 +50,6 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
     [Multitenancy.ExcludeFromCodeCoverage]
     internal class Log4NetLogProvider : LogProviderBase
     {
-        private static bool providerIsAvailableOverride = true;
-
         private readonly Func<string, object> getLoggerByNameDelegate;
 
         [SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "LogManager", Justification = "Pending")]
@@ -65,11 +63,7 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
             getLoggerByNameDelegate = GetGetLoggerMethodCall();
         }
 
-        public static bool ProviderIsAvailableOverride
-        {
-            get { return providerIsAvailableOverride; }
-            set { providerIsAvailableOverride = value; }
-        }
+        public static bool ProviderIsAvailableOverride { get; set; } = true;
 
         public override Logger GetLogger(string name)
         {
@@ -93,7 +87,6 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
             ParameterExpression messageParameter =
                 Expression.Parameter(typeof(string), "message");
 
-            // message => LogicalThreadContext.Stacks.Item["NDC"].Push(message);
             MethodCallExpression callPushBody =
                 Expression.Call(
                     Expression.Property(
@@ -124,10 +117,8 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
 
             MemberExpression propertiesExpression = Expression.Property(null, propertiesProperty);
 
-            // (key, value) => LogicalThreadContext.Properties.Item[key] = value;
             BinaryExpression setProperties = Expression.Assign(Expression.Property(propertiesExpression, propertiesIndexerProperty, keyParam), valueParam);
 
-            // key => LogicalThreadContext.Properties.Remove(key);
             MethodCallExpression removeMethodCall = Expression.Call(propertiesExpression, removeMethod, keyParam);
 
             Action<string, string> set = Expression
@@ -194,7 +185,6 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                 levelError = levelFields.First(x => x.Name == "Error").GetValue(null);
                 levelFatal = levelFields.First(x => x.Name == "Fatal").GetValue(null);
 
-                // Func<object, object, bool> isEnabledFor = (logger, level) => { return ((log4net.Core.ILogger)logger).IsEnabled(level); }
                 Type loggerType = Type.GetType("log4net.Core.ILogger, log4net");
                 if (loggerType == null)
                 {
@@ -253,7 +243,9 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                             }
                         }
 #else
+#pragma warning disable S2696 // Instance members should not write to "static" fields
                         callerStackBoundaryType = typeof(LoggerExecutionWrapper);
+#pragma warning restore S2696 // Instance members should not write to "static" fields
 #endif
                     }
                 }
@@ -271,8 +263,6 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
 
             private static Action<object, object> GetLogDelegate(Type loggerType, Type loggingEventType, UnaryExpression instanceCast, ParameterExpression instanceParam)
             {
-                // Action<object, object, string, Exception> Log =
-                // (logger, callerStackBoundaryDeclaringType, level, message, exception) => { ((ILogger)logger).Log(new LoggingEvent(callerStackBoundaryDeclaringType, logger.Repository, logger.Name, level, message, exception)); }
                 MethodInfo writeExceptionMethodInfo = loggerType.GetMethodPortable(
                     "Log",
                     loggingEventType);
@@ -288,7 +278,9 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                     writeExceptionMethodInfo,
                     loggingEventCasted);
 
+#pragma warning disable S1117 // Local variables should not shadow class fields
                 Action<object, object> logDelegate = Expression.Lambda<Action<object, object>>(
+#pragma warning restore S1117 // Local variables should not shadow class fields
                                                 writeMethodExp,
                                                 instanceParam,
                                                 loggingEventParameter).Compile();
@@ -308,8 +300,6 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                 ConstructorInfo loggingEventConstructor =
                     loggingEventType.GetConstructorPortable(typeof(Type), repositoryProperty.PropertyType, typeof(string), levelProperty.PropertyType, typeof(object), typeof(Exception));
 
-                // Func<object, object, string, Exception, object> Log =
-                // (logger, callerStackBoundaryDeclaringType, level, message, exception) => new LoggingEvent(callerStackBoundaryDeclaringType, ((ILogger)logger).Repository, ((ILogger)logger).Name, (Level)level, message, exception); }
                 NewExpression newLoggingEventExpression =
                     Expression.New(
                         loggingEventConstructor,
@@ -320,7 +310,9 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                         messageParam,
                         exceptionParam);
 
+#pragma warning disable S1117 // Local variables should not shadow class fields
                 Func<object, Type, object, string, Exception, object> createLoggingEvent =
+#pragma warning restore S1117 // Local variables should not shadow class fields
                     Expression.Lambda<Func<object, Type, object, string, Exception, object>>(
                                   newLoggingEventExpression,
                                   instanceParam,
@@ -360,7 +352,6 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                 PropertyInfo propertiesProperty = loggingEventType.GetPropertyPortable("Properties");
                 PropertyInfo item = propertiesProperty.PropertyType.GetPropertyPortable("Item");
 
-                // ((LoggingEvent)loggingEvent).Properties[key] = value;
                 BinaryExpression body =
                     Expression.Assign(
                         Expression.Property(
@@ -377,6 +368,7 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                 return result;
             }
 
+#pragma warning disable S1144 // Unused private types or members should be removed
             private static bool IsInTypeHierarchy(Type currentType, Type checkType)
             {
                 while (currentType != null && currentType != typeof(object))
@@ -391,6 +383,7 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
 
                 return false;
             }
+#pragma warning restore S1144 // Unused private types or members should be removed
 
             private void PopulateProperties(object loggingEvent, IEnumerable<string> patternMatches, object[] formatParameters)
             {

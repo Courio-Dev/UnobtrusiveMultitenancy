@@ -29,10 +29,6 @@
             IHttpContextAccessor httpContextAccessor,
             Func<string, Microsoft.Extensions.Logging.LogLevel, bool> filter = null)
         {
-            /*
-            factory.AddProvider(new MultitenantLoggerProvider<TTenant>(tenant, factory, filter, httpContextAccessor));
-            */
-
             return factory;
         }
     }

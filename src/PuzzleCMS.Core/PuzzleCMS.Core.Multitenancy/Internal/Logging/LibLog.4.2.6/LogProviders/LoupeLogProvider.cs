@@ -45,7 +45,6 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
     [ExcludeFromCodeCoverage]
     internal class LoupeLogProvider : LogProviderBase
     {
-        private static bool providerIsAvailableOverride = true;
         private readonly WriteDelegate logWriteDelegate;
 
         public LoupeLogProvider()
@@ -91,11 +90,7 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
         /// <value>
         /// <c>true</c> if [provider is available override]; otherwise, <c>false</c>.
         /// </value>
-        public static bool ProviderIsAvailableOverride
-        {
-            get { return providerIsAvailableOverride; }
-            set { providerIsAvailableOverride = value; }
-        }
+        public static bool ProviderIsAvailableOverride { get; set; } = true;
 
         public static bool IsLoggerAvailable()
         {

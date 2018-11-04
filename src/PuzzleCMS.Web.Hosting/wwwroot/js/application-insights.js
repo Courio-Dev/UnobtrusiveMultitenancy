@@ -20,7 +20,9 @@ var appInsights = window.appInsights || (function(aiConfig) {
     // capture initial cookie
     try {
         appInsights.cookie = localDocument.cookie;
-    } catch (e) {}
+    } catch (e) {
+        console.error(e);
+    }
 
     appInsights.queue = [];
     appInsights.version = "1.0";

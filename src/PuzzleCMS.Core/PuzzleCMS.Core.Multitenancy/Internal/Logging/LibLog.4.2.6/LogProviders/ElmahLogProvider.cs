@@ -34,9 +34,12 @@
 //
 // Define LIBLOG_PROVIDERS_ONLY if your library provides its own logging API and you just want to use the
 // LibLog providers internally to provide built in support for popular logging frameworks.
+#pragma warning disable S3261 // Namespaces should not be empty
 namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
 {
-    /*
+    
+#pragma warning disable S125 // Sections of code should not be commented out
+/*
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -161,3 +164,5 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
 
     */
 }
+#pragma warning restore S125 // Sections of code should not be commented out
+#pragma warning restore S3261 // Namespaces should not be empty

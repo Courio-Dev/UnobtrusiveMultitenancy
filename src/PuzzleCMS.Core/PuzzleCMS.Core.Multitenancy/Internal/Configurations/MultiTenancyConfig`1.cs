@@ -21,11 +21,6 @@
     {
         private readonly object SyncLock = new object();
 
-        /// <summary>
-        /// Indicate if post configure neede.
-        /// </summary>
-        protected bool IsPostConfigureNeeded = true;
-
         internal IList<Action<IServiceCollection, TTenant>> ConfigureServicesTenantList { get; } = new List<Action<IServiceCollection, TTenant>>();
 
         internal Func<IServiceCollection, TTenant, IConfiguration, ILogProvider> TenantLogProvider { get; private set; } = (sc, t, conf) => default;
@@ -35,18 +30,11 @@
         /// </summary>
         /// <param name="environment"></param>
         /// <param name="defaultMultitenancyConfiguration"></param>
-        /// <param name="setups">The configuration actions to run.</param>
-        /// <param name="postConfigures">The initialization actions to run.</param>
-        public MultiTenancyConfig(string environment,
-            IConfigurationRoot defaultMultitenancyConfiguration = null,
-            IEnumerable<IConfigureOptions<MultitenancyOptions<TTenant>>> setups = null,
-            IEnumerable<IPostConfigureOptions<MultitenancyOptions<TTenant>>> postConfigures = null)
+        public MultiTenancyConfig(string environment,IConfigurationRoot defaultMultitenancyConfiguration = null)
         {
             Environment = environment;
             DefaultMultitenancyConfiguration = defaultMultitenancyConfiguration;
             Config = BuildConfiguration(Ds, environment, defaultMultitenancyConfiguration);
-            Setups = setups ?? Enumerable.Empty<IConfigureOptions<MultitenancyOptions<TTenant>>>();
-            PostConfigures = postConfigures ?? Enumerable.Empty<IPostConfigureOptions<MultitenancyOptions<TTenant>>>();
         }
 
         /// <summary>
@@ -66,38 +54,10 @@
         public IConfigurationRoot DefaultMultitenancyConfiguration { get; private set; }
 
         /// <summary>
-        /// 
-        /// </summary>
-        public IEnumerable<IConfigureOptions<MultitenancyOptions<TTenant>>> Setups { get; private set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public IEnumerable<IPostConfigureOptions<MultitenancyOptions<TTenant>>> PostConfigures { get; private set; }
-
-        /// <summary>
         /// Environment name.
         /// </summary>
         public string Environment { get; private set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public MultitenancyOptions<TTenant> CurrentMultiTenacyOptionsValue
-        {
-            get
-            {
-                if (!IsPostConfigureNeeded)
-                {
-                    return storeCurrentMultiTenacyOptionsValue;
-                 }
-                else {
-                    return (storeCurrentMultiTenacyOptionsValue=CreateOptions(Config, Options.DefaultName));
-                }
-            }
-        }
-
-        private MultitenancyOptions<TTenant> storeCurrentMultiTenacyOptionsValue;
         /// <summary>
         /// 
         /// </summary>
@@ -107,16 +67,13 @@
         /// 
         /// </summary>
         /// <returns></returns>
-        public (MultitenancyOptions<TTenant> options, IChangeToken token) ReloadConfiguration()
+        public IChangeToken ReloadConfiguration()
         {
             lock (SyncLock)
             {
-                //Config.Reload();
                 Config = BuildConfiguration(Ds, Environment, DefaultMultitenancyConfiguration);
-            
-                IsPostConfigureNeeded = true;
             }
-            return (options: CurrentMultiTenacyOptionsValue, token: Config.GetReloadToken());
+            return (Config.GetReloadToken());
         }
 
         /// <summary>
@@ -196,42 +153,6 @@
             }
 
             return multitenancyConfiguration ?? (multitenancyConfiguration = BuildDefaultConfiguration(environment));
-        }
-
-        private MultitenancyOptions<TTenant> CreateOptions(IConfigurationRoot config, string name)
-        {
-            IConfigurationSection multitenantConfiguration = config.GetSection(nameof(MultitenancyConstants.MultitenancyOptions));
-            MultitenancyOptions<TTenant> options = multitenantConfiguration.Get<MultitenancyOptions<TTenant>>();
-
-            lock(SyncLock)
-            {
-                if (IsPostConfigureNeeded)
-                {
-                    IsPostConfigureNeeded = false;
-
-                    if (options != null)
-                    {
-                        options.TenantsConfigurations = multitenantConfiguration.GetSection(MultitenancyConstants.Tenants)?.GetChildren();
-                        foreach (IConfigureOptions<MultitenancyOptions<TTenant>> setup in Setups)
-                        {
-                            if (setup is IConfigureNamedOptions<MultitenancyOptions<TTenant>> namedSetup)
-                            {
-                                namedSetup.Configure(name, options);
-                            }
-                            else if (name == Options.DefaultName)
-                            {
-                                setup.Configure(options);
-                            }
-                        }
-                        foreach (IPostConfigureOptions<MultitenancyOptions<TTenant>> post in PostConfigures)
-                        {
-                            post.PostConfigure(name, options);
-                        }
-                    }
-                }
-            }
-            
-            return options;
         }
 
         /// <summary>

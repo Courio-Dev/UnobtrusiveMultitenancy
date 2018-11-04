@@ -7,14 +7,14 @@
     /// </summary>
     public class BrowserConfigService : IBrowserConfigService
     {
-        private readonly IUrlHelper urlHelper;
+        private IUrlHelper UrlHelper { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowserConfigService"/> class.
         /// </summary>
         public BrowserConfigService(IUrlHelper urlHelper)
         {
-            this.urlHelper = urlHelper;
+            UrlHelper = urlHelper;
         }
 
         /// <summary>

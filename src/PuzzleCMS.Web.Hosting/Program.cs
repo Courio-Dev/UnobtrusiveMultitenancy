@@ -1,4 +1,4 @@
-﻿namespace PuzzleCMS.WebHost
+﻿namespace PuzzleCMS.Web.Hosting
 {
     using System;
     using System.IO;
@@ -15,31 +15,15 @@
     /// <summary>
     /// Program class.
     /// </summary>
-    public class Program
+    public static partial class Program
     {
-        private const string BasePathName = "Configs";
-        private const string HostingJsonFileName = "hosting.json";
-
-        protected static IConfigurationRoot Configuration => new ConfigurationBuilder()
-                    .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), BasePathName))
-                    .AddJsonFile("config.json", optional: false, reloadOnChange: true)
-                    .Build();
-
-        protected static Serilog.ILogger SeriLogger => new LoggerConfiguration()
-                .ReadFrom.Configuration(Configuration)
-                .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Error)
-                .CreateLogger();
-
-
-        protected static SerilogLoggerProvider SerilogLoggerProvider => new SerilogLoggerProvider(SeriLogger, dispose: true);
-
         /// <summary>
         /// The entry point.
         /// </summary>
         public static int Main(string[] args)
         {
 
-            Log.Logger = SeriLogger;
+            Log.Logger = GetSeriLogger();
             try
             {
                 Log.Information("Starting web host");
@@ -80,7 +64,7 @@
                   .ConfigureLogging((context, logging) => logging.ClearProviders())
                   .UseIISIntegration()
                   .UseUnobtrusiveMulitenancyStartupWithDefaultConvention<Startup>(actionConfiguration:(action)=> {
-                      action.UseLogProvider(new SeriLogProvider(SerilogLoggerProvider));
+                      action.UseLogProvider(new SeriLogProvider(GetSerilogLoggerProvider()));
                       action.UseConfigureServicesTenant((sc, tenant) => { });
                       action.UseCustomServicesTenant((IServiceCollection sc,AppTenant tenant,IConfiguration tentantConfiguration) =>
                       {
@@ -121,13 +105,16 @@
                 .Build();
         }
 
+#pragma warning disable S1144 // Unused private types or members should be removed
         private static void ConfigureLogger(WebHostBuilderContext ctx, ILoggingBuilder logging)
         {
             logging.AddConfiguration(ctx.Configuration.GetSection("Logging"));
             logging.AddConsole();
             logging.AddDebug();
         }
+#pragma warning restore S1144 // Unused private types or members should be removed
 
+#pragma warning disable S1144 // Unused private types or members should be removed
         private static int? BuildSslPort(WebHostBuilderContext ctx)
         {
             int? sslPort = null;
@@ -142,5 +129,6 @@
 
             return sslPort;
         }
+#pragma warning restore S1144 // Unused private types or members should be removed
     }
 }

@@ -53,6 +53,7 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
         internal static readonly int Error;
         internal static readonly int Critical;
 
+#pragma warning disable S3963 // "static" fields should be initialized inline
         [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Pending")]
         static TraceEventTypeValues()
         {
@@ -74,5 +75,6 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
             Error = (int)Enum.Parse(Type, "Error", false);
             Critical = (int)Enum.Parse(Type, "Critical", false);
         }
+#pragma warning restore S3963 // "static" fields should be initialized inline
     }
 }

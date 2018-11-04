@@ -5,24 +5,25 @@
     using System.Linq;
     using System.Reflection;
     using Microsoft.AspNetCore.Hosting.Internal;
+    using Microsoft.Extensions.Configuration;
 
-    internal class StartupLoaderMultitenant
+    internal static class StartupLoaderMultitenant
     {
         internal static StartupMethodsMultitenant<TTenant> LoadMethods<TTenant>(IServiceProvider hostingServiceProvider, Type startupType, string environmentName)
         {
             StartupMethods methods = StartupLoader.LoadMethods(hostingServiceProvider, startupType, environmentName);
-            ConfigureMultitenantServicesBuilder<TTenant> servicesMethosPerTenant = FindConfigurePerTenantServicesDelegate<TTenant>(startupType, null, environmentName);
+            ConfigureMultitenantServicesBuilder<TTenant,IConfiguration> servicesMethosPerTenant = FindConfigurePerTenantServicesDelegate<TTenant>(startupType, environmentName);
 
             return new StartupMethodsMultitenant<TTenant>(methods, servicesMethosPerTenant.Build(methods.StartupInstance));
         }
 
-        private static ConfigureMultitenantServicesBuilder<TTenant> FindConfigurePerTenantServicesDelegate<TTenant>(Type startupType, string tenantName, string environmentName)
+        private static ConfigureMultitenantServicesBuilder<TTenant,IConfiguration> FindConfigurePerTenantServicesDelegate<TTenant>(Type startupType, string environmentName)
         {
             string pertenantKey = "PerTenant";
             string methodName = $@"Configure{pertenantKey}{{0}}Services";
             MethodInfo servicesMethod = FindMethod(startupType, methodName, environmentName, typeof(IServiceProvider))
                 ?? FindMethod(startupType, methodName, environmentName, typeof(void));
-            return new ConfigureMultitenantServicesBuilder<TTenant>(servicesMethod);
+            return new ConfigureMultitenantServicesBuilder<TTenant,IConfiguration>(servicesMethod);
         }
 
         /// <summary>

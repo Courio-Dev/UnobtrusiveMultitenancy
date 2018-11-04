@@ -55,8 +55,8 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
         private static readonly Type TraceEventTypeType;
         private static readonly Action<string, string, int> WriteLogEntry;
         private static readonly Func<string, int, bool> ShouldLogEntry;
-        private static bool providerIsAvailableOverride = true;
 
+#pragma warning disable S3963 // "static" fields should be initialized inline
         [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Pending")]
         static EntLibLogProvider()
         {
@@ -73,6 +73,7 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
             WriteLogEntry = GetWriteLogEntry();
             ShouldLogEntry = GetShouldLogEntry();
         }
+#pragma warning restore S3963 // "static" fields should be initialized inline
 
         [SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "EnterpriseLibrary", Justification = "Pending")]
         public EntLibLogProvider()
@@ -83,11 +84,7 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
             }
         }
 
-        public static bool ProviderIsAvailableOverride
-        {
-            get { return providerIsAvailableOverride; }
-            set { providerIsAvailableOverride = value; }
-        }
+        public static bool ProviderIsAvailableOverride { get; set; } = true;
 
         public override Logger GetLogger(string name)
         {
@@ -113,7 +110,6 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                 Expression.Convert(severityParameter, TraceEventTypeType),
                 logNameParameter);
 
-            // Logger.Write(new LogEntry(....));
             MethodInfo writeLogEntryMethod = LoggerType.GetMethodPortable("Write", LogEntryType);
             MethodCallExpression writeLogEntryExpression = Expression.Call(writeLogEntryMethod, memberInit);
 
@@ -135,7 +131,6 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                 Expression.Convert(severityParameter, TraceEventTypeType),
                 logNameParameter);
 
-            // Logger.Write(new LogEntry(....));
             MethodInfo writeLogEntryMethod = LoggerType.GetMethodPortable("ShouldLog", LogEntryType);
             MethodCallExpression writeLogEntryExpression = Expression.Call(writeLogEntryMethod, memberInit);
 

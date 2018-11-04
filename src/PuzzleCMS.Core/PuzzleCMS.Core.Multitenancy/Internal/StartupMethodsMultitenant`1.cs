@@ -4,11 +4,12 @@
     using System.Diagnostics;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting.Internal;
+    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
 
     internal class StartupMethodsMultitenant<TTenant> : StartupMethods
     {
-        public StartupMethodsMultitenant(StartupMethods methods, Action<IServiceCollection, TTenant> configurePerTenantServices)
+        public StartupMethodsMultitenant(StartupMethods methods, Action<IServiceCollection, TTenant, IConfiguration> configurePerTenantServices)
             : this(
                 methods.StartupInstance,
                 methods.ConfigureDelegate,
@@ -21,7 +22,7 @@
             object instance,
             Action<IApplicationBuilder> configure,
             Func<IServiceCollection, IServiceProvider> configureServices,
-            Action<IServiceCollection, TTenant> configurePerTenantServices)
+            Action<IServiceCollection, TTenant, IConfiguration> configurePerTenantServices)
         : base(instance, configure, configureServices)
         {
             Debug.Assert(instance != null, nameof(instance));
@@ -31,6 +32,6 @@
             ConfigurePerTenantServicesDelegate = configurePerTenantServices;
         }
 
-        public Action<IServiceCollection, TTenant> ConfigurePerTenantServicesDelegate { get; }
+        public Action<IServiceCollection, TTenant, IConfiguration> ConfigurePerTenantServicesDelegate { get; }
     }
 }

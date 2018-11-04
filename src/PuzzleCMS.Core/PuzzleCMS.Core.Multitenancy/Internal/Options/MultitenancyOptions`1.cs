@@ -1,5 +1,6 @@
 ﻿namespace PuzzleCMS.Core.Multitenancy.Internal.Options
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using Microsoft.Extensions.Configuration;
@@ -8,25 +9,26 @@
     /// Options for multitenancy.
     /// </summary>
     /// <typeparam name="TTenant">Tenant object.</typeparam>
-    public class MultitenancyOptions<TTenant>
+    public class MultitenancyOptions<TTenant> : MultitenancyOptions
     {
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MultitenancyOptions{TTenant}"/> class.
         /// </summary>
         public MultitenancyOptions()
+            : base(new Dictionary<Type, IMultitenancyOptionsExtension>())
         {
-            Tokens = new Dictionary<string, string>();
         }
 
         /// <summary>
-        /// Gets or sets tenant's folder.
+        ///     Initializes a new instance of the <see cref="MultitenancyOptions{TTenant}" /> class.
         /// </summary>
-        public string TenantFolder { get; set; }
+        /// <param name="extensions"> The extensions that store the configured options. </param>
+        public MultitenancyOptions(IReadOnlyDictionary<Type, IMultitenancyOptionsExtension> extensions)
+            : base(extensions)
+        {
+        }
 
-        /// <summary>
-        /// Gets or sets tokens replacement.
-        /// </summary>
-        public IDictionary<string, string> Tokens { get; set; }
 
         /// <summary>
         /// Gets or sets list of tenant.
@@ -34,8 +36,8 @@
         public virtual Collection<TTenant> Tenants { get; set; }
 
         /// <summary>
-        /// Configuration of each tenant.
+        ///     The type of context that these options are for (<typeparamref name="TTenant" />).
         /// </summary>
-        public virtual IEnumerable<IConfigurationSection> TenantsConfigurations { get; set; } 
+        public override Type TenantType => typeof(TTenant);
     }
 }

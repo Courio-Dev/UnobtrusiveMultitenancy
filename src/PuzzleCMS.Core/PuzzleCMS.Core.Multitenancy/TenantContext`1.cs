@@ -95,8 +95,9 @@
             {
                 obj.Dispose();
             }
-            catch (ObjectDisposedException)
+            catch (ObjectDisposedException odex)
             {
+                Console.WriteLine(odex);
             }
         }
     }

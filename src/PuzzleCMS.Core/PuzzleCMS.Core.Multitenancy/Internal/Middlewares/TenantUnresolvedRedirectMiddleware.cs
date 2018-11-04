@@ -1,44 +1,46 @@
-﻿namespace PuzzleCMS.Core.Multitenancy.Internal.Middlewares
+﻿#pragma warning disable S3261 // Namespaces should not be empty
+namespace PuzzleCMS.Core.Multitenancy.Internal.Middlewares
 {
+#pragma warning disable S125 // Sections of code should not be commented out
     /*
-    internal class TenantUnresolvedRedirectMiddleware<TTenant>
-    {
-        private readonly string redirectLocation;
-        private readonly bool permanentRedirect;
-        private readonly RequestDelegate next;
-
-        public TenantUnresolvedRedirectMiddleware(
-            RequestDelegate next,
-            string redirectLocation,
-            bool permanentRedirect)
+        internal class TenantUnresolvedRedirectMiddleware<TTenant>
         {
-            this.next = next ?? throw new ArgumentNullException($"Argument {nameof(next)} must not be null");
-            this.redirectLocation = redirectLocation ?? throw new ArgumentNullException($"Argument {nameof(redirectLocation)} must not be null");
-            this.permanentRedirect = permanentRedirect;
-        }
+            private readonly string redirectLocation;
+            private readonly bool permanentRedirect;
+            private readonly RequestDelegate next;
 
-        public async Task Invoke(HttpContext context)
-        {
-            if (context == null) throw new ArgumentNullException($"Argument {nameof(context)} must not be null");
-            var tenantContext = context.GetTenantContext<TTenant>();
-
-            if (tenantContext == null)
+            public TenantUnresolvedRedirectMiddleware(
+                RequestDelegate next,
+                string redirectLocation,
+                bool permanentRedirect)
             {
-                Redirect(context, redirectLocation);
-                return;
+                this.next = next ?? throw new ArgumentNullException($"Argument {nameof(next)} must not be null");
+                this.redirectLocation = redirectLocation ?? throw new ArgumentNullException($"Argument {nameof(redirectLocation)} must not be null");
+                this.permanentRedirect = permanentRedirect;
             }
 
-            // otherwise continue processing
-            await next(context);
-        }
+            public async Task Invoke(HttpContext context)
+            {
+                if (context == null) throw new ArgumentNullException($"Argument {nameof(context)} must not be null");
+                var tenantContext = context.GetTenantContext<TTenant>();
 
-        private void Redirect(HttpContext context, string redirectLocation)
-        {
-            context.Response.Redirect(redirectLocation);
-            context.Response.StatusCode = permanentRedirect ? StatusCodes.Status301MovedPermanently : StatusCodes.Status302Found;
+                if (tenantContext == null)
+                {
+                    Redirect(context, redirectLocation);
+                    return;
+                }
+
+                // otherwise continue processing
+                await next(context);
+            }
+
+            private void Redirect(HttpContext context, string redirectLocation)
+            {
+                context.Response.Redirect(redirectLocation);
+                context.Response.StatusCode = permanentRedirect ? StatusCodes.Status301MovedPermanently : StatusCodes.Status302Found;
+            }
         }
-    }
-    */
+        */
     /*
     internal class TenantUnresolved404Middleware
     {
@@ -75,3 +77,5 @@
 
     */
 }
+#pragma warning restore S3261 // Namespaces should not be empty
+#pragma warning restore S125 // Sections of code should not be commented out

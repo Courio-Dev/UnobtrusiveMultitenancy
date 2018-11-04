@@ -20,8 +20,6 @@
         /// <param name="logProvider"></param>
         public Log(ILogProvider logProvider)
         {
-            //if (logProvider == null) throw new ArgumentNullException(nameof(logProvider));
-            //log =GetLogger(logProvider, typeof(T));
             log =(logProvider!=null)? GetLogger(logProvider,typeof(T)) : LogProvider.For<T>();
         }
 

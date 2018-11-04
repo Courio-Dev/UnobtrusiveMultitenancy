@@ -20,12 +20,12 @@
         private readonly MemoryCacheTenantResolverOptions options;
         private readonly IMultitenancyOptionsProvider<TTenant> multitenancyOptionsProvider;
 
-        public MemoryCacheTenantResolver(IMultitenancyOptionsProvider<TTenant> multitenancyOptionsProvider,IMemoryCache cache, Logging.LibLog.ILog log)
+        protected MemoryCacheTenantResolver(IMultitenancyOptionsProvider<TTenant> multitenancyOptionsProvider,IMemoryCache cache, Logging.LibLog.ILog log)
             : this(multitenancyOptionsProvider,cache, log, new MemoryCacheTenantResolverOptions())
         {
         }
 
-        public MemoryCacheTenantResolver(
+        protected MemoryCacheTenantResolver(
             IMultitenancyOptionsProvider<TTenant> multitenancyOptionsProvider,
             IMemoryCache cache, 
             Logging.LibLog.ILog log, 
@@ -50,13 +50,18 @@
             multitenancyOptionsProvider?.Reload();
         }
 
-        async Task<TenantContext<TTenant>> ITenantResolver<TTenant>.ResolveAsync(HttpContext context)
+        Task<TenantContext<TTenant>> ITenantResolver<TTenant>.ResolveAsync(HttpContext context)
         {
             if (context == null)
             {
                 throw new ArgumentNullException($"Argument {nameof(context)} must not be null");
             }
 
+            return ResolveInternalAsync(context);
+        }
+
+        private async Task<TenantContext<TTenant>> ResolveInternalAsync(HttpContext context)
+        {
             // Obtain the key used to identify cached tenants from the current request
             string cacheKey = GetContextIdentifier(context);
             if (string.IsNullOrWhiteSpace(cacheKey))
@@ -83,7 +88,7 @@
 
                         foreach (string identifier in tenantIdentifiers)
                         {
-                            Set(cache,identifier, tenantContext, cacheEntryOptions,resetCacheToken);
+                            _ = Set(cache, identifier, tenantContext, cacheEntryOptions, resetCacheToken);
                         }
                     }
                 }
@@ -122,8 +127,7 @@
         protected int GetTenantPositionWithPredicateResolver(HttpContext context)
         {
             int? index = Tenants.Select((x, p) => new { Item = x, Position = p })
-                                    .Where(x => PredicateResolver().Invoke(context, (x.Item)))
-                                    .FirstOrDefault()?.Position
+                                    .FirstOrDefault(x => PredicateResolver().Invoke(context, x.Item))?.Position
                                     ;
 
             return index.GetValueOrDefault(-1);

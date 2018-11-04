@@ -47,7 +47,6 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
     [Multitenancy.ExcludeFromCodeCoverage]
     internal class SerilogLogProvider : LogProviderBase
     {
-        private static bool providerIsAvailableOverride = true;
         private readonly Func<string, object> getLoggerByNameDelegate;
 
         [SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "Serilog", Justification = "Pending")]
@@ -61,11 +60,7 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
             getLoggerByNameDelegate = GetForContextMethodCall();
         }
 
-        public static bool ProviderIsAvailableOverride
-        {
-            get { return providerIsAvailableOverride; }
-            set { providerIsAvailableOverride = value; }
-        }
+        public static bool ProviderIsAvailableOverride { get; set; } = true;
 
         public override Logger GetLogger(string name)
         {
@@ -152,6 +147,7 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
             private static readonly Action<object, object, Exception, string, object[]> WriteException;
             private readonly object logger;
 
+#pragma warning disable S3963 // "static" fields should be initialized inline
             [SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations", Justification = "Pending")]
             [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Pending")]
             [SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "ILogger", Justification = "Pending")]
@@ -162,7 +158,9 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                 Type logEventLevelType = Type.GetType("Serilog.Events.LogEventLevel, Serilog");
                 if (logEventLevelType == null)
                 {
+#pragma warning disable S3877 // Exceptions should not be thrown from unexpected methods
                     throw new InvalidOperationException("Type Serilog.Events.LogEventLevel was not found.");
+#pragma warning restore S3877 // Exceptions should not be thrown from unexpected methods
                 }
 
                 DebugLevel = Enum.Parse(logEventLevelType, "Debug", false);
@@ -172,7 +170,6 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                 VerboseLevel = Enum.Parse(logEventLevelType, "Verbose", false);
                 WarningLevel = Enum.Parse(logEventLevelType, "Warning", false);
 
-                // Func<object, object, bool> isEnabled = (logger, level) => { return ((SeriLog.ILogger)logger).IsEnabled(level); }
                 Type loggerType = Type.GetType("Serilog.ILogger, Serilog");
                 if (loggerType == null)
                 {
@@ -187,8 +184,6 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                 MethodCallExpression isEnabledMethodCall = Expression.Call(instanceCast, isEnabledMethodInfo, levelCast);
                 IsEnabled = Expression.Lambda<Func<object, object, bool>>(isEnabledMethodCall, instanceParam, levelParam).Compile();
 
-                // Action<object, object, string> Write =
-                // (logger, level, message, params) => { ((SeriLog.ILoggerILogger)logger).Write(level, message, params); }
                 MethodInfo writeMethodInfo = loggerType.GetMethodPortable("Write", logEventLevelType, typeof(string), typeof(object[]));
                 ParameterExpression messageParam = Expression.Parameter(typeof(string));
                 ParameterExpression propertyValuesParam = Expression.Parameter(typeof(object[]));
@@ -206,8 +201,6 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                     propertyValuesParam);
                 Write = expression.Compile();
 
-                // Action<object, object, string, Exception> WriteException =
-                // (logger, level, exception, message) => { ((ILogger)logger).Write(level, exception, message, new object[]); }
                 MethodInfo writeExceptionMethodInfo = loggerType.GetMethodPortable(
                     "Write",
                     logEventLevelType,
@@ -230,6 +223,7 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders
                     messageParam,
                     propertyValuesParam).Compile();
             }
+#pragma warning restore S3963 // "static" fields should be initialized inline
 
             internal SerilogLogger(object logger)
             {

@@ -33,7 +33,7 @@
             services.AddSingleton<IPostConfigureOptions<MultitenancyOptions<TTenant>>, MultitenancyPostConfigureOptions<TTenant>>();
             services.AddSingleton(sp => sp.GetService<IOptionsMonitor<MultitenancyOptions<TTenant>>>().CurrentValue);
 
-            services.AddSingleton<IMultitenancyOptionsProvider<TTenant>>(sp=> new MultitenancyOptionsProvider<TTenant>(multitenancyConfig));
+            services.AddSingleton<IMultitenancyOptionsProvider<TTenant>>(sp=> new MultitenancyOptionsProvider<TTenant>(sp,multitenancyConfig));
 
             return services;
         }

@@ -15,6 +15,8 @@
     {
         private readonly ILog<AppTenantResolver> logger;
 
+        internal ILog<AppTenantResolver> Logger => logger;
+
         public AppTenantResolver(
             IMultitenancyOptionsProvider<AppTenant> multitenancyOptionsProvider,
             IMemoryCache cache,

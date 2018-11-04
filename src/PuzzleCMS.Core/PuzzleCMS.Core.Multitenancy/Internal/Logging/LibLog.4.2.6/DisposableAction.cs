@@ -6,7 +6,7 @@
     /// DisposableAction.
     /// </summary>
     [ExcludeFromCodeCoverage]
-    internal class DisposableAction : IDisposable
+    internal sealed class DisposableAction : IDisposable
     {
         private readonly Action onDispose;
 

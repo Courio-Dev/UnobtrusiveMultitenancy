@@ -46,20 +46,15 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog
     internal class LoggerExecutionWrapper : ILog
     {
         internal const string FailedToGenerateLogMessage = "Failed to generate log message";
-
-        private readonly Logger logger;
         private readonly Func<bool> getIsDisabled;
 
         internal LoggerExecutionWrapper(Logger logger, Func<bool> getIsDisabled = null)
         {
-            this.logger = logger;
+            WrappedLogger = logger;
             this.getIsDisabled = getIsDisabled ?? (() => false);
         }
 
-        internal Logger WrappedLogger
-        {
-            get { return logger; }
-        }
+        internal Logger WrappedLogger { get; }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Pending")]
         public bool Log(LogLevel logLevel, Func<string> messageFunc, Exception exception = null, params object[] formatParameters)
@@ -71,7 +66,7 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog
 
             if (messageFunc == null)
             {
-                return logger(logLevel, null);
+                return WrappedLogger(logLevel, null);
             }
 
             string WrappedMessageFunc()
@@ -88,7 +83,7 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog
                 return null;
             }
 
-            return logger(logLevel, WrappedMessageFunc, exception, formatParameters);
+            return WrappedLogger(logLevel, WrappedMessageFunc, exception, formatParameters);
         }
     }
 }

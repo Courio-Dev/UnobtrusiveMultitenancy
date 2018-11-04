@@ -23,6 +23,7 @@
     {
         public MultitenantRequestStartupFilter()
         {
+            Console.WriteLine($"{typeof(TStartup)}");
         }
 
         public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
@@ -41,10 +42,6 @@
                             Console.WriteLine($" Configuration changed. ");
                         });
 
-                        //Thread.Sleep(200);
-                        //GetService<ITenantResolver<TTenant>>()?.Reset();
-                        //GetService<IServiceFactoryForMultitenancy<TTenant>>()?.RemoveAll();
-                        //Console.WriteLine($" Configuration changed. ");
                     });
 
                     T GetService<T>()
@@ -56,7 +53,6 @@
 
                 builder.UseMultitenancy<TTenant>();
                 builder.UseMiddleware<MultitenancyRequestServicesContainerMiddleware<TTenant>>();
-                //builder.UsePerTenant<TStartup>((ctx, innerBuilder) => { });
 
                 next(builder);
             };

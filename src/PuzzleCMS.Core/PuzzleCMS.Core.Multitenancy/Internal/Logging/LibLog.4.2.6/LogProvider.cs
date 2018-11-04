@@ -57,8 +57,10 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog
             new Tuple<IsLoggerAvailable, CreateLogProvider>(LoupeLogProvider.IsLoggerAvailable, () => new LoupeLogProvider()),
         };
 
+#pragma warning disable S1144 // Unused private types or members should be removed
         private const string NullLogProvider = "Current Log Provider is not set. Call SetCurrentLogProvider " +
                                                "with a non-null value first.";
+#pragma warning restore S1144 // Unused private types or members should be removed
 
         private static dynamic currentLogProvider;
         private static Action<ILogProvider> onCurrentLogProviderSet;
@@ -89,13 +91,10 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog
         /// LibLog (or other logging abstraction) so you adapt and delegate to them.
         /// <see cref="SetCurrentLogProvider"/>
         /// </summary>
-        internal static Action<ILogProvider> OnCurrentLogProviderSet
+        internal static void SetOnCurrentLogProviderSet(Action<ILogProvider> value)
         {
-            set
-            {
-                onCurrentLogProviderSet = value;
-                RaiseOnCurrentLogProviderSet();
-            }
+            onCurrentLogProviderSet = value;
+            RaiseOnCurrentLogProviderSet();
         }
 
         internal static ILogProvider CurrentLogProvider
@@ -232,7 +231,7 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog
         {
             internal static readonly NoOpLogger Instance = new NoOpLogger();
 
-            public bool Log(LogLevel logLevel, Func<string> messageFunc, Exception exception, params object[] formatParameters)
+            public bool Log(LogLevel logLevel, Func<string> messageFunc, Exception exception = null, params object[] formatParameters)
             {
                 return false;
             }

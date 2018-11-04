@@ -1,4 +1,4 @@
-﻿namespace PuzzleCMS.WebHost
+﻿namespace PuzzleCMS.Web.Hosting
 {
     using System;
     using System.Net;
@@ -16,9 +16,9 @@
     /// </summary>
     public class Startup
     {
-        private readonly IConfiguration configuration;
-        private readonly IHostingEnvironment hostingEnvironment;
-        private readonly ILoggerFactory loggerFactory;
+        private IConfiguration Configuration { get; }
+        private IHostingEnvironment HostingEnvironment { get; }
+        private  ILoggerFactory LoggerFactory { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Startup"/> class.
@@ -30,9 +30,9 @@
         /// See http://docs.asp.net/en/latest/fundamentals/logging.html.</param>
         public Startup(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
         {
-            this.hostingEnvironment = hostingEnvironment ?? throw new ArgumentException(nameof(hostingEnvironment));
-            this.configuration = configuration ?? throw new ArgumentException(nameof(configuration));
-            this.loggerFactory = loggerFactory ?? throw new ArgumentException(nameof(loggerFactory));
+            HostingEnvironment = hostingEnvironment ?? throw new ArgumentException(nameof(hostingEnvironment));
+            Configuration = configuration ?? throw new ArgumentException(nameof(configuration));
+            LoggerFactory = loggerFactory ?? throw new ArgumentException(nameof(loggerFactory));
         }
 
         /// <summary>
@@ -43,6 +43,7 @@
         /// <param name="services">The services collection or IoC container.</param>
         public void ConfigureServices(IServiceCollection services)
         {
+            // Method intentionally left empty.
         }
 
         /// <summary>
@@ -52,14 +53,11 @@
         /// </summary>
         /// <param name="services">The services collection or IoC container.</param>
         /// <param name="tenant">The tenant object.</param>
-        public void ConfigurePerTenantServices(IServiceCollection services, AppTenant tenant)
+        public void ConfigurePerTenantServices(IServiceCollection services,in AppTenant tenant,in IConfiguration tenantConfiguration)
         {
             if (tenant.Id.ToUpperInvariant().StartsWith("Tenant-1".ToUpperInvariant()))
             {
                 services.AddMvc();
-            }
-            else if (tenant.Id.ToUpperInvariant() == "Tenant-2".ToUpperInvariant())
-            {
             }
         }
 
@@ -69,7 +67,7 @@
         /// </summary>
         public void Configure(IApplicationBuilder application, IApplicationLifetime appLifetime)
         {
-            if (hostingEnvironment.IsDevelopment())
+            if (HostingEnvironment.IsDevelopment())
             {
                 application.UseDeveloperExceptionPage();
             }

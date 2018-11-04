@@ -64,12 +64,24 @@
         {
             return new object[]
             {
+#pragma warning disable S1075 // URIs should not be hardcoded
                 GetIconJObject("~/img/icons/android-chrome-36x36.png", "36x36", "image/png", "0.75"),
+#pragma warning restore S1075 // URIs should not be hardcoded
+#pragma warning disable S1075 // URIs should not be hardcoded
                 GetIconJObject("~/img/icons/android-chrome-48x48.png", "48x48", "image/png", "1.0"),
+#pragma warning restore S1075 // URIs should not be hardcoded
+#pragma warning disable S1075 // URIs should not be hardcoded
                 GetIconJObject("~/img/icons/android-chrome-72x72.png", "72x72", "image/png", "1.5"),
+#pragma warning restore S1075 // URIs should not be hardcoded
+#pragma warning disable S1075 // URIs should not be hardcoded
                 GetIconJObject("~/img/icons/android-chrome-96x96.png", "96x96", "image/png", "2.0"),
+#pragma warning restore S1075 // URIs should not be hardcoded
+#pragma warning disable S1075 // URIs should not be hardcoded
                 GetIconJObject("~/img/icons/android-chrome-144x144.png", "144x144", "image/png", "3.0"),
+#pragma warning restore S1075 // URIs should not be hardcoded
+#pragma warning disable S1075 // URIs should not be hardcoded
                 GetIconJObject("~/img/icons/android-chrome-192x192.png", "192x192", "image/png", "4.0"),
+#pragma warning restore S1075 // URIs should not be hardcoded
             };
         }
     }

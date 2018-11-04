@@ -12,7 +12,9 @@
     /// <typeparam name="TTenant"></typeparam>
     public abstract class TenantLoggerProviderBase<TTenant> : /*LogProviderBase,*/ITenantLoggerProvider<TTenant>
     {
+#pragma warning disable S2743 // Static fields should not be used in generic types
         private static readonly IDisposable NoopDisposableInstance = new DisposableAction();
+#pragma warning restore S2743 // Static fields should not be used in generic types
 
         private readonly Lazy<OpenNdc> lazyOpenNdcMethod;
         private readonly Lazy<OpenMdc> lazyOpenMdcMethod;
