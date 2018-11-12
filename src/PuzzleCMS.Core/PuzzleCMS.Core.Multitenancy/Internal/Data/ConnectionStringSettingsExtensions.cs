@@ -11,12 +11,12 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Data
     public static class ConnectionStringSettingsExtensions
     {
         /// <summary>
-        /// 
+        /// Get Collection of ConnectionString.
         /// </summary>
         /// <param name="configuration"></param>
         /// <param name="section"></param>
         /// <returns></returns>
-        public static ConnectionStringSettingsCollection ConnectionStrings(this IConfigurationRoot configuration, string section = "ConnectionStrings")
+        public static ConnectionStringSettingsCollection ConnectionStrings(this IConfiguration configuration, string section = "ConnectionStrings")
         {
             ConnectionStringSettingsCollection connectionStringCollection = configuration.GetSection(section).Get<ConnectionStringSettingsCollection>();
             if (connectionStringCollection == null)
@@ -28,13 +28,13 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Data
         }
 
         /// <summary>
-        /// 
+        /// Get ConnectionString.
         /// </summary>
         /// <param name="configuration"></param>
         /// <param name="name"></param>
         /// <param name="section"></param>
         /// <returns></returns>
-        public static ConnectionStringSettings ConnectionString(this IConfigurationRoot configuration, string name, string section = "ConnectionStrings")
+        public static ConnectionStringSettings ConnectionString(this IConfiguration configuration, string name, string section = "ConnectionStrings")
         {
 
             ConnectionStringSettingsCollection connectionStringCollection = configuration.GetSection(section).Get<ConnectionStringSettingsCollection>();

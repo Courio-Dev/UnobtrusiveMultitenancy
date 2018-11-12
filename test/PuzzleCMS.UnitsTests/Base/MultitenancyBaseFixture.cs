@@ -139,8 +139,9 @@
                         .AddSingleton<MultiTenancyConfig<AppTenant>>(sp => new MultiTenancyConfig<AppTenant>(environmentTest, Config))
 
 
-                        .AddSingleton(sp => sp.GetService<IOptionsMonitor<MultitenancyOptions<TestTenant>>>().CurrentValue)
-                        .AddSingleton(sp => sp.GetService<IOptionsMonitor<MultitenancyOptions<AppTenant>>>().CurrentValue)
+                        //.AddSingleton(sp => sp.GetService<IOptionsMonitor<MultitenancyOptions<TestTenant>>>().CurrentValue)
+                        //.AddSingleton(sp => sp.GetService<IOptionsMonitor<MultitenancyOptions<AppTenant>>>().CurrentValue)
+
                         //.AddSingleton<IOptionsFactory<MultitenancyOptions<TestTenant>>, MultitenancyOptionsTestTenantFactoryTests>()
                         //.AddSingleton<IOptionsFactory<MultitenancyOptions<AppTenant>>, MultitenancyOptionsAppTenantFactoryTests>()
                         .AddSingleton<IMultitenancyOptionsProvider<TestTenant>>(sp =>

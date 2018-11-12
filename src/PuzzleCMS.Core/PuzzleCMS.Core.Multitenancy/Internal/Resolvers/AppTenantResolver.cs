@@ -13,9 +13,7 @@
 
     internal class AppTenantResolver : MemoryCacheTenantResolver<AppTenant>
     {
-        private readonly ILog<AppTenantResolver> logger;
-
-        internal ILog<AppTenantResolver> Logger => logger;
+        internal ILog<AppTenantResolver> Logger { get; }
 
         public AppTenantResolver(
             IMultitenancyOptionsProvider<AppTenant> multitenancyOptionsProvider,
@@ -23,7 +21,7 @@
             ILog<AppTenantResolver> logger)
             : base(multitenancyOptionsProvider,cache, logger)
         {
-            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />

@@ -20,18 +20,19 @@
     "DefaultConnection": "Server=.\\sqlexpress;Database=PuzzleCMSTryModular;Trusted_Connection=True;MultipleActiveResultSets=true"
   },
   "Serilog": {
-    "Using": [ "Serilog.Sinks.Literate", "Serilog.Sinks.Console", "Serilog.Sinks.File" ],
+    "Using": [ "Serilog.Sinks.Literate", "Serilog.Sinks.Console", "Serilog.Sinks.File", "Serilog.Sinks.Async" ],
     "MinimumLevel": {
-      "Default": "Verbose",
+      "Default": "Debug",
       "Override": {
-        "Microsoft": "Verbose"
+        "Microsoft": "Error",
+        "System": "Information"
       }
     },
     "WriteTo": [
       {
         "Name": "LiterateConsole"
       },
-      {
+      /*{
         "Name": "File",
         "Args": {
           "path": "App_Data/Logs/log.txt",
@@ -40,8 +41,25 @@
           "fileSizeLimitBytes": 5000000,
           "retainedFileCountLimit": null
         }
-      }
+      }*/
     ],
+    "WriteTo:Async": {
+      "Name": "Async",
+      "Args": {
+        "configure": [
+          {
+            "Name": "File",
+            "Args": {
+              "path": "App_Data/Logs/log.async_.txt",
+              "rollingInterval": "Day",
+              "formatter": "Serilog.Formatting.Compact.CompactJsonFormatter, Serilog.Formatting.Compact",
+              "fileSizeLimitBytes": 5000000,
+              "retainedFileCountLimit": null
+            }
+          }
+        ]
+      }
+    },
     "Enrich": [ "FromLogContext", "WithMachineName", "WithThreadId" ],
     "Properties": {
     }

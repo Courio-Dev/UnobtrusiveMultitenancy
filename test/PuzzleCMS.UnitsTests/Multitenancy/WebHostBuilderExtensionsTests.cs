@@ -55,7 +55,7 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
             {
                 PuzzleCMS.Core.Multitenancy.Extensions.
                 WebHostBuilderExtensions.
-                UseUnobtrusiveMulitenancyStartup<TestStartup,TestTenant, TestTenantMemoryCacheResolver>(null,typeof(TestStartup),null,true,null);
+                UseUnobtrusiveMulitenancyStartup<TestStartup,TestTenant, TestTenantMemoryCacheResolver>(null,typeof(TestStartup),null,true,null,null);
             })).ConfigureAwait(false);
 
 

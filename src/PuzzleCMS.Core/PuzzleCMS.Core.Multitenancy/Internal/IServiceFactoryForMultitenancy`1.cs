@@ -28,7 +28,7 @@
     {
         private static readonly LazyConcurrentDictionary<string, IServiceProvider> cache = new LazyConcurrentDictionary<string, IServiceProvider>();
 
-        protected ServiceFactoryForMultitenancyBase(){}
+        protected ServiceFactoryForMultitenancyBase() { }
 
         protected static LazyConcurrentDictionary<string, IServiceProvider> GetCache()
         {
@@ -37,34 +37,44 @@
 
     }
 
-    internal class ServiceFactoryForMultitenancy<TTenant> : ServiceFactoryForMultitenancyBase,IServiceFactoryForMultitenancy<TTenant>
+    internal class ServiceFactoryForMultitenancy<TTenant> : ServiceFactoryForMultitenancyBase, IServiceFactoryForMultitenancy<TTenant>
     {
         public ServiceFactoryForMultitenancy(
             IServiceProvider hostServiceprovider,
-            IServiceCollection hostServices, 
-            Action<IServiceCollection, TTenant, IConfiguration> configurePerTenantServicesDelegate,
-            Func<IServiceCollection, TTenant, IConfiguration, ILogProvider> additionnalServicesTenant)
+            IServiceCollection hostServices,
+            Action<IServiceCollection, TTenant, IConfiguration> configurePerTenantServicesDelegate)
             : this()
         {
-            HostServiceprovider = hostServiceprovider ?? throw new ArgumentNullException($"Argument {nameof(hostServiceprovider)} must not be null");
-            HostServices = hostServices ?? throw new ArgumentNullException($"Argument {nameof(hostServices)} must not be null");
+            this.hostServiceprovider = hostServiceprovider ?? throw new ArgumentNullException($"Argument {nameof(hostServiceprovider)} must not be null");
+            this.hostServices = hostServices ?? throw new ArgumentNullException($"Argument {nameof(hostServices)} must not be null");
             ConfigurePerTenantServicesDelegate = configurePerTenantServicesDelegate ?? throw new ArgumentNullException($"Argument {nameof(configurePerTenantServicesDelegate)} must not be null");
-            AdditionnalServicesTenant = additionnalServicesTenant ?? throw new ArgumentNullException($"Argument {nameof(additionnalServicesTenant)} must not be null");
         }
 
-        protected ServiceFactoryForMultitenancy():base() {}
+        protected ServiceFactoryForMultitenancy() : base() { }
 
-        public IServiceProvider HostServiceprovider { get; }
+        protected IServiceProvider hostServiceprovider { get; }
 
-        public IServiceCollection HostServices { get; }
+        protected IServiceCollection hostServices { get; }
 
-        
+        protected Action<IServiceCollection, TTenant, IConfiguration> ConfigurePerTenantServicesDelegate { get; }
 
-        public Action<IServiceCollection, TTenant, IConfiguration> ConfigurePerTenantServicesDelegate { get; }
+        protected IMultitenancyOptionsProvider<TTenant> multiTenancyOptionsProvider
+        {
+            get
+            {
+                return hostServiceprovider.GetRequiredService<IMultitenancyOptionsProvider<TTenant>>();
+            }
+        }
 
-        public Func<IServiceCollection, TTenant, IConfiguration, ILogProvider> AdditionnalServicesTenant { get; }
 
-        
+        protected Func<IServiceCollection, TTenant, IConfiguration, ILogProvider> additionnalServicesTenant
+        {
+            get
+            {
+                return multiTenancyOptionsProvider.TenantLogProvider;
+            }
+        }
+
 
         public IServiceProvider Build(TenantContext<TTenant> tenantContext)
         {
@@ -72,17 +82,16 @@
 
             IServiceProvider value = GetCache().GetOrAdd(key, (k) =>
             {
-                IMultitenancyOptionsProvider<TTenant> multiTenancyOptionsProvider = HostServiceprovider.GetRequiredService<IMultitenancyOptionsProvider<TTenant>>();
                 int position = tenantContext.Position;
                 IConfiguration tenantConfiguration = multiTenancyOptionsProvider
                                                      ?.MultitenancyOptions
                                                      ?.TenantsConfigurations
                                                      ?.FirstOrDefault(x => string.Equals(x.Key, position.ToString(), StringComparison.OrdinalIgnoreCase));
 
-                IServiceCollection serviceCollection = HostServices.Clone();    
+                IServiceCollection serviceCollection = hostServices.Clone();
 
                 // Add specific tenant services to servicecollection.
-                ConfigurePerTenantServicesDelegate(serviceCollection, tenantContext.Tenant,tenantConfiguration);
+                ConfigurePerTenantServicesDelegate(serviceCollection, tenantContext.Tenant, tenantConfiguration);
 
                 // Add tenant services to servicecollection.
                 if (tenantConfiguration != null)
@@ -136,13 +145,13 @@
 
         private void OverrideLoggerFactoryForTenant(IServiceCollection collectionClone, TTenant tenant, IConfiguration tenantConfiguration)
         {
-            ILogProvider logProvider = AdditionnalServicesTenant?.Invoke(collectionClone, tenant, tenantConfiguration);
+            ILogProvider logProvider = additionnalServicesTenant?.Invoke(collectionClone, tenant, tenantConfiguration);
             if (logProvider != null)
             {
                 collectionClone.RemoveAll(typeof(ILogProvider));
                 collectionClone.RemoveAll(typeof(ILog<>));
 
-                collectionClone.TryAdd(ServiceDescriptor.Singleton<ILogProvider>(logProvider));             
+                collectionClone.TryAdd(ServiceDescriptor.Singleton<ILogProvider>(logProvider));
                 collectionClone.TryAdd(ServiceDescriptor.Singleton(typeof(ILog<>), typeof(Log<>)));
             }
         }
@@ -163,7 +172,7 @@
         {
             ICollection<ServiceDescriptor> descriptorListToRemove = services.Where(d => d.ServiceType == typeof(TService)).ToList()
                                                                             ?? Enumerable.Empty<ServiceDescriptor>().ToList();
-       
+
             if (descriptorListToRemove.Any())
             {
                 TService instance = factory();

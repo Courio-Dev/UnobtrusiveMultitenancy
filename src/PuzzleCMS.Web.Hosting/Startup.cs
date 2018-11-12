@@ -10,6 +10,7 @@
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using PuzzleCMS.Core.Multitenancy.Internal;
+    using PuzzleCMS.Core.Multitenancy.Internal.Data;
 
     /// <summary>
     /// The main start-up class for the application.
@@ -53,7 +54,11 @@
         /// </summary>
         /// <param name="services">The services collection or IoC container.</param>
         /// <param name="tenant">The tenant object.</param>
-        public void ConfigurePerTenantServices(IServiceCollection services,in AppTenant tenant,in IConfiguration tenantConfiguration)
+        public void ConfigurePerTenantServices(
+            IServiceCollection services,
+            in AppTenant tenant,
+            in IConfiguration tenantConfiguration,
+            ConnectionStringSettingsCollection ConnectionStrings)
         {
             if (tenant.Id.ToUpperInvariant().StartsWith("Tenant-1".ToUpperInvariant()))
             {

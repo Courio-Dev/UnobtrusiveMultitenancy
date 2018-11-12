@@ -14,6 +14,7 @@ using PuzzleCMS.Core.Multitenancy.Constants;
 using PuzzleCMS.Core.Multitenancy.Internal.Configurations;
 using PuzzleCMS.Core.Multitenancy.Internal.Logging;
 using PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog;
+using PuzzleCMS.Core.Multitenancy.Internal.Logging.LibLog.LogProviders;
 using PuzzleCMS.Core.Multitenancy.Internal.Options;
 
 namespace PuzzleCMS.Core.Multitenancy.Extensions
@@ -24,16 +25,23 @@ namespace PuzzleCMS.Core.Multitenancy.Extensions
         /// 
         /// </summary>
         /// <typeparam name="TTenant"></typeparam>
+        /// <param name="hostBuilder"></param>
+        /// <param name="environment"></param>
+        /// <param name="throwErrorIfOptionsNotFound"></param>
+        /// <param name="hasTenants"></param>
+        /// <param name="defaultMultitenancyConfiguration"></param>
+        /// <param name="optionsAction">additionnal options for config MultitenancyOptionsProviderBuilder.</param>
         /// <returns></returns>
-        internal static void BuildTemporaryMulitenancyProviderAndValidate<TTenant>(
-            this IWebHostBuilder hostBuilder, 
+        internal static void GetTemporaryMulitenancyProviderAndValidate<TTenant>(
+            this IWebHostBuilder hostBuilder,
             string environment,
-            bool throwErrorIfOptionsNotFound, 
-            out bool hasTenants,
-            IConfigurationRoot defaultMultitenancyConfiguration = null)
+            bool throwErrorIfOptionsNotFound,
+            IConfigurationRoot defaultMultitenancyConfiguration,
+            Action<IServiceProvider, MultitenancyOptionsProviderBuilder<TTenant>> optionsAction,
+            out bool hasTenants)
         {
             ServiceCollection services = new ServiceCollection();
-            _ = AddPuzzleCMSMulitenancyCore<TTenant>(services, environment, defaultMultitenancyConfiguration);
+            AddPuzzleCMSMulitenancyCore<TTenant>(services, environment, defaultMultitenancyConfiguration, optionsAction);
 
 
             // Build an intermediate service provider
@@ -59,7 +67,7 @@ namespace PuzzleCMS.Core.Multitenancy.Extensions
         {
             if (multitenantProvider == null)
             {
-                throw new ArgumentNullException($"Argument {nameof(multitenantProvider)} must not be null");
+                throw new ArgumentNullException($"Argument {nameof(multitenantProvider)} must not be null.");
             }
 
             MultitenancyOptions<TTenant> buildedOptions = multitenantProvider.MultitenancyOptions;
@@ -77,24 +85,19 @@ namespace PuzzleCMS.Core.Multitenancy.Extensions
         /// <param name="services"></param>
         /// <param name="environment"></param>
         /// <param name="defaultMultitenancyConfiguration"></param>
+        /// <param name="optionsAction">additionnal options for config MultitenancyOptionsProviderBuilder.</param>
         /// <returns></returns>
-        internal static MultitenancyOptionsBuilder<TTenant> AddPuzzleCMSMulitenancyCore<TTenant>(
-            this IServiceCollection services, string environment,IConfigurationRoot defaultMultitenancyConfiguration = null)
+        internal static void AddPuzzleCMSMulitenancyCore<TTenant>(
+            this IServiceCollection services,
+            string environment,
+            IConfigurationRoot defaultMultitenancyConfiguration,
+            Action<IServiceProvider, MultitenancyOptionsProviderBuilder<TTenant>> optionsAction)
         {
-            if (!(services
-                .LastOrDefault(d => d.ServiceType == typeof(MultitenancyOptionsBuilder<TTenant>))?
-                .ImplementationInstance is MultitenancyOptionsBuilder<TTenant> builder))
-            {
-                builder = new MultitenancyOptionsBuilder<TTenant>(services);
-                services.AddSingleton(builder);
-
-                AddDefaultPuzzleCMSServices<TTenant>(
-                    serviceCollection: services, 
-                    environment:environment,
-                    defaultMultitenancyConfiguration:defaultMultitenancyConfiguration);
-            }
-
-            return builder;
+            AddDefaultPuzzleCMSServices<TTenant>(
+                serviceCollection: services,
+                environment: environment,
+                defaultMultitenancyConfiguration: defaultMultitenancyConfiguration,
+                optionsAction: optionsAction);
         }
 
         /// <summary>
@@ -104,41 +107,49 @@ namespace PuzzleCMS.Core.Multitenancy.Extensions
         /// <param name="serviceCollection"></param>
         /// <param name="environment"></param>
         /// <param name="defaultMultitenancyConfiguration"></param>
+        /// <param name="optionsAction">additionnal options for config MultitenancyOptionsProviderBuilder.</param>
         private static void AddDefaultPuzzleCMSServices<TTenant>(
-            IServiceCollection serviceCollection, string environment,IConfigurationRoot defaultMultitenancyConfiguration = null)
+            IServiceCollection serviceCollection,
+            string environment,
+            IConfigurationRoot defaultMultitenancyConfiguration,
+            Action<IServiceProvider, MultitenancyOptionsProviderBuilder<TTenant>> optionsAction)
         {
             // Register IHttpContextAccessor.
             serviceCollection.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            MultiTenancyConfig<TTenant> multitenancyConfig = new MultiTenancyConfig<TTenant>(environment,defaultMultitenancyConfiguration);
+            MultiTenancyConfig<TTenant> multitenancyConfig = new MultiTenancyConfig<TTenant>(environment, defaultMultitenancyConfiguration);
 
             // Register MultiTenancyConfig<TTenant>.
             serviceCollection.AddSingleton(multitenancyConfig);
 
-            // Override config.
-            // Add logging
-            multitenancyConfig.UseColoredConsoleLogProvider();
-            
-            serviceCollection.TryAdd(ServiceDescriptor.Singleton<ILogProvider>(LogProvider.CurrentLogProvider));
-            serviceCollection.TryAdd(ServiceDescriptor.Singleton(typeof(ILog<>), typeof(Log<>)));
+            // Add config.
             serviceCollection.AddSingleton<MultiTenancyConfig<TTenant>>(serviceProvider => multitenancyConfig);
 
+            // Add logging
+            MultitenancyOptionsProviderBuilderExtensions.SetDefaultLogProvider();
+            serviceCollection.TryAdd(ServiceDescriptor.Singleton<ILogProvider>(LogProvider.CurrentLogProvider));
+            serviceCollection.TryAdd(ServiceDescriptor.Singleton(typeof(ILog<>), typeof(Log<>)));
+
             // Register multitenancy options.
-            AddMultitenancyOptions<TTenant>(serviceCollection, multitenancyConfig);
+            AddMultitenancyOptions<TTenant>(serviceCollection, multitenancyConfig, optionsAction);
         }
 
         /// <summary>
         /// Add MultitenanCy Options.
         /// </summary>
-        /// <param name="services">An IServiceCollection.</param>
+        /// <param name="serviceCollection">An IServiceCollection.</param>
         /// <param name="multitenancyConfig">The object which containd multitenant config.</param>
+        /// <param name="optionsAction">additionnal options for config MultitenancyOptionsProviderBuilder.</param>
         /// <returns>IServiceCollection.</returns>
         /// <typeparam name="TTenant">Tenant object.</typeparam>
-        private static void  AddMultitenancyOptions<TTenant>(IServiceCollection services, MultiTenancyConfig<TTenant> multitenancyConfig)
+        internal static void AddMultitenancyOptions<TTenant>(
+            this IServiceCollection serviceCollection,
+            MultiTenancyConfig<TTenant> multitenancyConfig,
+            Action<IServiceProvider, MultitenancyOptionsProviderBuilder<TTenant>> optionsAction)
         {
-            if (services == null)
+            if (serviceCollection == null)
             {
-                throw new ArgumentNullException($"Argument {nameof(services)} must not be null");
+                throw new ArgumentNullException($"Argument {nameof(serviceCollection)} must not be null");
             }
 
             if (multitenancyConfig == null)
@@ -146,15 +157,35 @@ namespace PuzzleCMS.Core.Multitenancy.Extensions
                 throw new ArgumentNullException($"Argument {nameof(multitenancyConfig)} must not be null");
             }
 
-            services.AddOptions();
-            services.Configure<MultitenancyOptions<TTenant>>(multitenancyConfig.Config.GetSection(nameof(MultitenancyConstants.MultitenancyOptions)));
-            services.AddSingleton<IPostConfigureOptions<MultitenancyOptions<TTenant>>, MultitenancyPostConfigureOptions<TTenant>>();
-            services.AddSingleton(sp => sp.GetService<IOptionsMonitor<MultitenancyOptions<TTenant>>>().CurrentValue);
+            serviceCollection.AddOptions();
+            serviceCollection.Configure<MultitenancyOptions<TTenant>>(multitenancyConfig.Config.GetSection(nameof(MultitenancyConstants.MultitenancyOptions)));
+            serviceCollection.AddSingleton<IPostConfigureOptions<MultitenancyOptions<TTenant>>, MultitenancyPostConfigureOptions<TTenant>>();
 
-            services.AddSingleton<IMultitenancyOptionsProvider<TTenant>>(sp =>
-            {
-                return new MultitenancyOptionsProvider<TTenant>(sp,sp.GetRequiredService<MultiTenancyConfig<TTenant>>());
-            });
+            serviceCollection.TryAdd(
+                new ServiceDescriptor(
+                    typeof(IMultitenancyOptionsProvider<TTenant>),
+                    p => MultitenancyOptionsProviderFactory<TTenant>(p, optionsAction),
+                    ServiceLifetime.Singleton));
         }
+
+        private static IMultitenancyOptionsProvider<TTenant> MultitenancyOptionsProviderFactory<TTenant>(
+           IServiceProvider sp,
+           Action<IServiceProvider, MultitenancyOptionsProviderBuilder<TTenant>> optionsAction)
+        {
+
+            MultitenancyOptionsProviderBuilder<TTenant> builder = new MultitenancyOptionsProviderBuilder<TTenant>(
+                new ServiceCollection(),
+                new MultitenancyOptionsProvider<TTenant>(sp, sp.GetRequiredService<MultiTenancyConfig<TTenant>>()));
+
+            // Add default logging provider i.e ColoredConsoleLogProvider.
+            builder.UseColoredConsoleLogProvider();
+
+            //// builder.UseApplicationServiceProvider(applicationServiceProvider);
+            optionsAction?.Invoke(sp, builder);
+            
+            return builder.BuildOptionsProviderBuilder();
+        }
+
+        
     }
 }

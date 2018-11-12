@@ -19,14 +19,10 @@
     internal class ConventionMultitenantBasedStartup<TTenant> : IStartup
     {
         private readonly StartupMethodsMultitenant<TTenant> methods;
-        private readonly Func<IServiceCollection, TTenant, IConfiguration, ILogProvider> additionnalServicesTenant;
 
-        public ConventionMultitenantBasedStartup(
-            StartupMethodsMultitenant<TTenant> methods, 
-            Func<IServiceCollection, TTenant, IConfiguration, ILogProvider> additionnalServicesTenant)
+        public ConventionMultitenantBasedStartup(StartupMethodsMultitenant<TTenant> methods)
         {
             this.methods = methods ?? throw new ArgumentNullException($"Argument {nameof(methods)} must not be null");
-            this.additionnalServicesTenant = additionnalServicesTenant ?? throw new ArgumentNullException($"Argument {nameof(additionnalServicesTenant)} must not be null");
         }
 
         public IServiceProvider ConfigureServices(IServiceCollection services)
@@ -38,8 +34,7 @@
                     services.AddScoped<IServiceFactoryForMultitenancy<TTenant>>(_ =>
                     {
                         return new ServiceFactoryForMultitenancy<TTenant>(hostServiceprovider,services.Clone(), 
-                            methods.ConfigurePerTenantServicesDelegate,
-                            additionnalServicesTenant);
+                            methods.ConfigurePerTenantServicesDelegate);
                     });
                 }
 

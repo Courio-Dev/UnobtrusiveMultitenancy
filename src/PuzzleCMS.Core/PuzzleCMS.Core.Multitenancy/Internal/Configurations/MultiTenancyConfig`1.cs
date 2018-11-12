@@ -21,10 +21,6 @@
     {
         private readonly object SyncLock = new object();
 
-        internal IList<Action<IServiceCollection, TTenant>> ConfigureServicesTenantList { get; } = new List<Action<IServiceCollection, TTenant>>();
-
-        internal Func<IServiceCollection, TTenant, IConfiguration, ILogProvider> TenantLogProvider { get; private set; } = (sc, t, conf) => default;
-
         /// <summary>
         /// Initializes a new instance with the specified options configurations.
         /// </summary>
@@ -64,6 +60,11 @@
         public IChangeToken ChangeTokenConfiguration => Config.GetReloadToken();
 
         /// <summary>
+        ///     The type of context that these options are for (<typeparamref name="TTenant" />).
+        /// </summary>
+        public Type TenantType => typeof(TTenant);
+
+        /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
@@ -81,53 +82,7 @@
         /// </summary>
         protected char Ds => System.IO.Path.DirectorySeparatorChar;
 
-        /// <summary>
-        /// Add additionnal ConfigureServices for specific tenant.
-        /// </summary>
-        /// <param name="action">Action to configure services.</param>
-        internal void SetConfigureServicesTenant(Action<IServiceCollection, TTenant> action)
-        {
-            if (action != null)
-            {
-                ConfigureServicesTenantList?.Add(action);
-            }
-        }
 
-        /// <summary>
-        /// Set Tenant LogProvider.
-        /// </summary>
-        /// <param name="func"></param>
-        internal void SetTenantLogProvider(Func<IServiceCollection, TTenant, IConfiguration, ILogProvider> func)
-        {
-            if (func != null)
-            {
-                TenantLogProvider = func;
-            }
-        }
-
-        /// <summary>
-        /// Build additionals configure services for each tenant.
-        /// </summary>
-        /// <returns></returns>
-        internal Func<IServiceCollection, TTenant, IConfiguration, ILogProvider> BuildTenantLogProvider()
-        {
-            // https://stackoverflow.com/questions/2559807/how-do-i-combine-several-actiont-into-a-single-actiont-in-c
-            // https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/delegates/how-to-combine-delegates-multicast-delegates
-            Action<IServiceCollection, TTenant> action = (sc, tenant) => { };
-            foreach (Action<IServiceCollection, TTenant> singleAction in ConfigureServicesTenantList)
-            {
-                action += singleAction;
-            }
-
-            ILogProvider func(IServiceCollection sc, TTenant t, IConfiguration conf)
-            {
-                action(sc, t);
-                return TenantLogProvider(sc, t, conf);
-            }
-
-
-            return func;
-    }
             
 
         private static IConfigurationRoot BuildConfiguration(char ds, string environment, IConfigurationRoot multitenancyConfiguration = null)

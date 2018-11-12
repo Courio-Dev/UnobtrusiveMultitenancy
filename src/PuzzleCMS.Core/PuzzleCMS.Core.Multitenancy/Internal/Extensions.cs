@@ -2,7 +2,7 @@
 {
     using Microsoft.Extensions.DependencyInjection;
 
-    internal static class ServiceCollectionExtensions
+    internal static class Extensions
     {
         public static IServiceCollection Clone(this IServiceCollection serviceCollection)
         {

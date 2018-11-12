@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Serilog;
-using Serilog.Extensions.Logging;
-
-namespace PuzzleCMS.Web.Hosting
+﻿namespace PuzzleCMS.Web.Hosting
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Microsoft.Extensions.Configuration;
+    using Serilog;
+    using Serilog.Extensions.Logging;
+
+
     public static partial class Program
     {
         private const string BasePathName = "Configs";
@@ -26,7 +27,6 @@ namespace PuzzleCMS.Web.Hosting
         {
             return new LoggerConfiguration()
                         .ReadFrom.Configuration(GetConfiguration())
-                        .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Error)
                         .CreateLogger();
         }
 

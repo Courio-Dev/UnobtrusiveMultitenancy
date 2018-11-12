@@ -11,6 +11,7 @@
     using PuzzleCMS.WebHost.Infrastructure.Logging;
     using Serilog;
     using Serilog.Extensions.Logging;
+    using Serilog.AspNetCore;
 
     /// <summary>
     /// Program class.
@@ -29,6 +30,7 @@
                 Log.Information("Starting web host");
 
                 CreateWebHostBuilder(args)
+                .UseSerilog(Log.Logger)
                 .Build()
                 .Run();
 
@@ -64,9 +66,11 @@
                   .ConfigureLogging((context, logging) => logging.ClearProviders())
                   .UseIISIntegration()
                   .UseUnobtrusiveMulitenancyStartupWithDefaultConvention<Startup>(actionConfiguration:(action)=> {
-                      action.UseLogProvider(new SeriLogProvider(GetSerilogLoggerProvider()));
-                      action.UseConfigureServicesTenant((sc, tenant) => { });
-                      action.UseCustomServicesTenant((IServiceCollection sc,AppTenant tenant,IConfiguration tentantConfiguration) =>
+                      
+                  }, optionsAction:(p,b)=> {
+                      b.UseLogProvider(new SeriLogProvider(GetSerilogLoggerProvider()));
+                      b.UseConfigureServicesTenant((sc, tenant) => { });
+                      b.UseCustomServicesTenant((IServiceCollection sc, AppTenant tenant, IConfiguration tentantConfiguration) =>
                       {
                           try
                           {
@@ -75,7 +79,7 @@
                           }
                           catch
                           {
-                              string fileName =$"App_Tenants/{tenant.Name}/Logs/log.txt";
+                              string fileName = $"App_Tenants/{tenant.Name}/Logs/log.txt";
                               Serilog.Core.Logger serilogger = new LoggerConfiguration()
                                .Enrich.FromLogContext()
                                .MinimumLevel.Verbose()

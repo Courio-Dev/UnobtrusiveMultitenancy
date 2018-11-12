@@ -43,9 +43,12 @@
                 });
 
                 Exception ex = await Assert.ThrowsAsync<InvalidOperationException>(res).ConfigureAwait(false);
-                Assert.Equal(
-                    "The ConfigurePerTenantServices method must take only two parameter one of type IServiceCollection and one of type TTenant.",
-                    ex.Message);
+                string expected = @"The ConfigurePerTenantServices method must take only parameters 
+                                                      of type IServiceCollection 
+                                                      or one of type TTenant
+                                                      or one of type IConfiguration.
+                                                      or one of type ConnectionStringSettingsCollection.";
+                Assert.Equal(expected, ex.Message);
             }
         }
 
@@ -67,9 +70,12 @@
                 });
 
                 Exception ex = await Assert.ThrowsAsync<InvalidOperationException>(res).ConfigureAwait(false);
-                Assert.Equal(
-                    "The ConfigurePerTenantServices method must take only two parameter one of type IServiceCollection and one of type TTenant.",
-                    ex.Message);
+                string expected = @"The ConfigurePerTenantServices method must take only parameters 
+                                                      of type IServiceCollection 
+                                                      or one of type TTenant
+                                                      or one of type IConfiguration.
+                                                      or one of type ConnectionStringSettingsCollection.";
+                Assert.Equal(expected, ex.Message);
             }
         }
 

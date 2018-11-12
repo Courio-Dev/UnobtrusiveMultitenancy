@@ -8,6 +8,21 @@
 
     public class MultitenancyHttpContextExtensionsTests
     {
+
+        [Fact]
+        public void CannotSetTenantContext_WhenTenantIsNull()
+        {
+            Exception ex = Assert.Throws<ArgumentNullException>(() => new TenantContext<AppTenantTest>(null, 0));
+            Assert.Contains($"Argument tenant must not be null", ex.Message);
+        }
+
+        [Fact]
+        public void CannotSetTenantContext_WhenIndexPositionIsNegative()
+        {
+            Exception ex = Assert.Throws<ArgumentException>(() => new TenantContext<AppTenantTest>(new AppTenantTest(), -1));
+            Assert.Contains($"Argument position cannot be negative.", ex.Message);
+        }
+
         [Fact]
         public void CannotSetTenantContext_WhenHttpContextIsNull()
         {
