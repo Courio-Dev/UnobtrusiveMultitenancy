@@ -11,7 +11,7 @@
         [Fact]
         public void WhenConstructMultitenantConfigTestsWithNullHostingEnvironmentWith__ThenThrowArgumentNullException()
         {
-            Exception ex = Assert.Throws<NotImplementedException>(() => new MultiTenancyConfig<TestTenant>(null as IHostingEnvironment));
+            Exception ex = Assert.Throws<NotImplementedException>(() => new MultiTenancyConfig(null as IHostingEnvironment));
             Assert.NotNull(ex);
         }
     }

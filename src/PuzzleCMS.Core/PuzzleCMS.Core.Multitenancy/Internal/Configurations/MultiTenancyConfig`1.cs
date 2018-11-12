@@ -14,10 +14,9 @@
     using PuzzleCMS.Core.Multitenancy.Internal.Options;
 
     /// <summary>
-    /// 
+    /// MultiTenancyConfig.
     /// </summary>
-    /// <typeparam name="TTenant"></typeparam>
-    public class MultiTenancyConfig<TTenant>
+    public class MultiTenancyConfig
     {
         private readonly object SyncLock = new object();
 
@@ -58,11 +57,6 @@
         /// 
         /// </summary>
         public IChangeToken ChangeTokenConfiguration => Config.GetReloadToken();
-
-        /// <summary>
-        ///     The type of context that these options are for (<typeparamref name="TTenant" />).
-        /// </summary>
-        public Type TenantType => typeof(TTenant);
 
         /// <summary>
         /// 

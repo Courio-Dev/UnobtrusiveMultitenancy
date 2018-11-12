@@ -117,13 +117,13 @@ namespace PuzzleCMS.Core.Multitenancy.Extensions
             // Register IHttpContextAccessor.
             serviceCollection.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            MultiTenancyConfig<TTenant> multitenancyConfig = new MultiTenancyConfig<TTenant>(environment, defaultMultitenancyConfiguration);
+            MultiTenancyConfig multitenancyConfig = new MultiTenancyConfig(environment, defaultMultitenancyConfiguration);
 
-            // Register MultiTenancyConfig<TTenant>.
+            // Register MultiTenancyConfig.
             serviceCollection.AddSingleton(multitenancyConfig);
 
             // Add config.
-            serviceCollection.AddSingleton<MultiTenancyConfig<TTenant>>(serviceProvider => multitenancyConfig);
+            serviceCollection.AddSingleton<MultiTenancyConfig>(serviceProvider => multitenancyConfig);
 
             // Add logging
             MultitenancyOptionsProviderBuilderExtensions.SetDefaultLogProvider();
@@ -144,7 +144,7 @@ namespace PuzzleCMS.Core.Multitenancy.Extensions
         /// <typeparam name="TTenant">Tenant object.</typeparam>
         internal static void AddMultitenancyOptions<TTenant>(
             this IServiceCollection serviceCollection,
-            MultiTenancyConfig<TTenant> multitenancyConfig,
+            MultiTenancyConfig multitenancyConfig,
             Action<IServiceProvider, MultitenancyOptionsProviderBuilder<TTenant>> optionsAction)
         {
             if (serviceCollection == null)
@@ -175,7 +175,7 @@ namespace PuzzleCMS.Core.Multitenancy.Extensions
 
             MultitenancyOptionsProviderBuilder<TTenant> builder = new MultitenancyOptionsProviderBuilder<TTenant>(
                 new ServiceCollection(),
-                new MultitenancyOptionsProvider<TTenant>(sp, sp.GetRequiredService<MultiTenancyConfig<TTenant>>()));
+                new MultitenancyOptionsProvider<TTenant>(sp, sp.GetRequiredService<MultiTenancyConfig>()));
 
             // Add default logging provider i.e ColoredConsoleLogProvider.
             builder.UseColoredConsoleLogProvider();

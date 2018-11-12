@@ -1,0 +1,5 @@
+﻿{
+  "webroot": "wwwroot",
+  "urls": "http://localhost:47887;http://localhost:60000;http://localhost:60001;http://localhost:51261;http://localhost:50000"
+  //"urls": "http://localhost:47887;http://localhost:60000;http://localhost:60001;http://localhost:51261;http://localhost:5000;https://localhost:44301;https://*:44303;https://localhost:44302;https://*:44304"
+}

@@ -35,8 +35,6 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
                 UseColoredConsoleLogProvider<TestTenant>(null);
 
             })).ConfigureAwait(false);
-
-
         }
 
         [Fact]
@@ -44,7 +42,7 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
         {
             // Arrange
             IServiceProvider sp = new ServiceCollection().BuildServiceProvider();
-            MultiTenancyConfig<TestTenant> config = sp.GetService<MultiTenancyConfig<TestTenant>>() ?? new MultiTenancyConfig<TestTenant>("");
+            MultiTenancyConfig config = sp.GetService<MultiTenancyConfig>() ?? new MultiTenancyConfig("");
 
             MultitenancyOptionsProviderBuilder<TestTenant> builder = new MultitenancyOptionsProviderBuilder<TestTenant>(
               new ServiceCollection(),
@@ -65,7 +63,7 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
         {
             // Arrange
             IServiceProvider sp = new ServiceCollection().BuildServiceProvider();
-            MultiTenancyConfig<TestTenant> config = sp.GetService<MultiTenancyConfig<TestTenant>>() ?? new MultiTenancyConfig<TestTenant>("");
+            MultiTenancyConfig config = sp.GetService<MultiTenancyConfig>() ?? new MultiTenancyConfig("");
 
             MultitenancyOptionsProviderBuilder<TestTenant> builder = new MultitenancyOptionsProviderBuilder<TestTenant>(
               new ServiceCollection(),
@@ -93,7 +91,7 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
         {
             // Arrange
             IServiceProvider sp = new ServiceCollection().BuildServiceProvider();
-            MultiTenancyConfig<TestTenant> config = sp.GetService<MultiTenancyConfig<TestTenant>>() ?? new MultiTenancyConfig<TestTenant>("");
+            MultiTenancyConfig config = sp.GetService<MultiTenancyConfig>() ?? new MultiTenancyConfig("");
 
             MultitenancyOptionsProviderBuilder<TestTenant> builder = new MultitenancyOptionsProviderBuilder<TestTenant>(
               new ServiceCollection(),
@@ -179,7 +177,7 @@ namespace PuzzleCMS.UnitsTests.Multitenancy
             // Assert
             Task Res() => Task.Run(() =>
             {
-                ServiceCollectionExtensions.AddMultitenancyOptions<TestTenant>(null, new MultiTenancyConfig<TestTenant>(""), optionsAction: (sp, opts) => { });
+                ServiceCollectionExtensions.AddMultitenancyOptions<TestTenant>(null, new MultiTenancyConfig(""), optionsAction: (sp, opts) => { });
             });
 
             Assert.ThrowsAsync<ArgumentNullException>(Res);

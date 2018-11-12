@@ -32,14 +32,12 @@
         /// <param name="hostBuilder">The hostbuilder class.</param>
         /// <param name="multitenancyConfiguration">The configuration which contains MultitenancyOptions.</param>
         /// <param name="throwErrorIfOptionsNotFound">Boolean to indicate if throws exception when MultitenancyOptions is not found.</param>
-        /// <param name="actionConfiguration">Additionnal config.</param>
         /// <param name="optionsAction">additionnal options for config MultitenancyOptionsProviderBuilder.</param>
         /// <returns>IWebHostBuilder.</returns>
         public static IWebHostBuilder UseUnobtrusiveMulitenancyStartup<TStartup>(
             this IWebHostBuilder hostBuilder,
             IConfigurationRoot multitenancyConfiguration,
             bool throwErrorIfOptionsNotFound = true,
-            Action<MultiTenancyConfig<AppTenant>> actionConfiguration = null,
             Action<IServiceProvider, MultitenancyOptionsProviderBuilder<AppTenant>> optionsAction = null)
             where TStartup : class
         {
@@ -53,7 +51,6 @@
                 typeof(TStartup),
                 multitenancyConfiguration,
                 throwErrorIfOptionsNotFound,
-                actionConfiguration: actionConfiguration,
                 optionsAction : optionsAction);
         }
 
@@ -66,14 +63,12 @@
         /// <param name="hostBuilder">hostBuilder.</param>
         /// <param name="multitenancyConfiguration">The configuration which contains MultitenancyOptions.</param>
         /// <param name="throwErrorIfOptionsNotFound">Boolean to indicate if throws exception when MultitenancyOptions is not found.</param>
-        /// <param name="actionConfiguration">Additionnal config.</param>
         /// <param name="optionsAction">additionnal options for config MultitenancyOptionsProviderBuilder.</param>
         /// <returns>IWebHostBuilder.</returns>
         public static IWebHostBuilder UseUnobtrusiveMulitenancyStartup<TStartup, TTenant, TResolver>(
             this IWebHostBuilder hostBuilder,
             IConfigurationRoot multitenancyConfiguration = null,
             bool throwErrorIfOptionsNotFound = true,
-            Action<MultiTenancyConfig<TTenant>> actionConfiguration = null,
             Action<IServiceProvider, MultitenancyOptionsProviderBuilder<TTenant>> optionsAction=null)
                 where TStartup : class
                 where TTenant : class
@@ -89,7 +84,6 @@
                 typeof(TStartup),
                 multitenancyConfiguration: multitenancyConfiguration,
                 throwIfOptionsNotFound: throwErrorIfOptionsNotFound,
-                actionConfiguration: actionConfiguration,
                 optionsAction: optionsAction);
         }
 
@@ -99,13 +93,11 @@
         /// <typeparam name="TStartup">The stratup class.</typeparam>
         /// <param name="hostBuilder">hostBuilder.</param>
         /// <param name="throwErrorIfOptionsNotFound">Boolean to indicate if throws exception when MultitenancyOptions is not found.</param>
-        /// <param name="actionConfiguration">Additionnal config.</param>
         /// <param name="optionsAction">additionnal options for config MultitenancyOptionsProviderBuilder.</param>
         /// <returns>IWebHostBuilder.</returns>
         public static IWebHostBuilder UseUnobtrusiveMulitenancyStartupWithDefaultConvention<TStartup>(
             this IWebHostBuilder hostBuilder,
             bool throwErrorIfOptionsNotFound = true,
-            Action<MultiTenancyConfig<AppTenant>> actionConfiguration = null,
             Action<IServiceProvider, MultitenancyOptionsProviderBuilder<AppTenant>> optionsAction=null)
         where TStartup : class
         {
@@ -118,7 +110,6 @@
                 typeof(TStartup),
                 multitenancyConfiguration: null,
                 throwIfOptionsNotFound: throwErrorIfOptionsNotFound,
-                actionConfiguration: actionConfiguration,
                 optionsAction: optionsAction);
         }
 
@@ -132,7 +123,6 @@
         /// <param name="startupType">The type of the startup class.</param>
         /// <param name="multitenancyConfiguration">The configuration which contains MultitenancyOptions.</param>
         /// <param name="throwIfOptionsNotFound">Boolean to indicate if throws exception when MultitenancyOptions is not found.</param>
-        /// <param name="actionConfiguration">Additionnal config.</param>
         /// <param name="optionsAction">additionnal options for config MultitenancyOptionsProviderBuilder.</param>
         /// <returns>IWebHostBuilder.</returns>
         internal static IWebHostBuilder UseUnobtrusiveMulitenancyStartup<TStartup, TTenant, TResolver>(
@@ -140,7 +130,6 @@
             Type startupType,
             IConfigurationRoot multitenancyConfiguration,
             bool throwIfOptionsNotFound,
-            Action<MultiTenancyConfig<TTenant>> actionConfiguration,
             Action<IServiceProvider, MultitenancyOptionsProviderBuilder<TTenant>> optionsAction)
                 where TStartup : class
                 where TTenant : class

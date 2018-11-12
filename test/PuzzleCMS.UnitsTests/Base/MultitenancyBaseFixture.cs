@@ -135,8 +135,8 @@
                         .AddOptions()
                         .Configure<MultitenancyOptions<TestTenant>>(Config.GetSection(nameof(MultitenancyConstants.MultitenancyOptions)))
                         .Configure<MultitenancyOptions<AppTenant>>(Config.GetSection(nameof(MultitenancyConstants.MultitenancyOptions)))
-                        .AddSingleton<MultiTenancyConfig<TestTenant>>(sp => new MultiTenancyConfig<TestTenant>(environmentTest, Config))
-                        .AddSingleton<MultiTenancyConfig<AppTenant>>(sp => new MultiTenancyConfig<AppTenant>(environmentTest, Config))
+                        .AddSingleton<MultiTenancyConfig>(sp => new MultiTenancyConfig(environmentTest, Config))
+                        .AddSingleton<MultiTenancyConfig>(sp => new MultiTenancyConfig(environmentTest, Config))
 
 
                         //.AddSingleton(sp => sp.GetService<IOptionsMonitor<MultitenancyOptions<TestTenant>>>().CurrentValue)
@@ -146,11 +146,11 @@
                         //.AddSingleton<IOptionsFactory<MultitenancyOptions<AppTenant>>, MultitenancyOptionsAppTenantFactoryTests>()
                         .AddSingleton<IMultitenancyOptionsProvider<TestTenant>>(sp =>
                         {
-                            return new MultitenancyOptionsProvider<TestTenant>(sp, new MultiTenancyConfig<TestTenant>(environmentTest, Config));
+                            return new MultitenancyOptionsProvider<TestTenant>(sp, new MultiTenancyConfig(environmentTest, Config));
                         })
                         .AddSingleton<IMultitenancyOptionsProvider<AppTenant>>(sp =>
                         {
-                            return new MultitenancyOptionsProvider<AppTenant>(sp, new MultiTenancyConfig<AppTenant>(environmentTest, Config));
+                            return new MultitenancyOptionsProvider<AppTenant>(sp, new MultiTenancyConfig(environmentTest, Config));
                         })
                         .BuildServiceProvider();
 

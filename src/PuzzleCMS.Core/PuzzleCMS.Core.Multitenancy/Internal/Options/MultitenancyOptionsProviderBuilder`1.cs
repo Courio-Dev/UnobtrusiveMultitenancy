@@ -31,7 +31,7 @@ namespace PuzzleCMS.Core.Multitenancy.Internal.Options
         /// <summary>
         /// 
         /// </summary>
-        protected MultitenancyOptionsProvider<TTenant> MultitenancyOptionsProvider { get; }
+        internal MultitenancyOptionsProvider<TTenant> MultitenancyOptionsProvider { get; }
 
 
         /////// <summary>

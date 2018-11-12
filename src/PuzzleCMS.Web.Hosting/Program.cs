@@ -65,9 +65,7 @@
                   .ConfigureAppConfiguration((context, configBuilder) => ConfigureConfigurationBuilder(context, configBuilder, args))
                   .ConfigureLogging((context, logging) => logging.ClearProviders())
                   .UseIISIntegration()
-                  .UseUnobtrusiveMulitenancyStartupWithDefaultConvention<Startup>(actionConfiguration:(action)=> {
-                      
-                  }, optionsAction:(p,b)=> {
+                  .UseUnobtrusiveMulitenancyStartupWithDefaultConvention<Startup>(optionsAction:(p,b)=> {
                       b.UseLogProvider(new SeriLogProvider(GetSerilogLoggerProvider()));
                       b.UseConfigureServicesTenant((sc, tenant) => { });
                       b.UseCustomServicesTenant((IServiceCollection sc, AppTenant tenant, IConfiguration tentantConfiguration) =>

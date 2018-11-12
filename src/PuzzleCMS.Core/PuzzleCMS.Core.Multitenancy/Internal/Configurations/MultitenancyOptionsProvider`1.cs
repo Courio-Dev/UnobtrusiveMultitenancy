@@ -24,7 +24,7 @@
         /// </summary>
         /// <param name="serviceProvider"></param>
         /// <param name="multiTenancyConfig"></param>
-        public MultitenancyOptionsProvider(IServiceProvider serviceProvider, MultiTenancyConfig<TTenant> multiTenancyConfig)
+        public MultitenancyOptionsProvider(IServiceProvider serviceProvider, MultiTenancyConfig multiTenancyConfig)
         {
             ServiceProvider = serviceProvider;
             MultiTenancyConfig = multiTenancyConfig;
@@ -49,7 +49,7 @@
         }
 
         /// <inheritdoc/>
-        public MultiTenancyConfig<TTenant> MultiTenancyConfig { get; }
+        internal MultiTenancyConfig MultiTenancyConfig { get; }
 
         /// <inheritdoc/>
         public IChangeToken ChangeTokenConfiguration => MultiTenancyConfig.ChangeTokenConfiguration;

@@ -25,6 +25,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{C46235CA-C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PuzzleCMS.UnitsTests", "test\PuzzleCMS.UnitsTests\PuzzleCMS.UnitsTests.csproj", "{B6D75A37-A852-45DB-B6B4-5BCB8A0FBB57}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{DBF6AEE4-8E19-40EE-995D-03B0F479CBB0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleMvcWithDatabase", "samples\SampleMvcWithDatabase\SampleMvcWithDatabase.csproj", "{B889CC4C-4FC7-4EB8-8868-289C2204DA5B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +47,10 @@ Global
 		{B6D75A37-A852-45DB-B6B4-5BCB8A0FBB57}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6D75A37-A852-45DB-B6B4-5BCB8A0FBB57}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6D75A37-A852-45DB-B6B4-5BCB8A0FBB57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B889CC4C-4FC7-4EB8-8868-289C2204DA5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B889CC4C-4FC7-4EB8-8868-289C2204DA5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B889CC4C-4FC7-4EB8-8868-289C2204DA5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B889CC4C-4FC7-4EB8-8868-289C2204DA5B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,6 +61,7 @@ Global
 		{4C1D4A63-1206-4948-BC79-FEE4BB87C27F} = {938F61AB-A715-4870-A3F8-BAA4573465DD}
 		{93C0E47A-8F09-476E-B279-8522CD3A0109} = {4C1D4A63-1206-4948-BC79-FEE4BB87C27F}
 		{B6D75A37-A852-45DB-B6B4-5BCB8A0FBB57} = {C46235CA-CF95-4644-BC9C-3F5339321DA3}
+		{B889CC4C-4FC7-4EB8-8868-289C2204DA5B} = {DBF6AEE4-8E19-40EE-995D-03B0F479CBB0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {68CFAEA8-5607-4971-BA55-057074F8412E}
